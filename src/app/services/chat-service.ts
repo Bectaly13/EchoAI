@@ -23,6 +23,11 @@ interface Conversation {
   messages: ChatMessage[];
 }
 
+// Tour utilisateur transitoire (non persisté) injecté quand l'utilisateur passe son
+// tour : l'historique se termine alors par un message du modèle, or Gemini attend un
+// dernier tour `user`. Ce texte amorce la suite sans polluer l'historique stocké.
+const CONTINUATION_PROMPT = "[L'utilisateur passe son tour. Poursuis la scène toi-même, sans attendre de réplique de sa part.]";
+
 @Injectable({
   providedIn: 'root',
 })
@@ -125,6 +130,24 @@ export class ChatService {
     return conversation.messages;
   }
 
+  // L'utilisateur passe son tour : on génère un message supplémentaire du modèle
+  // sans ajouter de message utilisateur, puis on l'ajoute et on persiste.
+  async skipTurn(characterId: string): Promise<ChatMessage[]> {
+    const character = await this.characterService.get(characterId);
+    if (!character) {
+      throw new Error("Personnage introuvable");
+    }
+    const conversation = await this.getOrCreateConversation(characterId);
+
+    const systemPrompt = buildSystemPrompt({ character: character });
+    const reply = await this.generateContinuation(systemPrompt, conversation.messages);
+
+    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
+    await this.saveConversation(conversation);
+
+    return conversation.messages;
+  }
+
   // Choisit entre l'appel réel à Gemini et une réponse simulée (mock).
   private async generateReply(systemPrompt: string, messages: ChatMessage[]): Promise<string> {
     if (!this.gemini.hasApiKey()) {
@@ -134,10 +157,26 @@ export class ChatService {
     return await this.gemini.generate(systemPrompt, contents);
   }
 
+  // Comme generateReply, mais sans nouveau message utilisateur : on ajoute un tour
+  // user transitoire (CONTINUATION_PROMPT) aux contents pour amorcer la suite.
+  private async generateContinuation(systemPrompt: string, messages: ChatMessage[]): Promise<string> {
+    if (!this.gemini.hasApiKey()) {
+      return this.mockContinuation();
+    }
+    const contents = buildGeminiContents(messages);
+    contents.push({ role: "user", parts: [{ text: CONTINUATION_PROMPT }] });
+    return await this.gemini.generate(systemPrompt, contents);
+  }
+
   // Réponse bidon utilisée tant qu'aucune clé API n'est configurée.
   private mockReply(messages: ChatMessage[]): string {
     const last = messages[messages.length - 1];
     return `(réponse simulée) Tu as dit : "${last.text}". Renseigne ta clé Gemini dans environment.ts pour une vraie réponse.`;
+  }
+
+  // Réponse bidon pour un tour passé (sans clé API configurée).
+  private mockContinuation(): string {
+    return "(réponse simulée) Le personnage poursuit la scène. Renseigne ta clé Gemini dans environment.ts pour une vraie réponse.";
   }
 
   // ----- Persistance des conversations -----

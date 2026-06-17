@@ -65,13 +65,13 @@ UX d'édition de la conversation.
 - **Cas limites vérifiés** (Node) : salutation non régénérable, troncature exacte, id inconnu sans effet.
 - **À garder pour plus tard** : quand la **mémoire permanente** (#4) existera, régénérer/supprimer devra aussi **annuler les écritures mémoire** des tours supprimés → rattacher chaque entrée mémoire au `messageId` qui l'a produite (voir Phase 3).
 
-### 3b — Passer son tour (faire reparler l'IA) 🟡
+### 3b — Passer son tour (faire reparler l'IA) 🟡 ✅ Fait
 Un bouton qui permet à l'utilisateur de **passer son tour** : sans écrire de message, il demande au personnage IA de produire un message de plus de lui-même (faire avancer la scène, enchaîner, relancer…).
 
-- **UI** : bouton dans le pied de page du `chat` (ex. « Passer mon tour » / « Laisser parler … »), à côté de « Envoyer ».
-- **Chat / service** : `ChatService.skipTurn(characterId)` (nom à confirmer) génère un nouveau message `model` à partir de l'historique courant, **sans** ajouter de message `user`, puis l'ajoute et le persiste.
-- **Limite à gérer — tour `user` final attendu** : après un « passage », le dernier message de l'historique est `model` (la salutation, ou la réponse précédente). Or `generateContent` attend que le dernier tour soit `user`. Solution : injecter dans les `contents` un tour `user` **transitoire et non persisté** (ex. « *[L'utilisateur passe son tour. Continue toi-même la scène.]* ») pour amorcer la réponse, sans polluer l'historique visible/stocké.
-- **Points d'attention** : couvrir aussi le chemin mock (sans clé API) ; gérer le `sending` (désactiver le bouton pendant l'attente) ; cohérent avec la régénération (#3) qui réutilisera la même mécanique de génération.
+- **Fait — UI** : bouton `⏭` (« Passer mon tour ») dans le pied de page du `chat`, à gauche du champ de saisie, désactivé pendant l'attente (`sending`).
+- **Fait — Chat / service** : `ChatService.skipTurn(characterId)` génère un nouveau message `model` à partir de l'historique courant, **sans** ajouter de message `user`, puis l'ajoute et le persiste.
+- **Fait — Limite tour `user` final** : `generateContinuation` ajoute aux `contents` un tour `user` **transitoire et non persisté** (constante `CONTINUATION_PROMPT`) pour amorcer la réponse, sans polluer l'historique stocké.
+- **Fait — Chemin mock** : `mockContinuation()` dédié quand aucune clé API n'est configurée.
 
 ---
 
@@ -157,7 +157,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 2 | Narration en astérisques | #3 | 🟢 | ✅ Fait |
 | 2b | Convention de dialogue (nom + guillemets) | — | 🟢 | ✅ Fait |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | ✅ Fait |
-| 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | À faire |
+| 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | ✅ Fait |
 | 4 | Personas | #1 | 🟡 | À faire |
 | 5 | Champs de création enrichis | #5 | 🟡 | À faire |
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | À faire |

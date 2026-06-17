@@ -74,6 +74,23 @@ export class ChatPage implements ViewWillEnter {
     }
   }
 
+  // L'utilisateur passe son tour : laisse le personnage IA enchaîner de lui-même.
+  async skip() {
+    if (this.sending || !this.character) {
+      return;
+    }
+    this.sending = true;
+    this.scrollToBottom();
+    try {
+      this.messages = await this.chatService.skipTurn(this.character.id);
+    } catch (error) {
+      await this.message.error("Échec de la génération.");
+    } finally {
+      this.sending = false;
+      this.scrollToBottom();
+    }
+  }
+
   // Vrai pour le dernier message s'il vient de l'IA et qu'un message utilisateur
   // le précède : on n'autorise pas la régénération de la salutation « ancrée ».
   canRegenerate(message: ChatMessage): boolean {
