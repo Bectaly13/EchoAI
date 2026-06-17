@@ -110,9 +110,9 @@ Conserver d'un message à l'autre des informations durables (lieu de l'action, r
 - **Fait — Fusion / croissance** : catégories à valeur unique (`location`, `relationship`) → la nouvelle valeur remplace l'ancienne ; catégories à valeurs multiples (`milestone`, `instruction`) → ajout borné à `MAX_LIST_ENTRIES` (30) par `capMemory`.
 - **Fait — Injection** : `buildSystemPrompt` ajoute un bloc `MÉMOIRE PERMANENTE` (groupé par catégorie) à chaque tour, plus un bloc `CONSIGNES DE MÉMOIRE` expliquant la convention d'écriture.
 - **Fait — Rollback** : `regenerate` oublie la mémoire produite par le message régénéré (`forgetMemoryFrom`) ; `deleteFrom` retire les entrées dont `sourceMessageId` n'est plus dans l'historique. Cas vérifiés (Node).
-- **Suite** : écran de visualisation/édition de la mémoire → fait en **3.6b**.
+- **Suite** : écran de visualisation/édition de la mémoire → fait en **6b**.
 
-### 3.6b — Écran de visualisation de la mémoire 🟢 ✅ Fait
+### 6b — Écran de visualisation de la mémoire 🟢 ✅ Fait
 Depuis une conversation, voir l'état de la mémoire permanente (et corriger si l'IA a mal mémorisé).
 
 - **Fait — Service** : `ChatService.getMemory` (lecture), `deleteMemoryEntry` (oublier une entrée), `clearMemory` (tout vider).
