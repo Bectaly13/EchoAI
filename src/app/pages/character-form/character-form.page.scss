@@ -1,0 +1,64 @@
+ion-content.character-form-content {
+  --background: var(--app-background);
+}
+
+.character-form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.character-form-back {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--app-accent);
+  cursor: pointer;
+  padding: 0;
+}
+
+.character-form-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.character-form-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 24px;
+}
+
+.character-form-label {
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.character-form-input,
+.character-form-textarea {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--app-surface);
+  color: var(--app-text);
+  resize: vertical;
+}
+
+.character-form-save {
+  margin-top: 24px;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  cursor: pointer;
+}

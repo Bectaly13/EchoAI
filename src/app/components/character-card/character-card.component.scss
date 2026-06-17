@@ -1,0 +1,62 @@
+.character-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: var(--app-surface);
+  cursor: pointer;
+}
+
+.character-card-avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-card-initial {
+  color: var(--app-on-accent);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.character-card-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.character-card-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.character-card-prompt {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.character-card-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.character-card-edit,
+.character-card-delete {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  padding: 6px;
+  cursor: pointer;
+}

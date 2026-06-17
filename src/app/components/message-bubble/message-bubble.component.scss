@@ -1,0 +1,28 @@
+.message-bubble {
+  align-self: flex-start;
+  max-width: 78%;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  background: var(--app-surface);
+}
+
+.message-bubble-user {
+  align-self: flex-end;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 4px;
+  background: var(--app-accent);
+}
+
+.message-bubble-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  color: var(--app-text);
+}
+
+.message-bubble-user .message-bubble-text {
+  color: var(--app-on-accent);
+}

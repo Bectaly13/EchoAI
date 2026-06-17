@@ -1,0 +1,23 @@
+<ion-content [fullscreen]="true" class="character-form-content">
+
+  <header class="character-form-header">
+    <button class="character-form-back" (click)="cancel()">← Annuler</button>
+    <h1 class="character-form-title">{{ isEditing() ? "Modifier le personnage" : "Nouveau personnage" }}</h1>
+  </header>
+
+  <form class="character-form-body" (ngSubmit)="save()">
+
+    <label class="character-form-label" for="name">Nom</label>
+    <input class="character-form-input" id="name" name="name" type="text"
+      [(ngModel)]="name" placeholder="Ex. : Sherlock Holmes" />
+
+    <label class="character-form-label" for="prompt">Personnalité</label>
+    <textarea class="character-form-textarea" id="prompt" name="prompt" rows="8"
+      [(ngModel)]="systemPrompt"
+      placeholder="Décris qui est ce personnage, sa façon de parler, ce qu'il sait, son ton…"></textarea>
+
+    <button class="character-form-save" type="submit">Enregistrer</button>
+
+  </form>
+
+</ion-content>

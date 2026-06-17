@@ -1,0 +1,13 @@
+// For information on how to create your own theme, please refer to:
+// https://ionicframework.com/docs/theming/
+
+// Variables de couleurs de l'application (jamais de couleur codée en dur ailleurs).
+:root {
+  --app-background: #f2f3f7;   // fond général des pages
+  --app-surface: #ffffff;      // fond des cartes / bulles reçues
+  --app-text: #1c1c28;         // texte principal
+  --app-text-muted: #8a8a9e;   // texte secondaire
+  --app-accent: #6c5ce7;       // couleur d'accent (boutons, bulles utilisateur)
+  --app-on-accent: #ffffff;    // texte posé sur la couleur d'accent
+  --app-border: #e3e3ee;       // bordures légères
+}

@@ -1,0 +1,27 @@
+<ion-content [fullscreen]="true" class="characters-content">
+
+  <header class="characters-header">
+    <h1 class="characters-title">Mes personnages</h1>
+    <button class="characters-add" (click)="goToCreate()">+ Nouveau</button>
+  </header>
+
+  @if (characters.length === 0) {
+    <div class="characters-empty">
+      <p class="characters-empty-text">Aucun personnage pour l'instant.</p>
+      <button class="characters-empty-button" (click)="goToCreate()">Créer mon premier personnage</button>
+    </div>
+  } @else {
+    <div class="characters-list">
+      @for (character of characters; track character.id) {
+        <app-character-card
+          class="characters-card"
+          [character]="character"
+          (open)="goToChat(character)"
+          (edit)="goToEdit(character)"
+          (remove)="confirmRemove(character)">
+        </app-character-card>
+      }
+    </div>
+  }
+
+</ion-content>

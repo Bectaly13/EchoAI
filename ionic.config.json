@@ -1,0 +1,7 @@
+{
+  "name": "character-chat",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

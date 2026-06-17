@@ -1,0 +1,21 @@
+<header class="chat-header">
+  <button class="chat-back" (click)="goBack()">←</button>
+  <h1 class="chat-title">{{ character?.name }}</h1>
+</header>
+
+<ion-content class="chat-content">
+  <div class="chat-messages">
+    @for (message of messages; track $index) {
+      <app-message-bubble class="chat-bubble" [message]="message"></app-message-bubble>
+    }
+    @if (sending) {
+      <p class="chat-typing">…</p>
+    }
+  </div>
+</ion-content>
+
+<footer class="chat-footer">
+  <input class="chat-input" type="text" name="draft"
+    [(ngModel)]="draft" (keyup.enter)="send()" placeholder="Écris un message…" />
+  <button class="chat-send" (click)="send()" [disabled]="sending">Envoyer</button>
+</footer>

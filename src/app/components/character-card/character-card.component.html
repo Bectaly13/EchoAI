@@ -1,0 +1,17 @@
+<div class="character-card" (click)="open.emit()">
+
+  <div class="character-card-avatar" [style.background]="character().avatarColor">
+    <span class="character-card-initial">{{ initial() }}</span>
+  </div>
+
+  <div class="character-card-info">
+    <h2 class="character-card-name">{{ character().name }}</h2>
+    <p class="character-card-prompt">{{ character().systemPrompt }}</p>
+  </div>
+
+  <div class="character-card-actions">
+    <button class="character-card-edit" (click)="onEdit($event)">✎</button>
+    <button class="character-card-delete" (click)="onRemove($event)">🗑</button>
+  </div>
+
+</div>
