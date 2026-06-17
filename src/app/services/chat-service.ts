@@ -38,9 +38,14 @@ export class ChatService {
 
   // Renvoie les messages de la conversation d'un personnage (vide si aucune).
   async getMessages(characterId: string): Promise<ChatMessage[]> {
-    const conversation = await this.getConversation(characterId);
+    let conversation = await this.getConversation(characterId);
     if (!conversation) {
-      return [];
+      // À la première ouverture, on matérialise la salutation du personnage (s'il en a une).
+      const greeting = await this.greetingFor(characterId);
+      if (!greeting) {
+        return [];
+      }
+      conversation = await this.persistNewConversation(characterId, greeting);
     }
     // Migration douce : attribue un id aux anciens messages qui n'en ont pas.
     if (this.ensureMessageIds(conversation.messages)) {
@@ -94,13 +99,30 @@ export class ChatService {
     return await this.database.getEntryWith("conversations", "characterId", characterId);
   }
 
-  // Renvoie la conversation du personnage, en la créant si elle n'existe pas encore.
+  // Renvoie la conversation du personnage, en la créant (avec sa salutation) si besoin.
   private async getOrCreateConversation(characterId: string): Promise<Conversation> {
-    let conversation = await this.getConversation(characterId);
-    if (!conversation) {
-      conversation = { id: crypto.randomUUID(), characterId: characterId, messages: [] };
-      await this.database.addEntry("conversations", conversation);
+    const conversation = await this.getConversation(characterId);
+    if (conversation) {
+      return conversation;
     }
+    const greeting = await this.greetingFor(characterId);
+    return await this.persistNewConversation(characterId, greeting);
+  }
+
+  // Renvoie la salutation (nettoyée) du personnage, ou "" s'il n'en a pas.
+  private async greetingFor(characterId: string): Promise<string> {
+    const character = await this.characterService.get(characterId);
+    return character?.greeting?.trim() ?? "";
+  }
+
+  // Crée et persiste une conversation, initialisée avec la salutation si elle est fournie.
+  private async persistNewConversation(characterId: string, greeting: string): Promise<Conversation> {
+    const messages: ChatMessage[] = [];
+    if (greeting) {
+      messages.push({ id: crypto.randomUUID(), role: "model", text: greeting, at: Date.now() });
+    }
+    const conversation: Conversation = { id: crypto.randomUUID(), characterId: characterId, messages: messages };
+    await this.database.addEntry("conversations", conversation);
     return conversation;
   }
 

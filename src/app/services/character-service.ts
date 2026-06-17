@@ -8,6 +8,9 @@ export interface Character {
   name: string;
   // Instructions de personnalité envoyées à l'IA comme "system prompt".
   systemPrompt: string;
+  // Message d'accueil du personnage : premier message (côté IA) de toute conversation,
+  // sert à planter le décor. Optionnel (vide = pas de premier message imposé).
+  greeting: string;
   // Couleur de l'avatar (pastille colorée affichée dans la liste).
   avatarColor: string;
   createdAt: number;
@@ -36,11 +39,12 @@ export class CharacterService {
   }
 
   // Crée un personnage et le renvoie.
-  async create(name: string, systemPrompt: string): Promise<Character> {
+  async create(name: string, systemPrompt: string, greeting: string): Promise<Character> {
     const character: Character = {
       id: this.generateId(),
       name: name,
       systemPrompt: systemPrompt,
+      greeting: greeting,
       avatarColor: this.pickColor(),
       createdAt: Date.now()
     };

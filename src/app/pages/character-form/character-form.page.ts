@@ -19,6 +19,8 @@ export class CharacterFormPage implements ViewWillEnter {
   characterId = "";
   name = "";
   systemPrompt = "";
+  // Message d'accueil du personnage (premier message de la conversation).
+  greeting = "";
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
@@ -44,6 +46,8 @@ export class CharacterFormPage implements ViewWillEnter {
     this.characterId = character.id;
     this.name = character.name;
     this.systemPrompt = character.systemPrompt;
+    // ?? "" : les anciens personnages créés avant cette fonctionnalité n'ont pas de salutation.
+    this.greeting = character.greeting ?? "";
   }
 
   isEditing(): boolean {
@@ -56,11 +60,11 @@ export class CharacterFormPage implements ViewWillEnter {
       await this.message.error("Donne un nom au personnage.");
       return;
     }
-    const changes = { name: name, systemPrompt: this.systemPrompt.trim() };
+    const changes = { name: name, systemPrompt: this.systemPrompt.trim(), greeting: this.greeting.trim() };
     if (this.isEditing()) {
       await this.characterService.update(this.characterId, changes);
     } else {
-      await this.characterService.create(changes.name, changes.systemPrompt);
+      await this.characterService.create(changes.name, changes.systemPrompt, changes.greeting);
     }
     this.router.navigate(["characters"]);
   }

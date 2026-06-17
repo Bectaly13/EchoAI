@@ -16,6 +16,11 @@
       [(ngModel)]="systemPrompt"
       placeholder="Décris qui est ce personnage, sa façon de parler, ce qu'il sait, son ton…"></textarea>
 
+    <label class="character-form-label" for="greeting">Message d'accueil</label>
+    <textarea class="character-form-textarea" id="greeting" name="greeting" rows="4"
+      [(ngModel)]="greeting"
+      placeholder="Premier message du personnage, pour planter le décor (optionnel)."></textarea>
+
     <button class="character-form-save" type="submit">Enregistrer</button>
 
   </form>

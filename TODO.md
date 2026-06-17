@@ -25,15 +25,15 @@ Aujourd'hui, `ChatService.send` passe directement `character.systemPrompt` à Ge
 
 ## Phase 1 — Immersion de base (gains rapides)
 
-### 1 — Salutation du personnage *(demande initiale #2)* 🟢
+### 1 — Salutation du personnage *(demande initiale #2)* 🟢 ✅ Fait
 Le **premier message** d'une conversation est toujours celui du personnage IA, défini à la création, pour planter le décor.
 
-- **Données** : ajouter `greeting: string` à `Character` (`character-service.ts`).
-- **Formulaire** : nouveau champ (textarea) dans `character-form`.
-- **Chat** : dans `ChatService.getOrCreateConversation`, si la conversation est neuve et que `greeting` est renseigné, l'injecter comme premier message `{ role: "model", text: greeting }`. Il fait partie de l'historique envoyé à Gemini (continuité narrative).
-- **Limites / points d'attention** :
-  - Personnages existants sans `greeting` → champ optionnel, pas de premier message forcé.
-  - La salutation ne doit **pas** être regénérée par #8 (c'est un message « ancré »).
+- **Fait — Données** : ajouté `greeting: string` à `Character` ; `create()` prend désormais la salutation en paramètre.
+- **Fait — Formulaire** : champ « Message d'accueil » (textarea) dans `character-form`, chargé en édition (`?? ""` pour les anciens personnages).
+- **Fait — Chat** : la salutation est semée comme premier message `{ role: "model", text: greeting }` à la création de la conversation, via `persistNewConversation` (factorisée, utilisée par `getMessages` et `getOrCreateConversation`). Elle s'affiche dès l'ouverture du chat (sans qu'on ait à écrire) et fait partie de l'historique envoyé à Gemini (l'enchaînement `[model(greeting), user(…)]` alterne correctement).
+- **Choix retenus** :
+  - Personnages sans `greeting` → champ optionnel, aucune conversation créée tant qu'on n'écrit pas (lazy preservé).
+  - La salutation ne devra **pas** être regénérée par #8 (message « ancré ») — à prendre en compte lors de l'implémentation du point 3.
 
 ### 2 — Narration en astérisques *(demande initiale #3)* 🟢
 L'IA peut utiliser `*…*` pour la narration/les actions ; le client les met en forme (italique + grisé).
@@ -130,7 +130,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | ----- | -------------- | ------- | ------ | ---- |
 | 0.1 | Refactor `PromptBuilder` | — | 🟢 | ✅ Fait |
 | 0.2 | `id` stable sur les messages | — | 🟢 | ✅ Fait |
-| 1 | Salutation du personnage | #2 | 🟢 | À faire |
+| 1 | Salutation du personnage | #2 | 🟢 | ✅ Fait |
 | 2 | Narration en astérisques | #3 | 🟢 | À faire |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | À faire |
 | 4 | Personas | #1 | 🟡 | À faire |

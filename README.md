@@ -11,13 +11,14 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 > Pour l'instant l'application couvre l'essentiel ; d'autres fonctionnalités suivront.
 
 ### Personnages
-- **Créer un personnage** : un nom et une « personnalité » (instructions envoyées à l'IA comme *system prompt*). Une couleur d'avatar est attribuée au hasard.
+- **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*) et un **message d'accueil** optionnel. Une couleur d'avatar est attribuée au hasard.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
 ### Conversation
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
+- **Message d'accueil** : si le personnage en a un, c'est le premier message affiché (côté IA) à l'ouverture de la conversation.
 - **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et l'historique de la conversation comme contexte.
 - **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du modèle ; la zone défile automatiquement vers le dernier message.
 - **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
