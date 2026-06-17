@@ -1,0 +1,102 @@
+ion-content.memory-content {
+  --background: var(--app-background);
+}
+
+.memory-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.memory-back {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--app-accent);
+  cursor: pointer;
+  padding: 0;
+}
+
+.memory-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.memory-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+}
+
+.memory-empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.memory-empty-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--app-text-muted);
+}
+
+.memory-list {
+  padding: 0 16px;
+}
+
+.memory-group {
+  margin-bottom: 18px;
+}
+
+.memory-group-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-text-muted);
+}
+
+.memory-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: var(--app-surface);
+}
+
+.memory-entry-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  color: var(--app-text);
+}
+
+.memory-entry-delete {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.memory-clear {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 8px 16px 24px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--app-surface);
+  color: var(--app-danger);
+  cursor: pointer;
+}

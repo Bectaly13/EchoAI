@@ -185,6 +185,12 @@ export class ChatPage implements ViewWillEnter {
     this.messages = await this.chatService.deleteFrom(this.character.id, message.id);
   }
 
+  goToMemory() {
+    if (this.character) {
+      this.router.navigate(["memory", this.character.id]);
+    }
+  }
+
   goBack() {
     this.router.navigate(["characters"]);
   }

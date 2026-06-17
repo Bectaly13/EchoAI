@@ -260,6 +260,33 @@ export class ChatService {
     return kept.reverse();
   }
 
+  // Renvoie la mémoire permanente de la conversation (vide si aucune).
+  async getMemory(characterId: string): Promise<MemoryEntry[]> {
+    const conversation = await this.getConversation(characterId);
+    return conversation?.memory ?? [];
+  }
+
+  // Supprime une entrée de mémoire et renvoie la mémoire restante.
+  async deleteMemoryEntry(characterId: string, entryId: string): Promise<MemoryEntry[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation || !conversation.memory) {
+      return [];
+    }
+    conversation.memory = conversation.memory.filter(entry => entry.id !== entryId);
+    await this.saveConversation(conversation);
+    return conversation.memory;
+  }
+
+  // Vide toute la mémoire permanente de la conversation.
+  async clearMemory(characterId: string): Promise<void> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation) {
+      return;
+    }
+    conversation.memory = [];
+    await this.saveConversation(conversation);
+  }
+
   // Choisit entre l'appel réel à Gemini et une réponse simulée (mock).
   private async generateReply(systemPrompt: string, messages: ChatMessage[]): Promise<string> {
     if (!this.gemini.hasApiKey()) {

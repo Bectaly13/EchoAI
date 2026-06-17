@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true" class="memory-content">
+
+  <header class="memory-header">
+    <button class="memory-back" (click)="goBack()">← Conversation</button>
+    <h1 class="memory-title">Mémoire — {{ character?.name }}</h1>
+    <p class="memory-hint">Ce que le personnage garde en tête au fil de l'histoire. Tu peux oublier une entrée si elle est erronée.</p>
+  </header>
+
+  @if (isEmpty()) {
+    <div class="memory-empty">
+      <p class="memory-empty-text">Aucune mémoire pour l'instant. Elle se remplit au fil de la conversation.</p>
+    </div>
+  } @else {
+    <div class="memory-list">
+      @for (group of groups; track group.label) {
+        <section class="memory-group">
+          <h2 class="memory-group-title">{{ group.label }}</h2>
+          @for (entry of group.entries; track entry.id) {
+            <div class="memory-entry">
+              <p class="memory-entry-value">{{ entry.value }}</p>
+              <button class="memory-entry-delete" (click)="confirmDeleteEntry(entry)">🗑</button>
+            </div>
+          }
+        </section>
+      }
+    </div>
+
+    <button class="memory-clear" (click)="confirmClear()">Tout oublier</button>
+  }
+
+</ion-content>

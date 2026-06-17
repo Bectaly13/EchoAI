@@ -31,6 +31,17 @@
   white-space: nowrap;
 }
 
+.chat-memory {
+  flex: 0 0 auto;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 6px 8px;
+  font-size: 15px;
+  line-height: 1;
+  background: var(--app-background);
+  cursor: pointer;
+}
+
 .chat-persona {
   flex: 0 0 auto;
   max-width: 45%;

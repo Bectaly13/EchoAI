@@ -110,7 +110,13 @@ Conserver d'un message à l'autre des informations durables (lieu de l'action, r
 - **Fait — Fusion / croissance** : catégories à valeur unique (`location`, `relationship`) → la nouvelle valeur remplace l'ancienne ; catégories à valeurs multiples (`milestone`, `instruction`) → ajout borné à `MAX_LIST_ENTRIES` (30) par `capMemory`.
 - **Fait — Injection** : `buildSystemPrompt` ajoute un bloc `MÉMOIRE PERMANENTE` (groupé par catégorie) à chaque tour, plus un bloc `CONSIGNES DE MÉMOIRE` expliquant la convention d'écriture.
 - **Fait — Rollback** : `regenerate` oublie la mémoire produite par le message régénéré (`forgetMemoryFrom`) ; `deleteFrom` retire les entrées dont `sourceMessageId` n'est plus dans l'historique. Cas vérifiés (Node).
-- **Suite possible (non bloquante)** : écran de visualisation/édition manuelle de la mémoire (fiabilité/debug) — repoussé volontairement (choix « moteur d'abord »).
+- **Suite** : écran de visualisation/édition de la mémoire → fait en **3.6b**.
+
+### 3.6b — Écran de visualisation de la mémoire 🟢 ✅ Fait
+Depuis une conversation, voir l'état de la mémoire permanente (et corriger si l'IA a mal mémorisé).
+
+- **Fait — Service** : `ChatService.getMemory` (lecture), `deleteMemoryEntry` (oublier une entrée), `clearMemory` (tout vider).
+- **Fait — Page** : `memory/:id` (`MemoryPage`), accessible via un bouton `🧠` dans le header du chat. Affiche la mémoire **groupée par catégorie** (Lieu actuel, Relation, Jalons, Consignes), avec suppression d'une entrée et « Tout oublier » (les deux avec confirmation). État vide explicite.
 
 ---
 
@@ -160,7 +166,8 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | ✅ Fait |
 | 4 | Personas | #1 | 🟡 | ✅ Fait |
 | 5 | Champs de création enrichis | #5 | 🟡 | ✅ Fait |
-| 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur ; UI mémoire repoussée) |
+| 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur) |
+| 6b | Écran de visualisation de la mémoire | — | 🟢 | ✅ Fait |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | À faire |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |
 | 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |

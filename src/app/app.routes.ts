@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/chat/chat.page').then((m) => m.ChatPage),
   },
   {
+    // Mémoire permanente d'une conversation (id du personnage en paramètre).
+    path: 'memory/:id',
+    loadComponent: () => import('./pages/memory/memory.page').then((m) => m.MemoryPage),
+  },
+  {
     // Liste des personas que l'utilisateur peut incarner.
     path: 'personas',
     loadComponent: () => import('./pages/personas/personas.page').then((m) => m.PersonasPage),

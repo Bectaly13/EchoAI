@@ -29,7 +29,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du modèle ; la zone défile automatiquement vers le dernier message.
 - **Régénérer / supprimer** : on peut régénérer la dernière réponse de l'IA, ou supprimer un message (et tous les suivants, avec confirmation).
 - **Passer son tour** : un bouton laisse le personnage IA enchaîner un message de lui-même, sans qu'on ait à écrire.
-- **Mémoire permanente** : l'IA mémorise d'elle-même les éléments durables de l'histoire (lieu courant, évolution de la relation, jalons, consignes) et les conserve d'un message à l'autre pour une meilleure fidélité, sans rien afficher de technique.
+- **Mémoire permanente** : l'IA mémorise d'elle-même les éléments durables de l'histoire (lieu courant, évolution de la relation, jalons, consignes) et les conserve d'un message à l'autre pour une meilleure fidélité, sans rien afficher de technique. Un écran dédié (bouton 🧠) permet de **consulter cette mémoire** et d'oublier une entrée erronée.
 - **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
 
 ---
@@ -78,7 +78,7 @@ npm run lint       # analyse statique (ESLint)
 
 Sous `src/app/` :
 
-- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation), `personas` (liste), `persona-form` (création/édition).
+- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `personas` (liste), `persona-form` (création/édition).
 - **`components/`** — composants réutilisables : `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
   - `GeminiService` — uniquement l'appel HTTP brut au modèle.
