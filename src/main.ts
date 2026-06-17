@@ -1,9 +1,11 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, inject, provideAppInitializer } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { IonicStorageModule } from '@ionic/storage-angular';
+
+import { VersionHandlerService } from './app/services/version-handler-service';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -17,5 +19,7 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(),
     // Stockage local des personnages et conversations (utilisé par StorageService).
     importProvidersFrom(IonicStorageModule.forRoot()),
+    // Applique les migrations de format de la bdd avant le démarrage de l'app.
+    provideAppInitializer(() => inject(VersionHandlerService).init()),
   ],
 });

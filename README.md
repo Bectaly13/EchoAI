@@ -78,6 +78,7 @@ Sous `src/app/` :
   - `DatabaseService` — interface dev-friendly (tables/lignes) pour le stockage local.
   - `StorageService` — couche de stockage bas niveau (Ionic Storage).
   - `MessageService` — retours UI (toasts, alertes).
+  - `VersionHandlerService` — montées de version du format de la bdd (migrations exécutées au démarrage via `provideAppInitializer`).
 - **`utils/`** — fonctions utilitaires pures.
 
 Changer de modèle ou de fournisseur d'IA ne doit toucher que `GeminiService` et l'`environment`.

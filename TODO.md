@@ -8,7 +8,7 @@ Légende effort : 🟢 faible · 🟡 moyen · 🔴 élevé.
 
 ## Phase 0 — Refactors transverses (prérequis)
 
-Ces deux chantiers ne sont pas des fonctionnalités visibles mais conditionnent presque toutes les suivantes. À faire **avant** la Phase 1 pour éviter de tout réécrire ensuite.
+Ces chantiers ne sont pas des fonctionnalités visibles mais conditionnent presque toutes les suivantes. À faire **avant** la Phase 1 pour éviter de tout réécrire ensuite.
 
 ### 0.1 — Extraire un `PromptBuilder` 🟢 ✅ Fait
 Aujourd'hui, `ChatService.send` passe directement `character.systemPrompt` à Gemini. Or le prompt système va devoir agréger de plus en plus de sources : personnalité + champs structurés (#5), salutation (#2), consigne de narration (#3), persona actif (#1), mémoire permanente (#4).
@@ -20,6 +20,13 @@ Aujourd'hui, `ChatService.send` passe directement `character.systemPrompt` à Ge
 `ChatMessage` n'a qu'un `at` (timestamp), insuffisant pour cibler un message de façon fiable (collisions possibles, nécessaire pour #8 et le rattachement mémoire de #4).
 
 - **Fait** : ajouté `id: string` (`crypto.randomUUID()`) à `ChatMessage`, généré à la création de chaque message (y compris le message optimiste de `chat.page`). Migration douce : `ChatService.getMessages` attribue un `id` aux anciens messages qui n'en ont pas et persiste la conversation si besoin. Le template de chat track désormais par `message.id`.
+
+### 0.3 — Gestionnaire de versions de la bdd 🟢 ✅ Fait
+Centralise les montées de version du format de la bdd, au lieu d'éparpiller des correctifs de migration. Indispensable avant les changements de format à venir (table `personas`, champs enrichis, mémoire…).
+
+- **Fait** : ajouté `VersionHandlerService` (repris du pattern du projet « Les-recettes-de-Titou », adapté aux API `DatabaseService`/`StorageService` d'ici). `init()` pose la version courante (`appVersion = 1`) au premier lancement en matérialisant la db **sans écraser** les données existantes ; ne fait rien si déjà à jour ; structure prête à enchaîner les migrations `updateToVx()` puis à enregistrer la nouvelle version.
+- **Fait** : `init()` est câblé via `provideAppInitializer` dans `main.ts` → les migrations s'exécutent **avant** le démarrage de l'app, donc avant toute lecture de la bdd par une page (pas de course).
+- **À l'avenir** : chaque évolution de format = incrémenter `appVersion` + ajouter la migration `updateToVx()` correspondante.
 
 ---
 
@@ -138,6 +145,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | ----- | -------------- | ------- | ------ | ---- |
 | 0.1 | Refactor `PromptBuilder` | — | 🟢 | ✅ Fait |
 | 0.2 | `id` stable sur les messages | — | 🟢 | ✅ Fait |
+| 0.3 | Gestionnaire de versions de la bdd | — | 🟢 | ✅ Fait |
 | 1 | Salutation du personnage | #2 | 🟢 | ✅ Fait |
 | 2 | Narration en astérisques | #3 | 🟢 | À faire |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | À faire |
