@@ -26,3 +26,12 @@
 .message-bubble-user .message-bubble-text {
   color: var(--app-on-accent);
 }
+
+.message-bubble-narration {
+  font-style: italic;
+  color: var(--app-narration);
+}
+
+.message-bubble-user .message-bubble-narration {
+  color: var(--app-narration-on-accent);
+}

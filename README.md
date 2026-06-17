@@ -20,6 +20,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
 - **Message d'accueil** : si le personnage en a un, c'est le premier message affiché (côté IA) à l'ouverture de la conversation.
 - **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et l'historique de la conversation comme contexte.
+- **Narration** : les passages encadrés d'astérisques (`*il sourit*`) sont mis en forme (italique, grisé) pour distinguer la narration des paroles.
 - **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du modèle ; la zone défile automatiquement vers le dernier message.
 - **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
 

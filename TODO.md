@@ -42,13 +42,13 @@ Le **premier message** d'une conversation est toujours celui du personnage IA, d
   - Personnages sans `greeting` → champ optionnel, aucune conversation créée tant qu'on n'écrit pas (lazy preservé).
   - La salutation ne devra **pas** être regénérée par #8 (message « ancré ») — à prendre en compte lors de l'implémentation du point 3.
 
-### 2 — Narration en astérisques *(demande initiale #3)* 🟢
+### 2 — Narration en astérisques *(demande initiale #3)* 🟢 ✅ Fait
 L'IA peut utiliser `*…*` pour la narration/les actions ; le client les met en forme (italique + grisé).
 
-- **Côté prompt** : bloc `CONSIGNES DE FORMAT` ajouté par le `PromptBuilder` (0.1) : « Utilise des astérisques `*texte*` pour décrire les actions et la narration. »
-- **Côté rendu** : util pur `formatNarration(text)` qui découpe le texte en segments `{ text, isNarration }` via une regex (`/\*([^*]+)\*/`). Le template de `message-bubble` rend les segments avec `@for` + `@if` (classe `.narration`), **sans `innerHTML`** (sécurité).
-- **Style** : `.narration` → `font-style: italic; color: var(--narration-color)` (nouvelle variable CSS dans `theme/variables.scss`).
-- **Limites** : gérer les astérisques non appariées (texte laissé brut) ; rester sur un mini-format maison, pas un moteur Markdown complet.
+- **Fait — Côté prompt** : bloc `CONSIGNES DE FORMAT` ajouté par `buildSystemPrompt` (0.1) : encadrer actions/narration entre astérisques, laisser les paroles sans.
+- **Fait — Côté rendu** : util pur `formatNarration(text)` qui découpe le texte en segments `{ text, isNarration }` via un `split` sur groupe capturant (`/(\*[^*]+\*)/`). Le template de `message-bubble` rend les segments avec `@for` + `@if` (spans `message-bubble-narration` / `message-bubble-speech`), **sans `innerHTML`** (sécurité). S'applique aussi bien aux messages IA qu'utilisateur.
+- **Fait — Style** : `.message-bubble-narration` → `italic` + `var(--app-narration)` (+ `var(--app-narration-on-accent)` sur les bulles utilisateur), nouvelles variables dans `theme/variables.scss`.
+- **Choix retenus** : astérisque non appariée laissée en texte brut ; `matchAll` écarté (lib < ES2020) au profit de `split` ; pas de moteur Markdown complet (mini-format maison). Cas limites vérifiés (espaces préservés, `*` isolée, `**`).
 
 ### 3 — Régénérer / supprimer un message *(demande initiale #8)* 🟡
 UX d'édition de la conversation.
@@ -147,7 +147,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 0.2 | `id` stable sur les messages | — | 🟢 | ✅ Fait |
 | 0.3 | Gestionnaire de versions de la bdd | — | 🟢 | ✅ Fait |
 | 1 | Salutation du personnage | #2 | 🟢 | ✅ Fait |
-| 2 | Narration en astérisques | #3 | 🟢 | À faire |
+| 2 | Narration en astérisques | #3 | 🟢 | ✅ Fait |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | À faire |
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | À faire |
 | 4 | Personas | #1 | 🟡 | À faire |
