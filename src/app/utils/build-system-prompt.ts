@@ -25,7 +25,8 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
 function buildFormatBlock(): string {
   return [
     "CONSIGNES DE FORMAT",
-    "Encadre les actions, gestes et passages de narration entre astérisques (par exemple : *il sourit et s'approche*). Laisse les paroles du personnage sans astérisques."
+    "Préfixe chaque réplique par le nom de celui qui parle, suivi d'un deux-points, puis mets les paroles entre guillemets droits. Exemple :\nAlice : \"Bonjour\"\nBob : \"Salut\"",
+    "Encadre les actions, gestes et passages de narration entre astérisques (par exemple : *il sourit et s'approche*), en dehors des guillemets."
   ].join("\n");
 }
 

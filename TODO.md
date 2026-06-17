@@ -50,6 +50,12 @@ L'IA peut utiliser `*…*` pour la narration/les actions ; le client les met en 
 - **Fait — Style** : `.message-bubble-narration` → `italic` + `var(--app-narration)` (+ `var(--app-narration-on-accent)` sur les bulles utilisateur), nouvelles variables dans `theme/variables.scss`.
 - **Choix retenus** : astérisque non appariée laissée en texte brut ; `matchAll` écarté (lib < ES2020) au profit de `split` ; pas de moteur Markdown complet (mini-format maison). Cas limites vérifiés (espaces préservés, `*` isolée, `**`).
 
+### 2b — Convention de dialogue (nom + guillemets) 🟢 ✅ Fait
+Le personnage IA préfixe chaque réplique par le nom de celui qui parle et met les paroles entre guillemets, p. ex. `Alice : "Bonjour"` / `Bob : "Salut"`. Utile quand l'IA fait parler plusieurs personnages dans une même scène.
+
+- **Fait — Côté prompt** : ligne ajoutée au bloc `CONSIGNES DE FORMAT` de `buildSystemPrompt`, avec l'exemple, et précision que la narration en astérisques reste en dehors des guillemets.
+- **Choix retenus** : convention purement côté prompt — le client affiche `Nom : "…"` tel quel (rien à transformer, contrairement aux astérisques). Une mise en forme du nom (ex. gras) côté client reste possible plus tard si besoin.
+
 ### 3 — Régénérer / supprimer un message *(demande initiale #8)* 🟡
 UX d'édition de la conversation.
 
@@ -148,6 +154,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 0.3 | Gestionnaire de versions de la bdd | — | 🟢 | ✅ Fait |
 | 1 | Salutation du personnage | #2 | 🟢 | ✅ Fait |
 | 2 | Narration en astérisques | #3 | 🟢 | ✅ Fait |
+| 2b | Convention de dialogue (nom + guillemets) | — | 🟢 | ✅ Fait |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | À faire |
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | À faire |
 | 4 | Personas | #1 | 🟡 | À faire |
