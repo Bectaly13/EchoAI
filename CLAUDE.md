@@ -16,6 +16,14 @@ Il est agrémenté au fur et à mesure.
 
 ---
 
+## Documentation
+
+- **`TODO.md`** (racine) et **`README.md`** (racine) doivent rester **à jour à tout moment**.
+- **`TODO.md`** : à chaque fonctionnalité avancée ou terminée, mettre à jour son état (cocher / déplacer / retirer) au fur et à mesure de l'implémentation.
+- **`README.md`** : à chaque évolution du projet (nouvelle fonctionnalité, changement d'installation, de configuration ou d'architecture), répercuter le changement dans le README.
+
+---
+
 ## Frontend
 
 ### Structuration des fichiers

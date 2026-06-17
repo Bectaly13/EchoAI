@@ -5,7 +5,7 @@
 
 <ion-content class="chat-content">
   <div class="chat-messages">
-    @for (message of messages; track $index) {
+    @for (message of messages; track message.id) {
       <app-message-bubble class="chat-bubble" [message]="message"></app-message-bubble>
     }
     @if (sending) {

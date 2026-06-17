@@ -1,11 +1,8 @@
 # Character Chat
 
-Application mobile/web où l'utilisateur crée des **personnages** (chacun avec sa propre
-personnalité) et discute avec eux. Chaque réponse est générée par l'IA **Gemini** de Google,
-appelée en HTTP.
+Application mobile/web où l'utilisateur crée des **personnages** (chacun avec sa propre personnalité) et discute avec eux. Chaque réponse est générée par l'IA **Gemini** de Google, appelée en HTTP.
 
-Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les données utilisateur
-sont stockées **localement** sur l'appareil (Ionic Storage), sans serveur ni compte.
+Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les données utilisateur sont stockées **localement** sur l'appareil (Ionic Storage), sans serveur ni compte.
 
 ---
 
@@ -14,20 +11,16 @@ sont stockées **localement** sur l'appareil (Ionic Storage), sans serveur ni co
 > Pour l'instant l'application couvre l'essentiel ; d'autres fonctionnalités suivront.
 
 ### Personnages
-- **Créer un personnage** : un nom et une « personnalité » (instructions envoyées à l'IA
-  comme *system prompt*). Une couleur d'avatar est attribuée au hasard.
+- **Créer un personnage** : un nom et une « personnalité » (instructions envoyées à l'IA comme *system prompt*). Une couleur d'avatar est attribuée au hasard.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
 ### Conversation
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
-- **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et
-  l'historique de la conversation comme contexte.
-- **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du
-  modèle ; la zone défile automatiquement vers le dernier message.
-- **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond
-  avec un message simulé — l'interface reste utilisable pour le développement.
+- **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et l'historique de la conversation comme contexte.
+- **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du modèle ; la zone défile automatiquement vers le dernier message.
+- **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
 
 ---
 
@@ -75,12 +68,11 @@ npm run lint       # analyse statique (ESLint)
 
 Sous `src/app/` :
 
-- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition),
-  `chat` (conversation).
+- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation).
 - **`components/`** — composants réutilisables : `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
   - `GeminiService` — uniquement l'appel HTTP brut au modèle.
-  - `ChatService` — orchestration (construit le prompt système + l'historique, persiste les messages).
+  - `ChatService` — orchestration (assemble le prompt système via l'util `buildSystemPrompt`, construit l'historique, persiste les messages).
   - `CharacterService` — gestion des personnages.
   - `DatabaseService` — interface dev-friendly (tables/lignes) pour le stockage local.
   - `StorageService` — couche de stockage bas niveau (Ionic Storage).

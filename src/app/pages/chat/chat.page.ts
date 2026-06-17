@@ -59,7 +59,7 @@ export class ChatPage implements ViewWillEnter {
     this.draft = "";
     this.sending = true;
     // Affiche immédiatement le message de l'utilisateur (réponse optimiste).
-    this.messages.push({ role: "user", text: text, at: Date.now() });
+    this.messages.push({ id: crypto.randomUUID(), role: "user", text: text, at: Date.now() });
     this.scrollToBottom();
     try {
       await this.chatService.send(this.character.id, text);

@@ -5,9 +5,12 @@ import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
+import { buildSystemPrompt } from '../utils/build-system-prompt';
 
 // Un message dans une conversation. role suit les valeurs attendues par l'API Gemini.
 export interface ChatMessage {
+  // Identifiant stable, utilisé pour cibler un message (régénération, suppression…).
+  id: string;
   role: "user" | "model";
   text: string;
   at: number;
@@ -36,7 +39,14 @@ export class ChatService {
   // Renvoie les messages de la conversation d'un personnage (vide si aucune).
   async getMessages(characterId: string): Promise<ChatMessage[]> {
     const conversation = await this.getConversation(characterId);
-    return conversation ? conversation.messages : [];
+    if (!conversation) {
+      return [];
+    }
+    // Migration douce : attribue un id aux anciens messages qui n'en ont pas.
+    if (this.ensureMessageIds(conversation.messages)) {
+      await this.saveConversation(conversation);
+    }
+    return conversation.messages;
   }
 
   // Envoie un message utilisateur, obtient la réponse de l'IA, persiste les deux,
@@ -50,13 +60,14 @@ export class ChatService {
     const conversation = await this.getOrCreateConversation(characterId);
 
     // Ajoute le message de l'utilisateur.
-    conversation.messages.push({ role: "user", text: text, at: Date.now() });
+    conversation.messages.push({ id: crypto.randomUUID(), role: "user", text: text, at: Date.now() });
 
     // Obtient la réponse (vraie IA si clé configurée, sinon mock).
-    const reply = await this.generateReply(character.systemPrompt, conversation.messages);
+    const systemPrompt = buildSystemPrompt({ character: character });
+    const reply = await this.generateReply(systemPrompt, conversation.messages);
 
     // Ajoute la réponse du modèle et persiste l'ensemble.
-    conversation.messages.push({ role: "model", text: reply, at: Date.now() });
+    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
     await this.saveConversation(conversation);
 
     return reply;
@@ -97,5 +108,17 @@ export class ChatService {
     await this.database.updateEntriesWith(
       "conversations", "characterId", conversation.characterId, { messages: conversation.messages }
     );
+  }
+
+  // Attribue un id aux messages qui n'en ont pas. Renvoie true si au moins un a été modifié.
+  private ensureMessageIds(messages: ChatMessage[]): boolean {
+    let changed = false;
+    for (const message of messages) {
+      if (!message.id) {
+        message.id = crypto.randomUUID();
+        changed = true;
+      }
+    }
+    return changed;
   }
 }
