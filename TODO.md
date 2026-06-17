@@ -56,13 +56,14 @@ Le personnage IA préfixe chaque réplique par le nom de celui qui parle et met 
 - **Fait — Côté prompt** : ligne ajoutée au bloc `CONSIGNES DE FORMAT` de `buildSystemPrompt`, avec l'exemple, et précision que la narration en astérisques reste en dehors des guillemets.
 - **Choix retenus** : convention purement côté prompt — le client affiche `Nom : "…"` tel quel (rien à transformer, contrairement aux astérisques). Une mise en forme du nom (ex. gras) côté client reste possible plus tard si besoin.
 
-### 3 — Régénérer / supprimer un message *(demande initiale #8)* 🟡
+### 3 — Régénérer / supprimer un message *(demande initiale #8)* 🟡 ✅ Fait
 UX d'édition de la conversation.
 
-- **Régénérer** : `ChatService.regenerate(characterId)` retire le dernier message `model` et relance `generate` avec l'historique jusqu'au dernier message `user`. Bouton sur le dernier message IA dans `chat`.
-- **Supprimer** : `ChatService.deleteFrom(characterId, messageId)` tronque le tableau à partir du message ciblé (supprime aussi tous les suivants pour ne pas « trouer » l'historique). Déclencheur UI : action sur la bulle (appui long ou bouton).
-- **Dépendances** : nécessite l'`id` de message (0.2).
-- **Limites** : quand la **mémoire permanente** (#4) existera, régénérer/supprimer devra aussi **annuler les écritures mémoire** issues des tours supprimés → prévoir de rattacher chaque entrée mémoire au `messageId` qui l'a produite (voir Phase 3).
+- **Fait — Régénérer** : `ChatService.regenerate(characterId)` retire le dernier message `model` et relance la génération sur l'historique restant. Bouton `↻` affiché **uniquement sur le dernier message de l'IA**, et jamais sur la salutation « ancrée » (garde : dernier message `model` **et** au moins un message `user` dans l'historique).
+- **Fait — Supprimer** : `ChatService.deleteFrom(characterId, messageId)` tronque le tableau à partir du message ciblé (`splice`), supprimant aussi tous les suivants. Bouton `🗑` sur chaque bulle, avec **confirmation** (`AlertController`, comme `characters.page`).
+- **Fait — UI** : `message-bubble` reçoit `canRegenerate` (input) et émet `regenerate` / `remove` (outputs) ; `chat.page` calcule `canRegenerate(message)` et orchestre, en réutilisant l'indicateur `sending`.
+- **Cas limites vérifiés** (Node) : salutation non régénérable, troncature exacte, id inconnu sans effet.
+- **À garder pour plus tard** : quand la **mémoire permanente** (#4) existera, régénérer/supprimer devra aussi **annuler les écritures mémoire** des tours supprimés → rattacher chaque entrée mémoire au `messageId` qui l'a produite (voir Phase 3).
 
 ### 3b — Passer son tour (faire reparler l'IA) 🟡
 Un bouton qui permet à l'utilisateur de **passer son tour** : sans écrire de message, il demande au personnage IA de produire un message de plus de lui-même (faire avancer la scène, enchaîner, relancer…).
@@ -155,7 +156,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 1 | Salutation du personnage | #2 | 🟢 | ✅ Fait |
 | 2 | Narration en astérisques | #3 | 🟢 | ✅ Fait |
 | 2b | Convention de dialogue (nom + guillemets) | — | 🟢 | ✅ Fait |
-| 3 | Régénérer / supprimer un message | #8 | 🟡 | À faire |
+| 3 | Régénérer / supprimer un message | #8 | 🟡 | ✅ Fait |
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | À faire |
 | 4 | Personas | #1 | 🟡 | À faire |
 | 5 | Champs de création enrichis | #5 | 🟡 | À faire |

@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, ViewWillEnter } from '@ionic/angular/standalone';
+import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
@@ -32,6 +32,7 @@ export class ChatPage implements ViewWillEnter {
   }
 
   constructor(
+    private alert: AlertController,
     private characterService: CharacterService,
     private chatService: ChatService,
     private message: MessageService,
@@ -71,6 +72,53 @@ export class ChatPage implements ViewWillEnter {
       this.sending = false;
       this.scrollToBottom();
     }
+  }
+
+  // Vrai pour le dernier message s'il vient de l'IA et qu'un message utilisateur
+  // le précède : on n'autorise pas la régénération de la salutation « ancrée ».
+  canRegenerate(message: ChatMessage): boolean {
+    const last = this.messages[this.messages.length - 1];
+    return !this.sending
+      && message === last
+      && message.role === "model"
+      && this.messages.some(item => item.role === "user");
+  }
+
+  // Régénère la dernière réponse de l'IA.
+  async regenerate() {
+    if (this.sending || !this.character) {
+      return;
+    }
+    this.sending = true;
+    try {
+      await this.chatService.regenerate(this.character.id);
+      this.messages = await this.chatService.getMessages(this.character.id);
+    } catch (error) {
+      await this.message.error("Échec de la régénération.");
+    } finally {
+      this.sending = false;
+      this.scrollToBottom();
+    }
+  }
+
+  // Demande confirmation avant de supprimer un message et tous les suivants.
+  async confirmDelete(message: ChatMessage) {
+    const alert = await this.alert.create({
+      header: "Supprimer ?",
+      message: "Supprimer ce message et tous les suivants ?",
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Supprimer", role: "destructive", handler: () => this.deleteFrom(message) }
+      ]
+    });
+    await alert.present();
+  }
+
+  async deleteFrom(message: ChatMessage) {
+    if (!this.character) {
+      return;
+    }
+    this.messages = await this.chatService.deleteFrom(this.character.id, message.id);
   }
 
   goBack() {

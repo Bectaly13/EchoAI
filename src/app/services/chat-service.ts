@@ -78,6 +78,53 @@ export class ChatService {
     return reply;
   }
 
+  // Régénère la dernière réponse du modèle : la retire et en génère une nouvelle à
+  // partir de l'historique restant. Ne touche jamais à la salutation « ancrée »
+  // (rien ne se passe s'il n'y a pas de message utilisateur avant la réponse).
+  async regenerate(characterId: string): Promise<ChatMessage[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation) {
+      return [];
+    }
+    const messages = conversation.messages;
+    const last = messages[messages.length - 1];
+    const hasUserTurn = messages.some(message => message.role === "user");
+    if (!last || last.role !== "model" || !hasUserTurn) {
+      return messages;
+    }
+
+    const character = await this.characterService.get(characterId);
+    if (!character) {
+      throw new Error("Personnage introuvable");
+    }
+
+    // Retire la dernière réponse, puis régénère à partir de l'historique restant.
+    messages.pop();
+    const systemPrompt = buildSystemPrompt({ character: character });
+    const reply = await this.generateReply(systemPrompt, messages);
+    messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
+    await this.saveConversation(conversation);
+
+    return messages;
+  }
+
+  // Supprime le message ciblé et tous ceux qui le suivent (pour ne pas « trouer »
+  // l'historique), puis persiste. Renvoie les messages restants.
+  async deleteFrom(characterId: string, messageId: string): Promise<ChatMessage[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation) {
+      return [];
+    }
+    const index = conversation.messages.findIndex(message => message.id === messageId);
+    if (index === -1) {
+      return conversation.messages;
+    }
+    conversation.messages.splice(index);
+    await this.saveConversation(conversation);
+
+    return conversation.messages;
+  }
+
   // Choisit entre l'appel réel à Gemini et une réponse simulée (mock).
   private async generateReply(systemPrompt: string, messages: ChatMessage[]): Promise<string> {
     if (!this.gemini.hasApiKey()) {

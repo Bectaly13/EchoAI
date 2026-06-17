@@ -35,3 +35,25 @@
 .message-bubble-user .message-bubble-narration {
   color: var(--app-narration-on-accent);
 }
+
+.message-bubble-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.message-bubble-regenerate,
+.message-bubble-delete {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.message-bubble-regenerate {
+  color: var(--app-text-muted);
+}
