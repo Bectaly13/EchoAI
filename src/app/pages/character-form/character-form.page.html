@@ -21,6 +21,33 @@
       [(ngModel)]="greeting"
       placeholder="Premier message du personnage, pour planter le décor (optionnel)."></textarea>
 
+    <p class="character-form-section">Détails (optionnels)</p>
+
+    <label class="character-form-label" for="appearance">Apparence</label>
+    <textarea class="character-form-textarea" id="appearance" name="appearance" rows="3"
+      [(ngModel)]="appearance"
+      placeholder="À quoi ressemble ce personnage."></textarea>
+
+    <label class="character-form-label" for="initialRelationship">Relation initiale avec toi</label>
+    <textarea class="character-form-textarea" id="initialRelationship" name="initialRelationship" rows="3"
+      [(ngModel)]="initialRelationship"
+      placeholder="Comment vous vous connaissez au début de l'histoire."></textarea>
+
+    <label class="character-form-label" for="likes">Goûts et préférences</label>
+    <textarea class="character-form-textarea" id="likes" name="likes" rows="3"
+      [(ngModel)]="likes"
+      placeholder="Ce qu'il aime."></textarea>
+
+    <label class="character-form-label" for="dislikes">Ce qu'il n'aime pas</label>
+    <textarea class="character-form-textarea" id="dislikes" name="dislikes" rows="3"
+      [(ngModel)]="dislikes"
+      placeholder="Ce qu'il déteste ou évite."></textarea>
+
+    <label class="character-form-label" for="knownCharacters">Personnages qu'il connaît</label>
+    <textarea class="character-form-textarea" id="knownCharacters" name="knownCharacters" rows="3"
+      [(ngModel)]="knownCharacters"
+      placeholder="Autres personnages qu'il connaît et la nature de ces liens."></textarea>
+
     <button class="character-form-save" type="submit">Enregistrer</button>
 
   </form>

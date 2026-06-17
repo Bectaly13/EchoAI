@@ -90,13 +90,13 @@ L'utilisateur définit plusieurs personas (nom/surnoms, histoire, pouvoirs…) e
   - **Chat** : bouton dans le header affichant le persona actif (ou « Aucun persona »), qui ouvre un choix radio (`AlertController`) ; « aucun persona » est un choix valide.
 - **Limites** : « aucun persona » est un cas valide (bloc omis). Cohérence si un persona est supprimé alors qu'il est référencé par une conversation → fallback « aucun ».
 
-### 5 — Champs de création enrichis *(demande initiale #5)* 🟡
-Remplacer le `systemPrompt` libre unique par des champs structurés : relation initiale avec l'utilisateur, goûts/préférences, connaissance d'autres personnages, apparence, etc.
+### 5 — Champs de création enrichis *(demande initiale #5)* 🟡 ✅ Fait
+Compléter la personnalité libre par des champs structurés : apparence, relation initiale avec l'utilisateur, goûts/préférences, ce qu'il n'aime pas, autres personnages qu'il connaît.
 
-- **Données** : enrichir `Character` avec un objet `profile` typé, tous champs **optionnels** : `initialRelationship`, `likes`, `dislikes`, `knownCharacters`, `appearance`, … Conserver un champ libre `additionalInstructions` (ex-`systemPrompt`) pour le surplus.
-- **Formulaire** : `character-form` éclaté en sections.
-- **Prompt** : le `PromptBuilder` compose ces champs en bloc `PERSONNAGE` lisible.
-- **Limites / migration** : champs optionnels pour ne pas casser les personnages existants ; prévoir le mapping de l'ancien `systemPrompt` → `additionalInstructions`.
+- **Fait — Données** : `Character` enrichi de 5 champs **optionnels** (`appearance`, `initialRelationship`, `likes`, `dislikes`, `knownCharacters`). Type `CharacterDraft` (champs éditables) ; `create()` refactoré pour prendre un objet `draft` (au lieu de paramètres positionnels).
+- **Fait — Formulaire** : `character-form` éclaté en sections (« Détails (optionnels) »), chaque champ chargé en édition (`?? ""`).
+- **Fait — Prompt** : `buildCharacterBlock` compose la personnalité + les champs renseignés en bloc `PERSONNAGE` lisible (helper `appendField`, ignore les champs vides).
+- **Écart assumé vs plan initial** : on **garde `systemPrompt`** (libellé « Personnalité ») comme description principale au lieu de le renommer `additionalInstructions`. Conséquence : **aucune migration de bdd** (les nouveaux champs optionnels n'impactent pas les personnages existants, gérés par `?? ""`).
 
 ---
 
@@ -163,7 +163,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | ✅ Fait |
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | ✅ Fait |
 | 4 | Personas | #1 | 🟡 | ✅ Fait |
-| 5 | Champs de création enrichis | #5 | 🟡 | À faire |
+| 5 | Champs de création enrichis | #5 | 🟡 | ✅ Fait |
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | À faire |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | À faire |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |

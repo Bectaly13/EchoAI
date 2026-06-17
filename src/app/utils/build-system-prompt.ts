@@ -55,9 +55,22 @@ function buildCharacterBlock(character: Character): string {
     "PERSONNAGE",
     `Tu incarnes « ${character.name} ». Reste fidèle à ce personnage en toutes circonstances.`
   ];
-  const personality = character.systemPrompt.trim();
-  if (personality) {
-    lines.push(personality);
-  }
+  // Personnalité (description principale), puis les champs structurés renseignés.
+  appendField(lines, "", character.systemPrompt);
+  appendField(lines, "Apparence", character.appearance);
+  appendField(lines, "Relation initiale avec l'utilisateur", character.initialRelationship);
+  appendField(lines, "Goûts et préférences", character.likes);
+  appendField(lines, "Ce qu'il n'aime pas", character.dislikes);
+  appendField(lines, "Personnages qu'il connaît", character.knownCharacters);
   return lines.join("\n");
+}
+
+// Ajoute une ligne « Libellé : valeur » (ou juste la valeur si pas de libellé)
+// uniquement si la valeur est renseignée.
+function appendField(lines: string[], label: string, value: string | undefined): void {
+  const text = value?.trim();
+  if (!text) {
+    return;
+  }
+  lines.push(label ? `${label} : ${text}` : text);
 }

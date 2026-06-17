@@ -21,6 +21,12 @@ export class CharacterFormPage implements ViewWillEnter {
   systemPrompt = "";
   // Message d'accueil du personnage (premier message de la conversation).
   greeting = "";
+  // Champs structurés optionnels.
+  appearance = "";
+  initialRelationship = "";
+  likes = "";
+  dislikes = "";
+  knownCharacters = "";
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
@@ -43,11 +49,16 @@ export class CharacterFormPage implements ViewWillEnter {
     if (!character) {
       return;
     }
+    // ?? "" : les anciens personnages n'ont pas forcément ces champs (ajoutés au fil des versions).
     this.characterId = character.id;
     this.name = character.name;
     this.systemPrompt = character.systemPrompt;
-    // ?? "" : les anciens personnages créés avant cette fonctionnalité n'ont pas de salutation.
     this.greeting = character.greeting ?? "";
+    this.appearance = character.appearance ?? "";
+    this.initialRelationship = character.initialRelationship ?? "";
+    this.likes = character.likes ?? "";
+    this.dislikes = character.dislikes ?? "";
+    this.knownCharacters = character.knownCharacters ?? "";
   }
 
   isEditing(): boolean {
@@ -60,11 +71,20 @@ export class CharacterFormPage implements ViewWillEnter {
       await this.message.error("Donne un nom au personnage.");
       return;
     }
-    const changes = { name: name, systemPrompt: this.systemPrompt.trim(), greeting: this.greeting.trim() };
+    const draft = {
+      name: name,
+      systemPrompt: this.systemPrompt.trim(),
+      greeting: this.greeting.trim(),
+      appearance: this.appearance.trim(),
+      initialRelationship: this.initialRelationship.trim(),
+      likes: this.likes.trim(),
+      dislikes: this.dislikes.trim(),
+      knownCharacters: this.knownCharacters.trim()
+    };
     if (this.isEditing()) {
-      await this.characterService.update(this.characterId, changes);
+      await this.characterService.update(this.characterId, draft);
     } else {
-      await this.characterService.create(changes.name, changes.systemPrompt, changes.greeting);
+      await this.characterService.create(draft);
     }
     this.router.navigate(["characters"]);
   }

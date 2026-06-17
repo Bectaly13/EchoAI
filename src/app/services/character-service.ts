@@ -6,15 +6,27 @@ import { DatabaseService } from './database-service';
 export interface Character {
   id: string;
   name: string;
-  // Instructions de personnalité envoyées à l'IA comme "system prompt".
+  // Personnalité : description principale envoyée à l'IA comme "system prompt".
   systemPrompt: string;
   // Message d'accueil du personnage : premier message (côté IA) de toute conversation,
   // sert à planter le décor. Optionnel (vide = pas de premier message imposé).
   greeting: string;
+  // Champs structurés optionnels, ajoutés à la fiche envoyée à l'IA s'ils sont remplis.
+  appearance?: string;            // apparence physique
+  initialRelationship?: string;   // relation initiale avec l'utilisateur
+  likes?: string;                 // goûts et préférences
+  dislikes?: string;              // ce qu'il n'aime pas
+  knownCharacters?: string;       // autres personnages qu'il connaît
   // Couleur de l'avatar (pastille colorée affichée dans la liste).
   avatarColor: string;
   createdAt: number;
 }
+
+// Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
+export type CharacterDraft = Pick<
+  Character,
+  "name" | "systemPrompt" | "greeting" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters"
+>;
 
 @Injectable({
   providedIn: 'root',
@@ -39,14 +51,12 @@ export class CharacterService {
   }
 
   // Crée un personnage et le renvoie.
-  async create(name: string, systemPrompt: string, greeting: string): Promise<Character> {
+  async create(draft: CharacterDraft): Promise<Character> {
     const character: Character = {
       id: this.generateId(),
-      name: name,
-      systemPrompt: systemPrompt,
-      greeting: greeting,
       avatarColor: this.pickColor(),
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      ...draft
     };
     return await this.database.addEntry("characters", character);
   }
