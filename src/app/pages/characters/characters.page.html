@@ -2,7 +2,10 @@
 
   <header class="characters-header">
     <h1 class="characters-title">Mes personnages</h1>
-    <button class="characters-add" (click)="goToCreate()">+ Nouveau</button>
+    <div class="characters-actions">
+      <button class="characters-personas" (click)="goToPersonas()">Personas</button>
+      <button class="characters-add" (click)="goToCreate()">+ Nouveau</button>
+    </div>
   </header>
 
   @if (characters.length === 0) {

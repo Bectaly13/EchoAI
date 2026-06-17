@@ -10,7 +10,8 @@ export class DatabaseService {
   // Structure par défaut de la db : une table par type de données.
   db: any = {
     characters: [],     // les personnages créés par l'utilisateur
-    conversations: []   // une conversation (liste de messages) par personnage
+    conversations: [],  // une conversation (liste de messages) par personnage
+    personas: []        // les personas que l'utilisateur peut incarner
   };
 
   constructor(

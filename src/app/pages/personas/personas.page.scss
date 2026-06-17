@@ -1,0 +1,142 @@
+ion-content.personas-content {
+  --background: var(--app-background);
+}
+
+.personas-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.personas-back {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--app-accent);
+  cursor: pointer;
+  padding: 0;
+}
+
+.personas-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.personas-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.personas-add {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  cursor: pointer;
+}
+
+.personas-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+}
+
+.personas-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.personas-empty-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--app-text-muted);
+}
+
+.personas-empty-button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  cursor: pointer;
+}
+
+.personas-list {
+  padding: 0 12px 24px;
+}
+
+.persona-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: var(--app-surface);
+}
+
+.persona-item-avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.persona-item-initial {
+  color: var(--app-on-accent);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.persona-item-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.persona-item-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.persona-item-description {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.persona-item-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.persona-item-edit,
+.persona-item-delete {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  padding: 6px;
+  cursor: pointer;
+}

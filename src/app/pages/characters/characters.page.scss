@@ -16,6 +16,22 @@ ion-content.characters-content {
   color: var(--app-text);
 }
 
+.characters-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.characters-personas {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--app-surface);
+  color: var(--app-accent);
+  cursor: pointer;
+}
+
 .characters-add {
   border: none;
   border-radius: 10px;
