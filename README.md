@@ -16,6 +16,10 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
+### Personas
+- **Définir des personas** : l'utilisateur crée des personas (nom + description : qui il est, son histoire, ses pouvoirs…) qu'il peut incarner.
+- **Incarner un persona** : dans chaque conversation, on choisit le persona incarné (ou aucun) ; ces infos sont transmises au personnage IA.
+
 ### Conversation
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
 - **Message d'accueil** : si le personnage en a un, c'est le premier message affiché (côté IA) à l'ouverture de la conversation.
@@ -73,12 +77,13 @@ npm run lint       # analyse statique (ESLint)
 
 Sous `src/app/` :
 
-- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation).
+- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation), `personas` (liste), `persona-form` (création/édition).
 - **`components/`** — composants réutilisables : `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
   - `GeminiService` — uniquement l'appel HTTP brut au modèle.
   - `ChatService` — orchestration (assemble le prompt système via l'util `buildSystemPrompt`, construit l'historique, persiste les messages).
   - `CharacterService` — gestion des personnages.
+  - `PersonaService` — gestion des personas incarnés par l'utilisateur.
   - `DatabaseService` — interface dev-friendly (tables/lignes) pour le stockage local.
   - `StorageService` — couche de stockage bas niveau (Ionic Storage).
   - `MessageService` — retours UI (toasts, alertes).

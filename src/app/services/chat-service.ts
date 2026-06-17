@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CharacterService } from './character-service';
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
+import { Persona, PersonaService } from './persona-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
@@ -21,6 +22,8 @@ interface Conversation {
   id: string;
   characterId: string;
   messages: ChatMessage[];
+  // Persona incarné par l'utilisateur dans cette conversation (aucun si absent).
+  personaId?: string;
 }
 
 // Tour utilisateur transitoire (non persisté) injecté quand l'utilisateur passe son
@@ -38,7 +41,8 @@ export class ChatService {
   constructor(
     private characterService: CharacterService,
     private database: DatabaseService,
-    private gemini: GeminiService
+    private gemini: GeminiService,
+    private personaService: PersonaService
   ) { }
 
   // Renvoie les messages de la conversation d'un personnage (vide si aucune).
@@ -73,7 +77,8 @@ export class ChatService {
     conversation.messages.push({ id: crypto.randomUUID(), role: "user", text: text, at: Date.now() });
 
     // Obtient la réponse (vraie IA si clé configurée, sinon mock).
-    const systemPrompt = buildSystemPrompt({ character: character });
+    const persona = await this.personaFor(conversation);
+    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
     const reply = await this.generateReply(systemPrompt, conversation.messages);
 
     // Ajoute la réponse du modèle et persiste l'ensemble.
@@ -105,7 +110,8 @@ export class ChatService {
 
     // Retire la dernière réponse, puis régénère à partir de l'historique restant.
     messages.pop();
-    const systemPrompt = buildSystemPrompt({ character: character });
+    const persona = await this.personaFor(conversation);
+    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
     const reply = await this.generateReply(systemPrompt, messages);
     messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
     await this.saveConversation(conversation);
@@ -139,13 +145,28 @@ export class ChatService {
     }
     const conversation = await this.getOrCreateConversation(characterId);
 
-    const systemPrompt = buildSystemPrompt({ character: character });
+    const persona = await this.personaFor(conversation);
+    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
     const reply = await this.generateContinuation(systemPrompt, conversation.messages);
 
     conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
     await this.saveConversation(conversation);
 
     return conversation.messages;
+  }
+
+  // Renvoie l'id du persona incarné dans la conversation (undefined si aucun).
+  async getActivePersonaId(characterId: string): Promise<string | undefined> {
+    const conversation = await this.getConversation(characterId);
+    return conversation?.personaId;
+  }
+
+  // Définit le persona incarné dans la conversation (undefined pour « aucun »).
+  async setActivePersona(characterId: string, personaId: string | undefined): Promise<void> {
+    await this.getOrCreateConversation(characterId);
+    await this.database.updateEntriesWith(
+      "conversations", "characterId", characterId, { personaId: personaId }
+    );
   }
 
   // Choisit entre l'appel réel à Gemini et une réponse simulée (mock).
@@ -199,6 +220,15 @@ export class ChatService {
   private async greetingFor(characterId: string): Promise<string> {
     const character = await this.characterService.get(characterId);
     return character?.greeting?.trim() ?? "";
+  }
+
+  // Renvoie le persona incarné dans la conversation, ou undefined (aucun, ou
+  // persona supprimé entre-temps → on retombe sur « aucun »).
+  private async personaFor(conversation: Conversation): Promise<Persona | undefined> {
+    if (!conversation.personaId) {
+      return undefined;
+    }
+    return await this.personaService.get(conversation.personaId);
   }
 
   // Crée et persiste une conversation, initialisée avec la salutation si elle est fournie.

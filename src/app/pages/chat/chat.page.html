@@ -1,6 +1,7 @@
 <header class="chat-header">
   <button class="chat-back" (click)="goBack()">←</button>
   <h1 class="chat-title">{{ character?.name }}</h1>
+  <button class="chat-persona" title="Choisir mon persona" (click)="choosePersona()">{{ activePersonaLabel() }}</button>
 </header>
 
 <ion-content class="chat-content">

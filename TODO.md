@@ -77,14 +77,17 @@ Un bouton qui permet à l'utilisateur de **passer son tour** : sans écrire de m
 
 ## Phase 2 — Rôle & richesse des personnages
 
-### 4 — Personas (qui est l'utilisateur) *(demande initiale #1)* 🟡 🚧 En cours
+### 4 — Personas (qui est l'utilisateur) *(demande initiale #1)* 🟡 ✅ Fait
 L'utilisateur définit plusieurs personas (nom/surnoms, histoire, pouvoirs…) et choisit, dans une conversation, lequel il incarne (ou aucun). Ces infos sont transmises à Gemini.
 
 - **Fait (commit A — CRUD)** :
   - **Données** : table `personas` ajoutée à la structure par défaut de `DatabaseService` ; migration `updateToV2()` du `VersionHandlerService` (bump `appVersion` 1 → 2). Modèle `Persona` : `{ id, name, description, avatarColor, createdAt }` (description libre, comme le `systemPrompt` d'un personnage).
   - **Service** : `PersonaService` (CRUD) calqué sur `CharacterService`.
   - **Pages** : `personas` (liste, avec pastille/édition/suppression confirmée) + `persona-form` (création/édition). Routes ajoutées + bouton « Personas » dans le header de la page personnages.
-- **À faire (commit B — intégration chat)** : sélecteur de persona actif dans le chat ; persistance du choix sur la conversation (`personaId?` sur `Conversation`) ; bloc `UTILISATEUR (PERSONA)` ajouté par `buildSystemPrompt` ; fallback « aucun » si le persona référencé a été supprimé.
+- **Fait (commit B — intégration chat)** :
+  - **Données** : `personaId?` ajouté à `Conversation`. `ChatService.getActivePersonaId` / `setActivePersona` (get/set + persistance), `personaFor(conversation)` résout le persona (et retombe sur « aucun » si l'id ne pointe plus sur rien → suppression gérée).
+  - **Prompt** : `buildSystemPrompt` accepte `persona?` et ajoute un bloc `UTILISATEUR (PERSONA)` ; branché sur les trois points de génération (`send`, `regenerate`, `skipTurn`).
+  - **Chat** : bouton dans le header affichant le persona actif (ou « Aucun persona »), qui ouvre un choix radio (`AlertController`) ; « aucun persona » est un choix valide.
 - **Limites** : « aucun persona » est un cas valide (bloc omis). Cohérence si un persona est supprimé alors qu'il est référencé par une conversation → fallback « aucun ».
 
 ### 5 — Champs de création enrichis *(demande initiale #5)* 🟡
@@ -159,7 +162,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 2b | Convention de dialogue (nom + guillemets) | — | 🟢 | ✅ Fait |
 | 3 | Régénérer / supprimer un message | #8 | 🟡 | ✅ Fait |
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | ✅ Fait |
-| 4 | Personas | #1 | 🟡 | 🚧 En cours (CRUD fait) |
+| 4 | Personas | #1 | 🟡 | ✅ Fait |
 | 5 | Champs de création enrichis | #5 | 🟡 | À faire |
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | À faire |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | À faire |

@@ -20,10 +20,30 @@
 }
 
 .chat-title {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   font-size: 18px;
   font-weight: 700;
   color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-persona {
+  flex: 0 0 auto;
+  max-width: 45%;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--app-background);
+  color: var(--app-accent);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 ion-content.chat-content {

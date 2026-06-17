@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatMessage, ChatService } from 'src/app/services/chat-service';
 import { MessageService } from 'src/app/services/message-service';
+import { Persona, PersonaService } from 'src/app/services/persona-service';
 
 import { MessageBubbleComponent } from 'src/app/components/message-bubble/message-bubble.component';
 
@@ -26,6 +27,9 @@ export class ChatPage implements ViewWillEnter {
   draft = "";
   // Vrai pendant l'attente de la réponse de l'IA (désactive l'envoi).
   sending = false;
+  // Personas disponibles et id de celui incarné dans cette conversation.
+  personas: Persona[] = [];
+  activePersonaId?: string;
 
   async ionViewWillEnter() {
     await this.loadConversation();
@@ -36,6 +40,7 @@ export class ChatPage implements ViewWillEnter {
     private characterService: CharacterService,
     private chatService: ChatService,
     private message: MessageService,
+    private personaService: PersonaService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -49,7 +54,49 @@ export class ChatPage implements ViewWillEnter {
     }
     this.character = await this.characterService.get(id);
     this.messages = await this.chatService.getMessages(id);
+    this.personas = await this.personaService.list();
+    this.activePersonaId = await this.chatService.getActivePersonaId(id);
     this.scrollToBottom();
+  }
+
+  // Libellé du bouton de persona : nom du persona actif, ou « Aucun persona ».
+  activePersonaLabel(): string {
+    const persona = this.personas.find(item => item.id === this.activePersonaId);
+    return persona ? persona.name : "Aucun persona";
+  }
+
+  // Ouvre le choix du persona incarné dans la conversation (ou aucun).
+  async choosePersona() {
+    if (!this.character) {
+      return;
+    }
+    const inputs = [
+      { type: "radio" as const, label: "Aucun persona", value: "", checked: !this.activePersonaId },
+      ...this.personas.map(persona => ({
+        type: "radio" as const,
+        label: persona.name,
+        value: persona.id,
+        checked: persona.id === this.activePersonaId
+      }))
+    ];
+    const alert = await this.alert.create({
+      header: "Quel persona incarnes-tu ?",
+      inputs: inputs,
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Valider", handler: (value: string) => this.applyPersona(value) }
+      ]
+    });
+    await alert.present();
+  }
+
+  async applyPersona(personaId: string) {
+    if (!this.character) {
+      return;
+    }
+    const id = personaId || undefined;
+    this.activePersonaId = id;
+    await this.chatService.setActivePersona(this.character.id, id);
   }
 
   async send() {
