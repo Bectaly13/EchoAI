@@ -102,19 +102,15 @@ Compléter la personnalité libre par des champs structurés : apparence, relati
 
 ## Phase 3 — Fidélité narrative avancée
 
-### 6 — Mémoire permanente / contexte persistant *(demande initiale #4)* 🔴
+### 6 — Mémoire permanente / contexte persistant *(demande initiale #4)* 🔴 ✅ Fait (moteur)
 Conserver d'un message à l'autre des informations durables (lieu de l'action, relation utilisateur/personnage, instructions à conserver, hauts-faits…). **L'IA décide elle-même** ce qui doit entrer en mémoire (changement de lieu, étape de relation, jalon d'histoire…).
 
-- **Données** : ajouter `memory` à `Conversation`, sous forme d'entrées catégorisées : `{ id, category: "location" | "relationship" | "milestone" | "instruction", value, at, sourceMessageId }`. (`sourceMessageId` permet le rollback de #8.)
-- **Détection par l'IA — deux approches** :
-  - **(a) Sortie structurée en un appel** *(recommandé)* : via `responseSchema` / function calling de Gemini, demander un objet `{ reply, memoryUpdates?: [...] }`. Un seul appel, mais nécessite de bien séparer narration libre et données structurées.
-  - **(b) Deuxième passe dédiée** : après la réponse, un appel « extrais les faits durables à mémoriser ». Plus simple/fiable, mais **double la consommation de quota** (voir #9).
-- **Injection** : le `PromptBuilder` ajoute un bloc `MÉMOIRE PERMANENTE` à chaque tour.
-- **Limites / points d'attention** :
-  - **Quota** (palier gratuit) : préférer l'approche (a) pour ne pas doubler les requêtes.
-  - **Croissance** : plafonner/fusionner/résumer la mémoire pour ne pas exploser le budget de tokens (dédup par catégorie, écrasement du lieu courant, liste de jalons bornée).
-  - **Fiabilité** : l'IA peut sur- ou sous-mémoriser → prévoir une page de visualisation/édition manuelle de la mémoire (utile aussi en debug).
-  - **Rollback** : régénérer/supprimer (#8) doit retirer les entrées dont `sourceMessageId` pointe vers un tour effacé.
+- **Fait — Données** : `memory?: MemoryEntry[]` sur `Conversation`, entrées catégorisées `{ id, category: "location" | "relationship" | "milestone" | "instruction", value, at, sourceMessageId }`. Persistées via `saveConversation`.
+- **Fait — Détection (approche balisée, 1 appel)** : l'IA ajoute en fin de réponse un bloc `[[MEMORY]] catégorie: valeur … [[/MEMORY]]` (consigne dans `buildSystemPrompt`). Util pur `parseMemory` qui retire le bloc du texte affiché et en extrait les mises à jour. Choix d'une **convention textuelle** plutôt que `responseSchema` JSON : 1 seul appel (pas de surcoût quota), réponse narrative préservée, dégradation propre si mal formé, `GeminiService` inchangé.
+- **Fait — Fusion / croissance** : catégories à valeur unique (`location`, `relationship`) → la nouvelle valeur remplace l'ancienne ; catégories à valeurs multiples (`milestone`, `instruction`) → ajout borné à `MAX_LIST_ENTRIES` (30) par `capMemory`.
+- **Fait — Injection** : `buildSystemPrompt` ajoute un bloc `MÉMOIRE PERMANENTE` (groupé par catégorie) à chaque tour, plus un bloc `CONSIGNES DE MÉMOIRE` expliquant la convention d'écriture.
+- **Fait — Rollback** : `regenerate` oublie la mémoire produite par le message régénéré (`forgetMemoryFrom`) ; `deleteFrom` retire les entrées dont `sourceMessageId` n'est plus dans l'historique. Cas vérifiés (Node).
+- **Suite possible (non bloquante)** : écran de visualisation/édition manuelle de la mémoire (fiabilité/debug) — repoussé volontairement (choix « moteur d'abord »).
 
 ---
 
@@ -164,7 +160,7 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 3b | Passer son tour (faire reparler l'IA) | — | 🟡 | ✅ Fait |
 | 4 | Personas | #1 | 🟡 | ✅ Fait |
 | 5 | Champs de création enrichis | #5 | 🟡 | ✅ Fait |
-| 6 | Mémoire permanente / contexte | #4 | 🔴 | À faire |
+| 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur ; UI mémoire repoussée) |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | À faire |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |
 | 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |

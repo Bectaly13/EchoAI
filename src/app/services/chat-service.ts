@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { CharacterService } from './character-service';
+import { Character, CharacterService } from './character-service';
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
 import { Persona, PersonaService } from './persona-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
+import { MemoryCategory, MemoryUpdate, parseMemory } from '../utils/parse-memory';
 
 // Un message dans une conversation. role suit les valeurs attendues par l'API Gemini.
 export interface ChatMessage {
@@ -17,6 +18,16 @@ export interface ChatMessage {
   at: number;
 }
 
+// Une entrée de mémoire permanente, transportée de prompt en prompt.
+export interface MemoryEntry {
+  id: string;
+  category: MemoryCategory;
+  value: string;
+  at: number;
+  // Message (du modèle) qui a produit cette entrée → permet le rollback (#3).
+  sourceMessageId: string;
+}
+
 // Une conversation rattachée à un personnage.
 interface Conversation {
   id: string;
@@ -24,7 +35,15 @@ interface Conversation {
   messages: ChatMessage[];
   // Persona incarné par l'utilisateur dans cette conversation (aucun si absent).
   personaId?: string;
+  // Mémoire permanente accumulée au fil de la conversation.
+  memory?: MemoryEntry[];
 }
+
+// Catégories de mémoire à valeur unique : une nouvelle valeur remplace l'ancienne.
+const SINGLE_VALUED_CATEGORIES: MemoryCategory[] = ["location", "relationship"];
+// Nombre maximum d'entrées conservées par catégorie à valeurs multiples (jalons,
+// consignes), pour borner la croissance de la mémoire (budget de tokens).
+const MAX_LIST_ENTRIES = 30;
 
 // Tour utilisateur transitoire (non persisté) injecté quand l'utilisateur passe son
 // tour : l'historique se termine alors par un message du modèle, or Gemini attend un
@@ -77,12 +96,11 @@ export class ChatService {
     conversation.messages.push({ id: crypto.randomUUID(), role: "user", text: text, at: Date.now() });
 
     // Obtient la réponse (vraie IA si clé configurée, sinon mock).
-    const persona = await this.personaFor(conversation);
-    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
-    const reply = await this.generateReply(systemPrompt, conversation.messages);
+    const systemPrompt = await this.buildPrompt(character, conversation);
+    const raw = await this.generateReply(systemPrompt, conversation.messages);
 
-    // Ajoute la réponse du modèle et persiste l'ensemble.
-    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
+    // Intègre la réponse (texte nettoyé + mises à jour de mémoire), puis persiste.
+    const reply = this.appendModelReply(conversation, raw);
     await this.saveConversation(conversation);
 
     return reply;
@@ -108,12 +126,14 @@ export class ChatService {
       throw new Error("Personnage introuvable");
     }
 
-    // Retire la dernière réponse, puis régénère à partir de l'historique restant.
-    messages.pop();
-    const persona = await this.personaFor(conversation);
-    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
-    const reply = await this.generateReply(systemPrompt, messages);
-    messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
+    // Retire la dernière réponse (et la mémoire qu'elle avait produite), puis régénère.
+    const removed = messages.pop();
+    if (removed) {
+      this.forgetMemoryFrom(conversation, removed.id);
+    }
+    const systemPrompt = await this.buildPrompt(character, conversation);
+    const raw = await this.generateReply(systemPrompt, messages);
+    this.appendModelReply(conversation, raw);
     await this.saveConversation(conversation);
 
     return messages;
@@ -131,6 +151,9 @@ export class ChatService {
       return conversation.messages;
     }
     conversation.messages.splice(index);
+    // Oublie la mémoire produite par les messages supprimés.
+    const remainingIds = new Set(conversation.messages.map(message => message.id));
+    conversation.memory = (conversation.memory ?? []).filter(entry => remainingIds.has(entry.sourceMessageId));
     await this.saveConversation(conversation);
 
     return conversation.messages;
@@ -145,11 +168,10 @@ export class ChatService {
     }
     const conversation = await this.getOrCreateConversation(characterId);
 
-    const persona = await this.personaFor(conversation);
-    const systemPrompt = buildSystemPrompt({ character: character, persona: persona });
-    const reply = await this.generateContinuation(systemPrompt, conversation.messages);
+    const systemPrompt = await this.buildPrompt(character, conversation);
+    const raw = await this.generateContinuation(systemPrompt, conversation.messages);
 
-    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: reply, at: Date.now() });
+    this.appendModelReply(conversation, raw);
     await this.saveConversation(conversation);
 
     return conversation.messages;
@@ -167,6 +189,75 @@ export class ChatService {
     await this.database.updateEntriesWith(
       "conversations", "characterId", characterId, { personaId: personaId }
     );
+  }
+
+  // ----- Prompt et mémoire permanente -----
+
+  // Assemble le prompt système pour cette conversation (personnage + persona + mémoire).
+  private async buildPrompt(character: Character, conversation: Conversation): Promise<string> {
+    const persona = await this.personaFor(conversation);
+    return buildSystemPrompt({ character: character, persona: persona, memory: conversation.memory });
+  }
+
+  // Intègre une réponse brute du modèle : extrait l'éventuel bloc mémoire, ajoute le
+  // message (texte nettoyé) et applique les mises à jour. Renvoie le texte affiché.
+  private appendModelReply(conversation: Conversation, raw: string): string {
+    const parsed = parseMemory(raw);
+    const messageId = crypto.randomUUID();
+    conversation.messages.push({ id: messageId, role: "model", text: parsed.text, at: Date.now() });
+    this.applyMemoryUpdates(conversation, parsed.updates, messageId);
+    return parsed.text;
+  }
+
+  // Applique les mises à jour de mémoire : remplace pour les catégories à valeur
+  // unique, ajoute (en bornant) pour les catégories à valeurs multiples.
+  private applyMemoryUpdates(conversation: Conversation, updates: MemoryUpdate[], sourceMessageId: string): void {
+    if (updates.length === 0) {
+      return;
+    }
+    let memory = conversation.memory ? [...conversation.memory] : [];
+    for (const update of updates) {
+      if (SINGLE_VALUED_CATEGORIES.includes(update.category)) {
+        memory = memory.filter(entry => entry.category !== update.category);
+      }
+      memory.push({
+        id: crypto.randomUUID(),
+        category: update.category,
+        value: update.value,
+        at: Date.now(),
+        sourceMessageId: sourceMessageId
+      });
+    }
+    conversation.memory = this.capMemory(memory);
+  }
+
+  // Retire les entrées de mémoire produites par un message donné (rollback).
+  private forgetMemoryFrom(conversation: Conversation, messageId: string): void {
+    if (!conversation.memory) {
+      return;
+    }
+    conversation.memory = conversation.memory.filter(entry => entry.sourceMessageId !== messageId);
+  }
+
+  // Borne chaque catégorie à valeurs multiples à ses MAX_LIST_ENTRIES plus récentes,
+  // en préservant l'ordre chronologique.
+  private capMemory(memory: MemoryEntry[]): MemoryEntry[] {
+    const counts = new Map<MemoryCategory, number>();
+    const kept: MemoryEntry[] = [];
+    // On parcourt du plus récent au plus ancien pour garder les derniers.
+    for (let i = memory.length - 1; i >= 0; i--) {
+      const entry = memory[i];
+      if (SINGLE_VALUED_CATEGORIES.includes(entry.category)) {
+        kept.push(entry);
+        continue;
+      }
+      const count = counts.get(entry.category) ?? 0;
+      if (count < MAX_LIST_ENTRIES) {
+        counts.set(entry.category, count + 1);
+        kept.push(entry);
+      }
+    }
+    return kept.reverse();
   }
 
   // Choisit entre l'appel réel à Gemini et une réponse simulée (mock).
@@ -244,7 +335,8 @@ export class ChatService {
 
   private async saveConversation(conversation: Conversation): Promise<void> {
     await this.database.updateEntriesWith(
-      "conversations", "characterId", conversation.characterId, { messages: conversation.messages }
+      "conversations", "characterId", conversation.characterId,
+      { messages: conversation.messages, memory: conversation.memory ?? [] }
     );
   }
 

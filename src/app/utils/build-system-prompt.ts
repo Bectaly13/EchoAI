@@ -6,11 +6,20 @@
 import { Character } from "../services/character-service";
 import { Persona } from "../services/persona-service";
 
-// Sources d'assemblage du prompt. S'enrichira avec la mémoire, des options…
+// Une entrée de mémoire telle qu'attendue par le prompt (catégorie + valeur).
+// Volontairement minimal pour ne pas coupler ce module au modèle de ChatService.
+interface MemoryItem {
+  category: string;
+  value: string;
+}
+
+// Sources d'assemblage du prompt. S'enrichira avec d'autres options au besoin.
 export interface BuildSystemPromptOptions {
   character: Character;
   // Persona incarné par l'utilisateur dans la conversation (facultatif).
   persona?: Persona;
+  // Mémoire permanente de la conversation (facultative).
+  memory?: MemoryItem[];
 }
 
 // Construit le prompt système complet à partir des sources fournies.
@@ -21,7 +30,11 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
   if (options.persona) {
     blocks.push(buildPersonaBlock(options.persona));
   }
+  if (options.memory && options.memory.length > 0) {
+    blocks.push(buildMemoryBlock(options.memory));
+  }
   blocks.push(buildFormatBlock());
+  blocks.push(buildMemoryInstructionBlock());
 
   // Les blocs sont séparés par une ligne vide pour rester lisibles côté modèle.
   return blocks.join("\n\n");
@@ -46,6 +59,54 @@ function buildFormatBlock(): string {
     "CONSIGNES DE FORMAT",
     "Préfixe chaque réplique par le nom de celui qui parle, suivi d'un deux-points, puis mets les paroles entre guillemets droits. Exemple :\nAlice : \"Bonjour\"\nBob : \"Salut\"",
     "Encadre les actions, gestes et passages de narration entre astérisques (par exemple : *il sourit et s'approche*), en dehors des guillemets."
+  ].join("\n");
+}
+
+// Bloc rappelant à l'IA les informations durables établies au fil de l'histoire.
+function buildMemoryBlock(memory: MemoryItem[]): string {
+  const lines = [
+    "MÉMOIRE PERMANENTE",
+    "Tiens compte de ces informations établies au fil de l'histoire :"
+  ];
+  const location = latestValue(memory, "location");
+  if (location) {
+    lines.push(`Lieu actuel : ${location}`);
+  }
+  const relationship = latestValue(memory, "relationship");
+  if (relationship) {
+    lines.push(`Relation avec l'utilisateur : ${relationship}`);
+  }
+  const milestones = valuesOf(memory, "milestone");
+  if (milestones.length > 0) {
+    lines.push("Jalons de l'histoire :");
+    milestones.forEach(value => lines.push(`- ${value}`));
+  }
+  const instructions = valuesOf(memory, "instruction");
+  if (instructions.length > 0) {
+    lines.push("Consignes à respecter :");
+    instructions.forEach(value => lines.push(`- ${value}`));
+  }
+  return lines.join("\n");
+}
+
+// Dernière valeur connue d'une catégorie à valeur unique (lieu, relation).
+function latestValue(memory: MemoryItem[], category: string): string | undefined {
+  const matching = memory.filter(item => item.category === category);
+  return matching.length > 0 ? matching[matching.length - 1].value : undefined;
+}
+
+// Toutes les valeurs d'une catégorie à valeurs multiples (jalons, consignes).
+function valuesOf(memory: MemoryItem[], category: string): string[] {
+  return memory.filter(item => item.category === category).map(item => item.value);
+}
+
+// Bloc expliquant à l'IA comment écrire en mémoire permanente (convention balisée).
+function buildMemoryInstructionBlock(): string {
+  return [
+    "CONSIGNES DE MÉMOIRE",
+    "Si — et seulement si — un élément durable change (nouveau lieu, évolution de votre relation, étape importante de l'histoire franchie, consigne à retenir), ajoute TOUT À LA FIN de ta réponse un bloc exactement à ce format :",
+    "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <le fait marquant qui vient de se produire>\ninstruction: <une consigne à respecter durablement>\n[[/MEMORY]]",
+    "N'inclus que les lignes pertinentes (pas forcément les quatre). N'évoque jamais ce bloc dans ta narration. S'il n'y a rien de nouveau à mémoriser, n'ajoute aucun bloc."
   ].join("\n");
 }
 
