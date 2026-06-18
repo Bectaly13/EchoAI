@@ -117,6 +117,17 @@ ion-content.personas-content {
   color: var(--app-text);
 }
 
+.persona-item-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--app-background);
+  color: var(--app-accent);
+  vertical-align: middle;
+}
+
 .persona-item-description {
   margin: 2px 0 0;
   font-size: 13px;

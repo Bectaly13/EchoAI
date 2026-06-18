@@ -5,6 +5,7 @@ import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } 
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { IonicStorageModule } from '@ionic/storage-angular';
 
+import { PersonaService } from './app/services/persona-service';
 import { VersionHandlerService } from './app/services/version-handler-service';
 
 import { routes } from './app/app.routes';
@@ -19,7 +20,11 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(),
     // Stockage local des personnages et conversations (utilisé par StorageService).
     importProvidersFrom(IonicStorageModule.forRoot()),
-    // Applique les migrations de format de la bdd avant le démarrage de l'app.
-    provideAppInitializer(() => inject(VersionHandlerService).init()),
+    // Applique les migrations de format de la bdd, puis garantit le persona par
+    // défaut, avant le démarrage de l'app.
+    provideAppInitializer(async () => {
+      await inject(VersionHandlerService).init();
+      await inject(PersonaService).ensureDefault();
+    }),
   ],
 });

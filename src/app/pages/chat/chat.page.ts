@@ -64,26 +64,23 @@ export class ChatPage implements ViewWillEnter {
     this.scrollToBottom();
   }
 
-  // Libellé du bouton de persona : nom du persona actif, ou « Aucun persona ».
+  // Libellé du bouton de persona : nom du persona actif.
   activePersonaLabel(): string {
     const persona = this.personas.find(item => item.id === this.activePersonaId);
-    return persona ? persona.name : "Aucun persona";
+    return persona ? persona.name : "Persona";
   }
 
-  // Ouvre le choix du persona incarné dans la conversation (ou aucun).
+  // Ouvre le choix du persona incarné dans la conversation (nom + description).
   async choosePersona() {
     if (!this.character) {
       return;
     }
-    const inputs = [
-      { type: "radio" as const, label: "Aucun persona", value: "", checked: !this.activePersonaId },
-      ...this.personas.map(persona => ({
-        type: "radio" as const,
-        label: persona.name,
-        value: persona.id,
-        checked: persona.id === this.activePersonaId
-      }))
-    ];
+    const inputs = this.personas.map(persona => ({
+      type: "radio" as const,
+      label: this.personaOptionLabel(persona),
+      value: persona.id,
+      checked: persona.id === this.activePersonaId
+    }));
     const alert = await this.alert.create({
       header: "Quel persona incarnes-tu ?",
       inputs: inputs,
@@ -96,12 +93,21 @@ export class ChatPage implements ViewWillEnter {
   }
 
   async applyPersona(personaId: string) {
-    if (!this.character) {
+    if (!this.character || !personaId) {
       return;
     }
-    const id = personaId || undefined;
-    this.activePersonaId = id;
-    await this.chatService.setActivePersona(this.character.id, id);
+    this.activePersonaId = personaId;
+    await this.chatService.setActivePersona(this.character.id, personaId);
+  }
+
+  // Libellé d'une option de persona : nom + début de description (tronquée).
+  private personaOptionLabel(persona: Persona): string {
+    const description = persona.description?.trim();
+    if (!description) {
+      return persona.name;
+    }
+    const short = description.length > 80 ? `${description.slice(0, 80).trim()}…` : description;
+    return `${persona.name} — ${short}`;
   }
 
   async send() {

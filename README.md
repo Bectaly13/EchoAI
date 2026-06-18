@@ -19,8 +19,8 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
 ### Personas
-- **Définir des personas** : l'utilisateur crée des personas (nom + description : qui il est, son histoire, ses pouvoirs…) qu'il peut incarner.
-- **Incarner un persona** : dans chaque conversation, on choisit le persona incarné (ou aucun) ; ces infos sont transmises au personnage IA.
+- **Définir des personas** : l'utilisateur crée des personas (nom + description : qui il est, son histoire, ses pouvoirs…) qu'il peut incarner. Un persona **par défaut** (« Moi ») existe toujours : au premier lancement, l'application propose de le nommer. Il est non supprimable mais reste modifiable.
+- **Incarner un persona** : chaque conversation a **toujours** un persona actif (le persona par défaut au départ) ; on peut en changer via une liste qui affiche nom **et** description. Ces infos sont transmises au personnage IA.
 
 ### Conversation
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.

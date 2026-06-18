@@ -3,6 +3,7 @@ import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/stand
 import { Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
+import { PersonaService } from 'src/app/services/persona-service';
 
 import { CharacterCardComponent } from 'src/app/components/character-card/character-card.component';
 
@@ -19,16 +20,49 @@ export class CharactersPage implements ViewWillEnter {
 
   async ionViewWillEnter() {
     await this.loadCharacters();
+    await this.promptUserNameIfNeeded();
   }
 
   constructor(
     private characterService: CharacterService,
+    private personaService: PersonaService,
     private router: Router,
     private alert: AlertController
   ) { }
 
   async loadCharacters() {
     this.characters = await this.characterService.list();
+  }
+
+  // Au premier lancement, invite l'utilisateur à nommer son persona par défaut.
+  // Proposé une seule fois (le persona reste éditable ensuite via la page Personas).
+  async promptUserNameIfNeeded() {
+    if (await this.personaService.hasPromptedName()) {
+      return;
+    }
+    // On mémorise tout de suite : on ne redemandera plus, même si l'invite est ignorée.
+    await this.personaService.markNamePrompted();
+    const persona = await this.personaService.getDefault();
+    if (!persona) {
+      return;
+    }
+    const alert = await this.alert.create({
+      header: "Comment t'appelles-tu ?",
+      message: "Ce nom est ton persona par défaut, transmis aux personnages. Tu pourras le modifier dans « Personas ».",
+      inputs: [{ name: "name", type: "text", value: persona.name, placeholder: "Ton nom" }],
+      buttons: [
+        { text: "Plus tard", role: "cancel" },
+        { text: "Valider", handler: (data: { name: string }) => this.saveUserName(persona.id, data.name) }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async saveUserName(personaId: string, name: string) {
+    const trimmed = (name || "").trim();
+    if (trimmed) {
+      await this.personaService.update(personaId, { name: trimmed });
+    }
   }
 
   goToCreate() {

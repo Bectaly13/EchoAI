@@ -217,10 +217,15 @@ export class ChatService {
     return conversation.messages;
   }
 
-  // Renvoie l'id du persona incarné dans la conversation (undefined si aucun).
+  // Renvoie l'id du persona incarné dans la conversation. À défaut de choix
+  // explicite (conversation ancienne ou non encore créée), renvoie le persona
+  // par défaut : l'utilisateur a toujours un persona actif.
   async getActivePersonaId(characterId: string): Promise<string | undefined> {
     const conversation = await this.getConversation(characterId);
-    return conversation?.personaId;
+    if (conversation?.personaId) {
+      return conversation.personaId;
+    }
+    return (await this.personaService.getDefault())?.id;
   }
 
   // Définit le persona incarné dans la conversation (undefined pour « aucun »).
@@ -384,22 +389,33 @@ export class ChatService {
     return character?.greeting?.trim() ?? "";
   }
 
-  // Renvoie le persona incarné dans la conversation, ou undefined (aucun, ou
-  // persona supprimé entre-temps → on retombe sur « aucun »).
+  // Renvoie le persona incarné dans la conversation. À défaut de choix explicite
+  // (ou si le persona choisi a été supprimé), on retombe sur le persona par défaut
+  // « Moi » → l'utilisateur a toujours un persona transmis à l'IA.
   private async personaFor(conversation: Conversation): Promise<Persona | undefined> {
-    if (!conversation.personaId) {
-      return undefined;
+    if (conversation.personaId) {
+      const persona = await this.personaService.get(conversation.personaId);
+      if (persona) {
+        return persona;
+      }
     }
-    return await this.personaService.get(conversation.personaId);
+    return await this.personaService.getDefault();
   }
 
-  // Crée et persiste une conversation, initialisée avec la salutation si elle est fournie.
+  // Crée et persiste une conversation, initialisée avec la salutation si elle est
+  // fournie, et avec le persona par défaut comme persona actif.
   private async persistNewConversation(characterId: string, greeting: string): Promise<Conversation> {
     const messages: ChatMessage[] = [];
     if (greeting) {
       messages.push({ id: crypto.randomUUID(), role: "model", text: greeting, at: Date.now() });
     }
-    const conversation: Conversation = { id: crypto.randomUUID(), characterId: characterId, messages: messages };
+    const defaultPersona = await this.personaService.getDefault();
+    const conversation: Conversation = {
+      id: crypto.randomUUID(),
+      characterId: characterId,
+      messages: messages,
+      personaId: defaultPersona?.id
+    };
     await this.database.addEntry("conversations", conversation);
     return conversation;
   }

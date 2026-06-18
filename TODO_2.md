@@ -31,14 +31,15 @@ La suppression d'un message du personnage fonctionnait déjà (bouton 🗑 sur *
 - **Effet** : supprimer une réponse de l'IA déclenchée par un message utilisateur ramène la conversation **avant** ce message (pas d'historique se terminant sur une question sans réponse). Seul `deleteFrom` peut produire ce cas (les autres flux finissent toujours sur un `model`).
 - **Vérifié** (simulation) : suppression d'une réponse IA → retire aussi le message utilisateur déclencheur ; suppression d'un message utilisateur → reste sur la réponse précédente ; id inconnu → sans effet.
 
-## 4 — Persona par défaut « Moi » + sélection descriptive *(corrige 4)* 🟡
-L'utilisateur doit **toujours** avoir un persona actif (au minimum pour transmettre son nom à l'IA). « Aucun persona » disparaît.
+## 4 — Persona par défaut « Moi » + sélection descriptive *(corrige 4)* 🟡 ✅ Fait
+L'utilisateur a **toujours** un persona actif (au minimum pour transmettre son nom à l'IA). « Aucun persona » a disparu.
 
-- **Persona « Moi » auto-créé** : au premier lancement, créer un persona par défaut. **Demander le nom de l'utilisateur une fois** (puis éditable comme n'importe quel persona). Méthode : migration **v4** du `VersionHandlerService` qui sème ce persona ; recueil du nom via une invite à la première utilisation (ou valeur initiale « Moi » à renommer).
-- **Non supprimable** : marquer ce persona (`isDefault: true`) ; empêcher sa suppression dans `PersonaService.remove` et masquer le bouton de suppression côté UI.
-- **Toujours actif** : une nouvelle conversation démarre avec le persona par défaut. `Conversation.personaId` pointe **toujours** sur un persona ; la sélection « aucun » est retirée. Migration douce : les conversations existantes sans `personaId` retombent sur le défaut.
-- **Modale de sélection descriptive** : le choix du persona dans la conversation affiche **nom + description** de chaque persona (aujourd'hui seul le nom apparaît, ce qui rend le choix difficile). Méthode : si l'`AlertController` radio est trop limité pour afficher les descriptions, basculer vers une petite liste/modale dédiée.
-- **Limites** : recueil initial du nom ; empêcher la suppression du défaut ; cohérence des conversations existantes (fallback sur le défaut).
+- **Fait — Persona « Moi » garanti** : `PersonaService.ensureDefault()` (idempotent) crée le persona par défaut (`isDefault: true`) s'il n'existe pas. Appelé au démarrage via `provideAppInitializer` **après** les migrations → couvre nouveaux et anciens utilisateurs. **Pas de migration versionnée** : `isDefault` est un champ optionnel (même logique qu'au point 5), l'invariant est posé au démarrage.
+- **Fait — Nom demandé une fois** : au premier lancement, la page personnages invite à nommer le persona (`AlertController`), puis mémorise le fait via `StorageService` (clé `defaultPersonaNamed`, comme la clé `version`) pour ne plus le redemander. Le persona reste éditable ensuite.
+- **Fait — Non supprimable** : `PersonaService.remove` ignore un persona `isDefault` ; le bouton 🗑 est masqué et un tag « par défaut » s'affiche sur la page Personas.
+- **Fait — Toujours actif** : `persistNewConversation` initialise `personaId` sur le défaut ; `personaFor` et `getActivePersonaId` **retombent sur le défaut** si aucun choix (ou persona supprimé). Les conversations existantes sans `personaId` sont gérées par ce fallback (pas de réécriture). La sélection « aucun » est retirée.
+- **Fait — Modale descriptive** : la sélection affiche `nom — début de description` (description tronquée à 80 caractères) pour chaque persona.
+- **Limite** : l'invite de nom est volontairement « soft » (ignorable, le persona garde « Moi ») et n'est proposée qu'une fois.
 
 ## 5 — Salutation obligatoire + conventions sur la salutation générée *(corrige 1 et 7a)* 🟡
 La salutation devient **obligatoire**, et celle **générée par l'IA** doit suivre les conventions d'écriture des messages.
@@ -71,7 +72,7 @@ Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**,
 | 1 | Génération d'image de profil : dégradation propre (gratuit) | 7b | 🟢 | ✅ Fait (dégradé) · génération parquée (plan payant) |
 | 2 | Illustration de scène : dégradation propre (gratuit) | 8 | 🟢 | ✅ Fait (dégradé) · génération parquée (plan payant) |
 | 3 | Invariant de suppression (jamais finir sur l'utilisateur) | 3 | 🟢 | ✅ Fait |
-| 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | À faire |
+| 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | ✅ Fait |
 | 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | À faire |
 | 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | À faire |
 | 7 | Comptabiliser tous les appels IA + max RPD par modèle | 9 | 🟡 | À faire |

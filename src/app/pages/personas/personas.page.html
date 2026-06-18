@@ -22,12 +22,17 @@
             <span class="persona-item-initial">{{ initial(persona) }}</span>
           </div>
           <div class="persona-item-info">
-            <h2 class="persona-item-name">{{ persona.name }}</h2>
+            <h2 class="persona-item-name">
+              {{ persona.name }}
+              @if (persona.isDefault) { <span class="persona-item-tag">par défaut</span> }
+            </h2>
             <p class="persona-item-description">{{ persona.description }}</p>
           </div>
           <div class="persona-item-actions">
             <button class="persona-item-edit" (click)="goToEdit(persona)">✎</button>
-            <button class="persona-item-delete" (click)="confirmRemove(persona)">🗑</button>
+            @if (!persona.isDefault) {
+              <button class="persona-item-delete" (click)="confirmRemove(persona)">🗑</button>
+            }
           </div>
         </div>
       }
