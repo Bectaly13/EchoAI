@@ -141,10 +141,15 @@ export class CharacterFormPage implements ViewWillEnter {
       await this.message.error("Donne un nom au personnage.");
       return;
     }
+    const greeting = this.greeting.trim();
+    if (!greeting) {
+      await this.message.error("Ajoute un message d'accueil au personnage.");
+      return;
+    }
     const draft = {
       name: name,
       systemPrompt: this.systemPrompt.trim(),
-      greeting: this.greeting.trim(),
+      greeting: greeting,
       appearance: this.appearance.trim(),
       initialRelationship: this.initialRelationship.trim(),
       likes: this.likes.trim(),

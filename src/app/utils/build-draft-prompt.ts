@@ -9,7 +9,7 @@ export function buildDraftPrompt(brief: string): string {
     "Consignes :",
     "- Reste fidèle au brouillon ; comble les manques de façon plausible sans contredire ce qui est donné.",
     "- \"systemPrompt\" décrit la personnalité, la façon de parler, le ton et ce que sait le personnage (rédigé à la 3ᵉ personne, comme des instructions de jeu de rôle).",
-    "- \"greeting\" est un premier message dit par le personnage lui-même, pour planter le décor (à la 1ʳᵉ personne).",
+    "- \"greeting\" est le premier message du personnage (à la 1ʳᵉ personne), pour planter le décor. Il DOIT suivre le format des messages : préfixe chaque réplique par le nom de celui qui parle suivi d'un deux-points, puis les paroles entre guillemets droits (ex. : Alice : \"Bonjour\"), et encadre les actions / la narration entre astérisques (ex. : *elle sourit*), en dehors des guillemets.",
     "- Les autres champs sont concis. Laisse une chaîne vide pour un champ que le brouillon ne permet pas de remplir raisonnablement.",
     "- N'invente pas de personnages connus si le brouillon n'en mentionne pas.",
     "",
@@ -43,5 +43,5 @@ export const CHARACTER_DRAFT_SCHEMA = {
     "dislikes",
     "knownCharacters"
   ],
-  required: ["name", "systemPrompt"]
+  required: ["name", "systemPrompt", "greeting"]
 };

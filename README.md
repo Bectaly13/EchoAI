@@ -11,7 +11,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 > Pour l'instant l'application couvre l'essentiel ; d'autres fonctionnalités suivront.
 
 ### Personnages
-- **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** optionnel, et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
+- **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** (obligatoire), et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
 - **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
 - **Photo de profil générée** : l'IA peut générer une photo de profil du personnage (modèles Imagen). ⚠️ Indisponible sur le palier gratuit Gemini (génération d'image réservée aux plans payants) : par défaut, une pastille colorée sert d'avatar. Réactivable via `GEMINI_IMAGE_ENABLED` avec un plan payant.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
@@ -24,7 +24,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 
 ### Conversation
 - **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
-- **Message d'accueil** : si le personnage en a un, c'est le premier message affiché (côté IA) à l'ouverture de la conversation.
+- **Message d'accueil** : premier message affiché (côté IA) à l'ouverture de la conversation, pour planter le décor. Obligatoire à la création ; suit le format des messages (narration, dialogue) — y compris quand il est généré par l'IA.
 - **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et l'historique de la conversation comme contexte.
 - **Narration** : les passages encadrés d'astérisques (`*il sourit*`) sont mis en forme (italique, grisé) pour distinguer la narration des paroles.
 - **Dialogue** : l'IA préfixe les répliques par le nom de celui qui parle et met les paroles entre guillemets (`Alice : "Bonjour"`), pratique quand plusieurs personnages interviennent.

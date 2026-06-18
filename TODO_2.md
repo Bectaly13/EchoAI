@@ -41,12 +41,12 @@ L'utilisateur a **toujours** un persona actif (au minimum pour transmettre son n
 - **Fait — Modale descriptive** : la sélection affiche `nom — début de description` (description tronquée à 80 caractères) pour chaque persona.
 - **Limite** : l'invite de nom est volontairement « soft » (ignorable, le persona garde « Moi ») et n'est proposée qu'une fois.
 
-## 5 — Salutation obligatoire + conventions sur la salutation générée *(corrige 1 et 7a)* 🟡
-La salutation devient **obligatoire**, et celle **générée par l'IA** doit suivre les conventions d'écriture des messages.
+## 5 — Salutation obligatoire + conventions sur la salutation générée *(corrige 1 et 7a)* 🟡 ✅ Fait
+La salutation est **obligatoire**, et celle **générée par l'IA** suit les conventions d'écriture des messages.
 
-- **Salutation obligatoire** : champ requis dans `character-form` (validation au `save`, comme le nom). `Character.greeting` ne doit plus être vide. Conséquence : le comportement « paresseux » (conversation non créée tant qu'il n'y a pas de salutation) n'a plus lieu d'être.
-- **Conventions sur la salutation générée (7a)** : le `greeting` produit par `draftFromBrief` doit respecter le **format des messages** — narration entre astérisques, répliques préfixées par le nom + deux points + guillemets (`Nom : "…"`). Méthode : enrichir l'instruction de `buildDraftPrompt` pour le champ `greeting` (rappeler ces conventions, comme le fait `buildFormatBlock` côté chat).
-- **Limite** : personnages **existants** sans salutation → à gérer (forcer une saisie à la prochaine édition, ou valeur de repli). À préciser au moment de l'implémentation.
+- **Fait — Salutation obligatoire** : `character-form.save` valide que la salutation est non vide (comme le nom) ; le libellé/placeholder n'indiquent plus « optionnel » et donnent un exemple au bon format. `Character.greeting` reste de type `string`.
+- **Fait — Conventions sur la salutation générée (7a)** : l'instruction du champ `greeting` dans `buildDraftPrompt` impose désormais le format des messages (répliques `Nom : "…"`, narration entre astérisques en dehors des guillemets). `greeting` est passé en **`required`** dans `CHARACTER_DRAFT_SCHEMA`.
+- **Limite (assumée)** : les personnages **existants** sans salutation ne sont pas migrés ; la salutation leur sera demandée à la **prochaine édition** (la validation bloque l'enregistrement sans salutation). En attendant, leur conversation démarre sans premier message imposé (comportement paresseux conservé pour ces cas anciens).
 
 ## 6 — Mémoire : créer et éditer un souvenir *(corrige 6b)* 🟡
 La **suppression unitaire** d'un souvenir existe déjà (🗑 par entrée) en plus de « Tout oublier ». Ajouts : **créer** et **éditer**.
@@ -73,6 +73,6 @@ Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**,
 | 2 | Illustration de scène : dégradation propre (gratuit) | 8 | 🟢 | ✅ Fait (dégradé) · génération parquée (plan payant) |
 | 3 | Invariant de suppression (jamais finir sur l'utilisateur) | 3 | 🟢 | ✅ Fait |
 | 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | ✅ Fait |
-| 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | À faire |
+| 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | ✅ Fait |
 | 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | À faire |
 | 7 | Comptabiliser tous les appels IA + max RPD par modèle | 9 | 🟡 | À faire |
