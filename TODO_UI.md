@@ -17,7 +17,7 @@ Mettre en place la gestion de thèmes (calquée sur le projet de référence) et
 - **`variables.scss`** : passer du `:root` unique actuel à **une classe par thème** définissant les `--app-*` existants + de nouvelles variables transverses : `--header-background/-border/-text/-back-background`, `--navbar-background/-border/-icon/-icon-active`, et `--safe-top` / `--safe-bottom` (= `env(safe-area-inset-*)`).
 - **Limite** : les palettes (notamment « Défaut » façon Discord) sont posées en première version et seront affinées à la phase style.
 
-## 2 — Blocage en mode portrait (Capacitor) 🟢
+## 2 — Blocage en mode portrait (Capacitor) 🟢 ✅ Fait
 Bloquer l'application en orientation portrait, comme le projet de référence.
 
 - **Méthode** : ajouter la dépendance `@capacitor/screen-orientation` ; appeler `ScreenOrientation.lock({ orientation: 'portrait' })` au chargement de `app.component.ts`.
@@ -75,7 +75,7 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 | Ordre | Tâche | Effort | État |
 | ----- | ----- | ------ | ---- |
 | 1 | Fondations de thème (ThemeService + variables par thème) | 🟡 | ✅ Fait |
-| 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | À faire |
+| 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | ✅ Fait |
 | 3 | Composants Header + Navbar | 🟡 | À faire |
 | 4 | Page Welcome / splash + reroutage init | 🟡 | À faire |
 | 5 | Architecture de navigation (routes + ossature) | 🔴 | À faire |
