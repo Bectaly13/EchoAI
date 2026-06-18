@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -44,6 +45,7 @@ export class ChatPage implements ViewWillEnter {
     private alert: AlertController,
     private characterService: CharacterService,
     private chatService: ChatService,
+    private location: Location,
     private message: MessageService,
     private personaService: PersonaService,
     private route: ActivatedRoute,
@@ -254,8 +256,9 @@ export class ChatPage implements ViewWillEnter {
     }
   }
 
+  // Retour à la page d'origine (Personnages ou Conversations selon d'où l'on vient).
   goBack() {
-    this.router.navigate(["characters"]);
+    this.location.back();
   }
 
   // Fait défiler la conversation jusqu'au dernier message (après rendu).
