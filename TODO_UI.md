@@ -10,7 +10,7 @@ Conventions confirmées pour cette volée :
 
 ---
 
-## 1 — Fondations de thème : ThemeService + variables par thème 🟡
+## 1 — Fondations de thème : ThemeService + variables par thème 🟡 ✅ Fait
 Mettre en place la gestion de thèmes (calquée sur le projet de référence) et restructurer `variables.scss`.
 
 - **ThemeService** : `type Theme = "Défaut" | "Clair" | "Sombre"`, mapping vers des classes body (`theme-default`, `theme-light`, `theme-dark`). Méthodes `initTheme` / `applyTheme(theme)` / `getTheme` / `getThemes`, persistance via `StorageService` (clé `theme`). Défaut : « Défaut ».
@@ -74,7 +74,7 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 
 | Ordre | Tâche | Effort | État |
 | ----- | ----- | ------ | ---- |
-| 1 | Fondations de thème (ThemeService + variables par thème) | 🟡 | À faire |
+| 1 | Fondations de thème (ThemeService + variables par thème) | 🟡 | ✅ Fait |
 | 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | À faire |
 | 3 | Composants Header + Navbar | 🟡 | À faire |
 | 4 | Page Welcome / splash + reroutage init | 🟡 | À faire |

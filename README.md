@@ -98,6 +98,7 @@ Sous `src/app/` :
   - `StorageService` — couche de stockage bas niveau (Ionic Storage).
   - `MessageService` — retours UI (toasts, alertes).
   - `UsageService` — suivi (estimé) de l'utilisation des modèles : compteurs de requêtes et de tokens par jour.
+  - `ThemeService` — gestion des thèmes (Défaut, Clair, Sombre), appliqués via une classe sur `<body>` et mémorisés localement.
   - `VersionHandlerService` — montées de version du format de la bdd (migrations exécutées au démarrage via `provideAppInitializer`).
 - **`utils/`** — fonctions utilitaires pures.
 

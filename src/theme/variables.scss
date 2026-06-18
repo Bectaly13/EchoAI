@@ -1,16 +1,86 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
 
-// Variables de couleurs de l'application (jamais de couleur codée en dur ailleurs).
+// Thèmes de l'application. Le ThemeService applique une classe sur <body>
+// (theme-default / theme-light / theme-dark) ; chaque classe redéfinit les
+// variables CSS ci-dessous. Jamais de couleur codée en dur ailleurs.
+
+// Variables indépendantes du thème : marges des zones sûres (encoche, barre système).
 :root {
-  --app-background: #f2f3f7;   // fond général des pages
-  --app-surface: #ffffff;      // fond des cartes / bulles reçues
-  --app-text: #1c1c28;         // texte principal
-  --app-text-muted: #8a8a9e;   // texte secondaire
-  --app-accent: #6c5ce7;       // couleur d'accent (boutons, bulles utilisateur)
-  --app-on-accent: #ffffff;    // texte posé sur la couleur d'accent
-  --app-border: #e3e3ee;       // bordures légères
-  --app-danger: #d63031;       // actions destructives (texte)
-  --app-narration: #6b6b80;          // narration (texte entre astérisques)
-  --app-narration-on-accent: #d9d2ff; // narration posée sur la couleur d'accent
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+// Thème par défaut (« Défaut », façon Discord : bleu + sombre).
+// Appliqué aussi via :root pour éviter un flash avant le choix de thème.
+:root,
+body.theme-default {
+  --app-background: #313338;          // fond général des pages
+  --app-surface: #2b2d31;             // fond des cartes / bulles reçues
+  --app-text: #f2f3f5;                // texte principal
+  --app-text-muted: #b5bac1;          // texte secondaire
+  --app-accent: #5865f2;              // couleur d'accent (boutons, bulles utilisateur)
+  --app-on-accent: #ffffff;           // texte posé sur la couleur d'accent
+  --app-border: #1e1f22;              // bordures légères
+  --app-danger: #f23f43;              // actions destructives (texte)
+  --app-narration: #b5bac1;           // narration (texte entre astérisques)
+  --app-narration-on-accent: #d7dbff; // narration posée sur la couleur d'accent
+
+  --header-background: #2b2d31;
+  --header-border: #1e1f22;
+  --header-text: #f2f3f5;
+  --header-back-background: #404249;
+
+  --navbar-background: #2b2d31;
+  --navbar-border: #1e1f22;
+  --navbar-icon: #b5bac1;
+  --navbar-icon-active: #5865f2;
+}
+
+// Thème clair (reprend la palette d'origine de l'application).
+body.theme-light {
+  --app-background: #f2f3f7;
+  --app-surface: #ffffff;
+  --app-text: #1c1c28;
+  --app-text-muted: #8a8a9e;
+  --app-accent: #6c5ce7;
+  --app-on-accent: #ffffff;
+  --app-border: #e3e3ee;
+  --app-danger: #d63031;
+  --app-narration: #6b6b80;
+  --app-narration-on-accent: #d9d2ff;
+
+  --header-background: #ffffff;
+  --header-border: #e3e3ee;
+  --header-text: #1c1c28;
+  --header-back-background: #f2f3f7;
+
+  --navbar-background: #ffffff;
+  --navbar-border: #e3e3ee;
+  --navbar-icon: #8a8a9e;
+  --navbar-icon-active: #6c5ce7;
+}
+
+// Thème sombre neutre.
+body.theme-dark {
+  --app-background: #121212;
+  --app-surface: #1e1e1e;
+  --app-text: #eaeaf0;
+  --app-text-muted: #9a9aac;
+  --app-accent: #8b7cf6;
+  --app-on-accent: #ffffff;
+  --app-border: #2a2a2a;
+  --app-danger: #ff5a5f;
+  --app-narration: #9a9aac;
+  --app-narration-on-accent: #d9d2ff;
+
+  --header-background: #1e1e1e;
+  --header-border: #2a2a2a;
+  --header-text: #eaeaf0;
+  --header-back-background: #2a2a2a;
+
+  --navbar-background: #1e1e1e;
+  --navbar-border: #2a2a2a;
+  --navbar-icon: #9a9aac;
+  --navbar-icon-active: #8b7cf6;
 }
