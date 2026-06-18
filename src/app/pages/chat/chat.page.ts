@@ -121,6 +121,27 @@ export class ChatPage implements ViewWillEnter {
     }
   }
 
+  // Génère une illustration de la scène courante, ajoutée comme message-image.
+  async illustrate() {
+    if (this.sending || !this.character) {
+      return;
+    }
+    this.sending = true;
+    this.scrollToBottom();
+    try {
+      this.messages = await this.chatService.illustrateScene(this.character.id);
+    } catch (error) {
+      // Sans clé API, la génération d'image est indisponible (pas de mode démo).
+      const text = (error as Error)?.message === "no-api-key"
+        ? "Génération d'image indisponible sans clé API."
+        : "Échec de la génération de l'illustration.";
+      await this.message.error(text);
+    } finally {
+      this.sending = false;
+      this.scrollToBottom();
+    }
+  }
+
   // L'utilisateur passe son tour : laisse le personnage IA enchaîner de lui-même.
   async skip() {
     if (this.sending || !this.character) {
@@ -145,6 +166,7 @@ export class ChatPage implements ViewWillEnter {
     return !this.sending
       && message === last
       && message.role === "model"
+      && !message.imageData
       && this.messages.some(item => item.role === "user");
   }
 

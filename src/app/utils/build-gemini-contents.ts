@@ -5,8 +5,10 @@
 // Nombre maximum de messages renvoyés à l'IA (les plus récents).
 const MAX_MESSAGES = 20;
 
-export function buildGeminiContents(messages: { role: string; text: string }[]) {
+export function buildGeminiContents(messages: { role: string; text: string; imageData?: string }[]) {
   return messages
+    // Les messages-images (illustrations) ne sont pas renvoyés au modèle texte.
+    .filter(message => !message.imageData)
     .slice(-MAX_MESSAGES)
     .map(message => ({
       role: message.role,

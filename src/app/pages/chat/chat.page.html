@@ -27,6 +27,7 @@
 
 <footer class="chat-footer">
   <button class="chat-skip" type="button" title="Passer mon tour" (click)="skip()" [disabled]="sending">⏭</button>
+  <button class="chat-illustrate" type="button" title="Illustrer la scène" (click)="illustrate()" [disabled]="sending">🖼</button>
   <input class="chat-input" type="text" name="draft"
     [(ngModel)]="draft" (keyup.enter)="send()" placeholder="Écris un message…" />
   <button class="chat-send" (click)="send()" [disabled]="sending">Envoyer</button>

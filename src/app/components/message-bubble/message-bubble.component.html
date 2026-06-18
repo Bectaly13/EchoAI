@@ -1,5 +1,10 @@
 <div class="message-bubble" [class.message-bubble-user]="isUser()">
-  <p class="message-bubble-text">@for (segment of segments(); track $index) {@if (segment.isNarration) {<span class="message-bubble-narration">{{ segment.text }}</span>} @else {<span class="message-bubble-speech">{{ segment.text }}</span>}}</p>
+  @if (message().imageData) {
+    <img class="message-bubble-image" [src]="message().imageData" alt="Illustration de la scène" />
+  }
+  @if (message().text) {
+    <p class="message-bubble-text">@for (segment of segments(); track $index) {@if (segment.isNarration) {<span class="message-bubble-narration">{{ segment.text }}</span>} @else {<span class="message-bubble-speech">{{ segment.text }}</span>}}</p>
+  }
   <div class="message-bubble-actions">
     @if (canRegenerate()) {
       <button class="message-bubble-regenerate" type="button" title="Régénérer" (click)="regenerate.emit()">↻</button>

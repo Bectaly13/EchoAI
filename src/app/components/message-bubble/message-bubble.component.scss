@@ -15,6 +15,12 @@
   background: var(--app-accent);
 }
 
+.message-bubble-image {
+  display: block;
+  max-width: 100%;
+  border-radius: 10px;
+}
+
 .message-bubble-text {
   margin: 0;
   font-size: 15px;

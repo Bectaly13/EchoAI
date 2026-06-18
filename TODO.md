@@ -134,14 +134,14 @@ Depuis une conversation, voir l'état de la mémoire permanente (et corriger si 
   - **Fait — UI** : section « Photo de profil » dans `character-form` (aperçu + « Générer / Régénérer / Retirer »). Avatar affiché dans la liste (`character-card`) et l'en-tête du chat ; **fallback** sur la pastille de couleur si pas d'image.
   - **Limite assumée** : quota 25/jour ; poids du base64 en IndexedDB ; politique de contenu du modèle.
 
-### 8 — Génération d'image dans le chat *(demande initiale #7)* 🔴
-Générer une image illustrant l'état actuel de la conversation, à partir de **(a)** la photo de profil du personnage (devient alors **obligatoire**) et **(b)** le contexte courant.
+### 8 — Génération d'image dans le chat *(demande initiale #7)* 🔴 ✅ Fait
+Générer une image illustrant l'état actuel de la conversation, à partir du contexte courant.
 
-- **Dépendances** : nécessite #7(b) (image de profil) et idéalement #6 (mémoire = contexte).
-- **Données** : `ChatMessage` doit pouvoir porter une image → ajouter `imageData?` ; le `message-bubble` affiche l'image. Déclencheur : bouton « Illustrer la scène ».
-- **Méthode** : construire le prompt image à partir de la mémoire + des derniers messages, en fournissant la photo de profil comme **image de référence** (image-to-image) pour garder l'apparence du personnage.
-- **⚠️ Limite forte (palier gratuit)** : les seuls modèles faisant de l'**image→image** (« Nano Banana » / modèles image de Gemini) sont à **0/0** sur la clé gratuite → **inaccessibles**. Imagen 4 (disponible) ne fait que du **text→image**. Donc, avec cette clé, l'illustration de scène sera **sans image de référence** → **pas de garantie de cohérence d'apparence** avec la photo de profil. À reconsidérer si un modèle image→image devient accessible.
-- **Limites** : quota/coût image ; latence ; poids cumulé du stockage (plusieurs images par convo).
+- **Fait — Données** : `ChatMessage.imageData?` (data URL base64). Un message-image a un `text` vide et porte `imageData` ; `build-gemini-contents` **exclut** ces messages (on ne renvoie pas de base64 au modèle texte).
+- **Fait — Service** : `ChatService.illustrateScene(characterId)` construit le prompt image (util pur `build-scene-image-prompt.ts` : apparence du personnage + lieu courant tiré de la mémoire + derniers messages), appelle `GeminiService.generateImage` (réutilise la chaîne de repli Imagen de 7(b)), ajoute le message-image et persiste. **Pas de mode démo** (lève `no-api-key` sans clé).
+- **Fait — UI** : bouton « Illustrer la scène » (🖼) dans le pied de page du chat. `message-bubble` affiche l'image (et masque le paragraphe de texte vide). Régénération désactivée sur les messages-images ; suppression possible (via la bulle, comme les autres messages).
+- **⚠️ Écart assumé vs plan initial (palier gratuit)** : les seuls modèles faisant de l'**image→image** (« Nano Banana ») sont à **0/0** → inaccessibles. On fait donc du **text→image** avec Imagen 4 : la photo de profil **n'est pas** une image de référence (et n'est donc **pas** rendue obligatoire). L'apparence est injectée **dans le texte** du prompt pour s'en approcher, **sans garantie de cohérence**. À reconsidérer si un modèle image→image devient accessible.
+- **Limites** : quota/coût image (25/jour partagés avec 7(b)) ; latence ; poids cumulé du stockage (plusieurs images par convo).
 
 ---
 
@@ -176,5 +176,5 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur) |
 | 6b | Écran de visualisation de la mémoire | — | 🟢 | ✅ Fait |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | ✅ Fait |
-| 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |
+| 8 | Génération d'image dans le chat | #7 | 🔴 | ✅ Fait |
 | 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |

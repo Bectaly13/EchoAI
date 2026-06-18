@@ -107,6 +107,21 @@ ion-content.chat-content {
   opacity: 0.5;
 }
 
+.chat-illustrate {
+  flex: 0 0 auto;
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-size: 15px;
+  background: var(--app-background);
+  color: var(--app-accent);
+  cursor: pointer;
+}
+
+.chat-illustrate[disabled] {
+  opacity: 0.5;
+}
+
 .chat-input {
   flex: 1 1 auto;
   border: 1px solid var(--app-border);

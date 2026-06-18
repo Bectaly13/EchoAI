@@ -6,6 +6,7 @@ import { GeminiService } from './gemini-service';
 import { Persona, PersonaService } from './persona-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
+import { buildSceneImagePrompt } from '../utils/build-scene-image-prompt';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
 import { MemoryCategory, MemoryUpdate, parseMemory } from '../utils/parse-memory';
 
@@ -15,6 +16,9 @@ export interface ChatMessage {
   id: string;
   role: "user" | "model";
   text: string;
+  // Illustration de la scène (data URL base64) : présente sur les messages-images
+  // générés par « Illustrer la scène ». Ces messages ne sont pas renvoyés au modèle texte.
+  imageData?: string;
   at: number;
 }
 
@@ -174,6 +178,28 @@ export class ChatService {
     this.appendModelReply(conversation, raw);
     await this.saveConversation(conversation);
 
+    return conversation.messages;
+  }
+
+  // Génère une illustration de la scène courante et l'ajoute comme message-image,
+  // puis persiste. Nécessite une clé API (pas de mode démo pour les images) → lève
+  // `no-api-key` sinon. Le message produit a un texte vide et porte `imageData`.
+  async illustrateScene(characterId: string): Promise<ChatMessage[]> {
+    if (!this.gemini.hasApiKey()) {
+      throw new Error("no-api-key");
+    }
+    const character = await this.characterService.get(characterId);
+    if (!character) {
+      throw new Error("Personnage introuvable");
+    }
+    const conversation = await this.getOrCreateConversation(characterId);
+
+    const prompt = buildSceneImagePrompt(character, conversation.memory ?? [], conversation.messages);
+    const imageData = await this.gemini.generateImage(prompt);
+    if (imageData) {
+      conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: imageData, at: Date.now() });
+      await this.saveConversation(conversation);
+    }
     return conversation.messages;
   }
 
