@@ -122,9 +122,12 @@ Depuis une conversation, voir l'état de la mémoire permanente (et corriger si 
 
 ## Phase 4 — Assistance IA & images
 
-### 7 — Création de personnage assistée par IA *(demande initiale #6)* 🔴
-- **(a) Brouillon → fiche structurée** : à partir d'un prompt brouillon, générer une fiche bien formulée qui **remplit les champs de #5**. Méthode : appel Gemini avec `responseSchema` correspondant au `profile` (#5) ; on pré-remplit le formulaire avec le résultat (éditable). **Dépend de #5.**
-- **(b) Image de profil générée** : à partir d'un prompt, générer une photo de profil.
+### 7 — Création de personnage assistée par IA *(demande initiale #6)* 🔴 — (a) ✅ Fait, (b) à faire
+- **(a) Brouillon → fiche structurée** ✅ **Fait** : à partir d'un prompt brouillon, générer une fiche bien formulée qui **remplit les champs de #5**.
+  - **Fait — Service bas niveau** : `GeminiService.generateStructured(prompt, responseSchema)` (appel HTTP brut avec `generationConfig.responseMimeType = "application/json"` + `responseSchema`), renvoie l'objet désérialisé (ou `null` si réponse inexploitable). `GeminiService` reste cantonné à l'appel brut.
+  - **Fait — Orchestration** : util pur `build-draft-prompt.ts` (`buildDraftPrompt(brief)` + `CHARACTER_DRAFT_SCHEMA` calqué sur `CharacterDraft`). `CharacterService.draftFromBrief(brief)` assemble le prompt, appelle Gemini, normalise le résultat en `CharacterDraft` (champs manquants → `""`), avec **chemin mock** sans clé API.
+  - **Fait — UI** : section « Brouillon (assistance IA) » en tête de `character-form` (textarea + bouton « Générer la fiche », désactivé pendant l'attente / si vide). Le résultat **pré-remplit** tous les champs, qui restent **éditables**. Disponible en création comme en édition.
+- **(b) Image de profil générée** 🔴 *(à faire)* : à partir d'un prompt, générer une photo de profil.
   - **Méthode** : `GeminiService.generateImage(prompt)` ; nouveau modèle image dans `environment` (`GEMINI_IMAGE_MODEL`). Stocker le résultat (data URL / base64) dans `Character.avatarImage`.
   - **Limites** : disponibilité d'un modèle image (et sur palier gratuit ?) à confirmer ; quota dédié ; **poids du stockage** local (base64 volumineux en IndexedDB) ; politique de contenu du modèle. La pastille de couleur actuelle reste le fallback si pas d'image.
 
@@ -168,6 +171,6 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 5 | Champs de création enrichis | #5 | 🟡 | ✅ Fait |
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur) |
 | 6b | Écran de visualisation de la mémoire | — | 🟢 | ✅ Fait |
-| 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | À faire |
+| 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | 🟡 (a) fiche faite · (b) image à faire |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |
 | 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |

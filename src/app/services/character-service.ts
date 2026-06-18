@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 
 import { DatabaseService } from './database-service';
+import { GeminiService } from './gemini-service';
+
+import { buildDraftPrompt, CHARACTER_DRAFT_SCHEMA } from 'src/app/utils/build-draft-prompt';
 
 // Un personnage créé par l'utilisateur.
 export interface Character {
@@ -36,7 +39,8 @@ export class CharacterService {
   private readonly colors = ["#6c5ce7", "#00b894", "#0984e3", "#e17055", "#d63031", "#fdcb6e", "#e84393"];
 
   constructor(
-    private database: DatabaseService
+    private database: DatabaseService,
+    private gemini: GeminiService
   ) { }
 
   // Renvoie tous les personnages, du plus récent au plus ancien.
@@ -59,6 +63,47 @@ export class CharacterService {
       ...draft
     };
     return await this.database.addEntry("characters", character);
+  }
+
+  // Génère une fiche de personnage structurée à partir d'un brouillon libre.
+  // Renvoie les champs éditables à pré-remplir dans le formulaire (résultat
+  // toujours retouchable par l'utilisateur). Retombe sur un mock sans clé API.
+  async draftFromBrief(brief: string): Promise<CharacterDraft> {
+    const text = brief.trim();
+    if (!this.gemini.hasApiKey()) {
+      return this.mockDraft(text);
+    }
+    const result = await this.gemini.generateStructured(buildDraftPrompt(text), CHARACTER_DRAFT_SCHEMA);
+    return this.normalizeDraft(result);
+  }
+
+  // Convertit la réponse brute de l'IA en CharacterDraft (champs manquants → "").
+  private normalizeDraft(result: any): CharacterDraft {
+    const value = (key: string): string => (typeof result?.[key] === "string" ? result[key].trim() : "");
+    return {
+      name: value("name"),
+      systemPrompt: value("systemPrompt"),
+      greeting: value("greeting"),
+      appearance: value("appearance"),
+      initialRelationship: value("initialRelationship"),
+      likes: value("likes"),
+      dislikes: value("dislikes"),
+      knownCharacters: value("knownCharacters")
+    };
+  }
+
+  // Fiche simulée quand aucune clé API n'est configurée (mode démo).
+  private mockDraft(brief: string): CharacterDraft {
+    return {
+      name: "Personnage (démo)",
+      systemPrompt: brief || "Personnalité à compléter.",
+      greeting: "",
+      appearance: "",
+      initialRelationship: "",
+      likes: "",
+      dislikes: "",
+      knownCharacters: ""
+    };
   }
 
   // Met à jour le nom et la personnalité d'un personnage existant.

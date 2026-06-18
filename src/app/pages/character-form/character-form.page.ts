@@ -17,6 +17,9 @@ export class CharacterFormPage implements ViewWillEnter {
 
   // Id du personnage en cours d'édition (vide en mode création).
   characterId = "";
+  // Brouillon libre pour la génération assistée par IA, et état d'attente associé.
+  brief = "";
+  generating = false;
   name = "";
   systemPrompt = "";
   // Message d'accueil du personnage (premier message de la conversation).
@@ -63,6 +66,30 @@ export class CharacterFormPage implements ViewWillEnter {
 
   isEditing(): boolean {
     return !!this.characterId;
+  }
+
+  // Génère une fiche à partir du brouillon et pré-remplit les champs (éditables).
+  async generateDraft() {
+    const brief = this.brief.trim();
+    if (!brief || this.generating) {
+      return;
+    }
+    this.generating = true;
+    try {
+      const draft = await this.characterService.draftFromBrief(brief);
+      this.name = draft.name;
+      this.systemPrompt = draft.systemPrompt;
+      this.greeting = draft.greeting ?? "";
+      this.appearance = draft.appearance ?? "";
+      this.initialRelationship = draft.initialRelationship ?? "";
+      this.likes = draft.likes ?? "";
+      this.dislikes = draft.dislikes ?? "";
+      this.knownCharacters = draft.knownCharacters ?? "";
+    } catch (error) {
+      await this.message.error("Échec de la génération de la fiche.");
+    } finally {
+      this.generating = false;
+    }
   }
 
   async save() {

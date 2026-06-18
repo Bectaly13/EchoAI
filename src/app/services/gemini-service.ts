@@ -37,4 +37,29 @@ export class GeminiService {
     // Chemin standard de la réponse Gemini : candidates[0].content.parts[0].text
     return response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   }
+
+  // Appel HTTP attendant une réponse JSON structurée conforme à responseSchema.
+  // Renvoie l'objet déjà désérialisé (ou null si la réponse est inexploitable).
+  async generateStructured(prompt: string, responseSchema: any): Promise<any> {
+    const url = `${environment.GEMINI_API_URL}/${environment.GEMINI_MODEL}:generateContent`;
+    const body = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      // Force le modèle à répondre par du JSON respectant le schéma fourni.
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: responseSchema
+      }
+    };
+    const response: any = await firstValueFrom(
+      this.http.post(url, body, {
+        headers: { "x-goog-api-key": environment.GEMINI_API_KEY }
+      })
+    );
+    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  }
 }

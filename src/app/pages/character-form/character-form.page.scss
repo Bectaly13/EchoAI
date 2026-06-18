@@ -32,6 +32,31 @@ ion-content.character-form-content {
   padding: 0 16px 24px;
 }
 
+.character-form-assist {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.character-form-generate {
+  align-self: flex-start;
+  margin-top: 10px;
+  border: 1px solid var(--app-accent);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--app-accent);
+  cursor: pointer;
+}
+
+.character-form-generate[disabled] {
+  opacity: 0.5;
+}
+
 .character-form-label {
   margin: 14px 0 6px;
   font-size: 14px;

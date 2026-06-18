@@ -12,6 +12,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 
 ### Personnages
 - **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** optionnel, et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
+- **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
