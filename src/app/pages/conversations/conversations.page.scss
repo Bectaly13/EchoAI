@@ -30,6 +30,30 @@ ion-content.conversations-content {
   cursor: pointer;
 }
 
+.conversation-photo,
+.conversation-avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.conversation-photo {
+  object-fit: cover;
+}
+
+.conversation-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversation-initial {
+  color: var(--app-on-accent);
+  font-weight: 700;
+  font-size: 18px;
+}
+
 .conversation-info {
   flex: 1 1 auto;
   min-width: 0;

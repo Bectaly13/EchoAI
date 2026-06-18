@@ -12,11 +12,15 @@ export class VersionHandlerService {
   // format évolue (nouvelles tables, nouveaux champs…). Évite d'éparpiller des
   // correctifs de migration dans le reste du code.
 
-  // Version courante du format de la bdd. À incrémenter à chaque changement de
-  // format, en ajoutant la migration updateToVx() correspondante ci-dessous.
+  // Version du **format de stockage** (entier) : à incrémenter à chaque changement
+  // de format, en ajoutant la migration updateToVx() correspondante. Sert à garantir
+  // qu'un utilisateur d'une version antérieure récupère des données au bon format.
+  // Indépendante de la version affichée ci-dessous.
   private readonly appVersion = 3;
-  // Version lisible, destinée à l'affichage (écran « à propos », debug…).
-  readonly appVersionDisplay = "3.0";
+  // Version **commerciale**, destinée à l'utilisateur (illustre l'ampleur des mises
+  // à jour). Sans rapport avec appVersion. Reste « 1.0 » jusqu'à la finalisation de
+  // l'app et les premiers tests utilisateur.
+  readonly appVersionDisplay = "1.0";
 
   constructor(
     private storage: StorageService,

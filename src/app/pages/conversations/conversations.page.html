@@ -12,6 +12,13 @@
     <div class="conversations-list">
       @for (conversation of conversations; track conversation.characterId) {
         <div class="conversation-item" (click)="openConversation(conversation)">
+          @if (conversation.avatarImage) {
+            <img class="conversation-photo" [src]="conversation.avatarImage" [alt]="conversation.characterName" />
+          } @else {
+            <div class="conversation-avatar" [style.background]="conversation.avatarColor">
+              <span class="conversation-initial">{{ conversation.characterName.charAt(0).toUpperCase() }}</span>
+            </div>
+          }
           <div class="conversation-info">
             <h2 class="conversation-name">{{ conversation.characterName }}</h2>
             <p class="conversation-preview">{{ conversation.lastMessage }}</p>

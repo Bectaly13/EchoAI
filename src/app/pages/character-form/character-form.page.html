@@ -8,17 +8,21 @@
 
   <form class="character-form-body" (ngSubmit)="save()">
 
-    <div class="character-form-assist">
-      <label class="character-form-label" for="brief">Brouillon (assistance IA)</label>
-      <textarea class="character-form-textarea" id="brief" name="brief" rows="3"
-        [(ngModel)]="brief"
-        placeholder="Décris ton idée en quelques mots ; l'IA en fera une fiche complète, que tu pourras retoucher."></textarea>
-      <button class="character-form-generate" type="button"
-        (click)="generateDraft()" [disabled]="generating || !brief.trim()">
-        {{ generating ? "Génération…" : "Générer la fiche" }}
-      </button>
-    </div>
+    @if (!isEditing()) {
+      <div class="character-form-assist">
+        <label class="character-form-label" for="brief">Création par IA</label>
+        <textarea class="character-form-textarea" id="brief" name="brief" rows="3"
+          [(ngModel)]="brief"
+          placeholder="Décris ton idée en quelques mots ; l'IA en fera une fiche complète, que tu pourras retoucher."></textarea>
+        <button class="character-form-generate" type="button"
+          (click)="generateDraft()" [disabled]="generating || !brief.trim()">
+          {{ generating ? "Génération…" : "Générer la fiche" }}
+        </button>
+      </div>
+    }
 
+    <!-- Génération de photo de profil : désactivée tant que la génération d'image
+         n'est pas disponible (palier gratuit). Code conservé pour réactivation future.
     <div class="character-form-avatar">
       <p class="character-form-label">Photo de profil (optionnelle)</p>
       @if (imageEnabled) {
@@ -42,6 +46,7 @@
         <p class="character-form-avatar-note">Génération d'image indisponible sur le palier gratuit (nécessite un plan payant Gemini).</p>
       }
     </div>
+    -->
 
     <label class="character-form-label" for="name">Nom</label>
     <input class="character-form-input" id="name" name="name" type="text"

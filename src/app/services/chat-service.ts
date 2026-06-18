@@ -37,6 +37,9 @@ export interface MemoryEntry {
 export interface ConversationSummary {
   characterId: string;
   characterName: string;
+  // Avatar du personnage : photo de profil si présente, sinon pastille de couleur.
+  avatarColor: string;
+  avatarImage?: string;
   // Aperçu du dernier message (texte ; « [image] » pour une illustration).
   lastMessage: string;
   // Date du dernier message, pour le tri par récence.
@@ -118,6 +121,8 @@ export class ChatService {
       summaries.push({
         characterId: conversation.characterId,
         characterName: character.name,
+        avatarColor: character.avatarColor,
+        avatarImage: character.avatarImage,
         lastMessage: lastMessage,
         at: last?.at ?? 0
       });
@@ -325,6 +330,9 @@ export class ChatService {
     for (const update of updates) {
       if (SINGLE_VALUED_CATEGORIES.includes(update.category)) {
         memory = memory.filter(entry => entry.category !== update.category);
+      } else if (memory.some(entry => entry.category === update.category && this.sameMemoryValue(entry.value, update.value))) {
+        // Anti-doublon : valeur déjà présente dans cette catégorie → on n'ajoute pas.
+        continue;
       }
       memory.push({
         id: crypto.randomUUID(),
@@ -335,6 +343,11 @@ export class ChatService {
       });
     }
     conversation.memory = this.capMemory(memory);
+  }
+
+  // Compare deux valeurs de mémoire en ignorant casse et espaces de bord (anti-doublon).
+  private sameMemoryValue(a: string, b: string): boolean {
+    return a.trim().toLowerCase() === b.trim().toLowerCase();
   }
 
   // Retire les entrées de mémoire produites par un message donné (rollback).
