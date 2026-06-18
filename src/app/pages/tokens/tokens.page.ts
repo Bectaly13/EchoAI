@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonContent, ViewWillEnter } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 
 import { UsageRow, UsageService } from 'src/app/services/usage-service';
-import { VersionHandlerService } from 'src/app/services/version-handler-service';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 
 import { environment } from 'src/environments/environment';
 
@@ -18,16 +19,14 @@ interface ModelUsage {
 }
 
 @Component({
-  selector: 'app-usage',
-  templateUrl: './usage.page.html',
-  styleUrls: ['./usage.page.scss'],
+  selector: 'app-tokens',
+  templateUrl: './tokens.page.html',
+  styleUrls: ['./tokens.page.scss'],
   standalone: true,
-  imports: [IonContent]
+  imports: [IonContent, IonHeader, HeaderComponent, NavbarComponent]
 })
-export class UsagePage implements ViewWillEnter {
+export class TokensPage implements ViewWillEnter {
 
-  // Version du format de la bdd (affichée à titre informatif).
-  appVersion = "";
   // Vrai si une clé API est configurée (sinon, aucun appel réel n'est suivi).
   hasApiKey = false;
   // Utilisation du jour, par modèle de texte puis par modèle d'image.
@@ -41,14 +40,11 @@ export class UsagePage implements ViewWillEnter {
   }
 
   constructor(
-    private router: Router,
-    private usageService: UsageService,
-    private versionHandler: VersionHandlerService
+    private usageService: UsageService
   ) { }
 
   // Charge l'utilisation du jour et la projette sur les chaînes de modèles configurées.
   async load() {
-    this.appVersion = this.versionHandler.appVersionDisplay;
     this.hasApiKey = !!environment.GEMINI_API_KEY;
     const rows = await this.usageService.getToday();
     this.textModels = environment.GEMINI_MODELS.map(model => this.viewFor(rows, model, "text"));
@@ -66,9 +62,5 @@ export class UsagePage implements ViewWillEnter {
       totalTokens: row?.totalTokens ?? 0,
       exhausted: row?.exhausted ?? false
     };
-  }
-
-  goBack() {
-    this.router.navigate(["characters"]);
   }
 }

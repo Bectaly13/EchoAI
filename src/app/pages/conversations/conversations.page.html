@@ -1,0 +1,27 @@
+<ion-header class="conversations-header-wrap">
+  <app-header class="conversations-header" title="Conversations"></app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="conversations-content">
+
+  @if (conversations.length === 0) {
+    <div class="conversations-empty">
+      <p class="conversations-empty-text">Aucune conversation pour l'instant. Ouvre un personnage pour commencer à discuter.</p>
+    </div>
+  } @else {
+    <div class="conversations-list">
+      @for (conversation of conversations; track conversation.characterId) {
+        <div class="conversation-item" (click)="openConversation(conversation)">
+          <div class="conversation-info">
+            <h2 class="conversation-name">{{ conversation.characterName }}</h2>
+            <p class="conversation-preview">{{ conversation.lastMessage }}</p>
+          </div>
+          <button class="conversation-delete" (click)="confirmDelete(conversation, $event)">🗑</button>
+        </div>
+      }
+    </div>
+  }
+
+</ion-content>
+
+<app-navbar class="conversations-navbar"></app-navbar>

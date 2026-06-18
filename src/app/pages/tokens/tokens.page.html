@@ -1,0 +1,48 @@
+<ion-header class="tokens-header-wrap">
+  <app-header class="tokens-header" title="Tokens"></app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="tokens-content">
+
+  <p class="tokens-disclaimer">
+    ⚠️ L'API Gemini n'expose pas le quota restant du palier gratuit. Ces chiffres sont
+    une <strong>estimation locale</strong> du jour (requêtes comptées dans l'app + tokens lus
+    dans les réponses) ; le maximum « / jour » est une valeur <strong>configurée à la main</strong>,
+    pas une lecture officielle. Le quota exact reste visible dans Google AI Studio.
+  </p>
+
+  @if (!hasApiKey) {
+    <p class="tokens-demo">Mode démo : aucune clé API configurée, donc aucun appel réel n'est suivi.</p>
+  }
+
+  <section class="tokens-section">
+    <h2 class="tokens-section-title">Texte ({{ totalTokens }} tokens aujourd'hui)</h2>
+    @for (model of textModels; track model.model; let first = $first) {
+      <div class="tokens-row">
+        <span class="tokens-model">
+          {{ model.model }}
+          @if (first) { <span class="tokens-tag">préféré</span> }
+          @if (model.exhausted) { <span class="tokens-tag tokens-tag-exhausted">épuisé</span> }
+        </span>
+        <span class="tokens-stats">{{ model.requests }} / {{ model.rpd }} req · {{ model.totalTokens }} tokens</span>
+      </div>
+    }
+  </section>
+
+  <section class="tokens-section">
+    <h2 class="tokens-section-title">Image</h2>
+    @for (model of imageModels; track model.model; let first = $first) {
+      <div class="tokens-row">
+        <span class="tokens-model">
+          {{ model.model }}
+          @if (first) { <span class="tokens-tag">préféré</span> }
+          @if (model.exhausted) { <span class="tokens-tag tokens-tag-exhausted">épuisé</span> }
+        </span>
+        <span class="tokens-stats">{{ model.requests }} / {{ model.rpd }} req</span>
+      </div>
+    }
+  </section>
+
+</ion-content>
+
+<app-navbar class="tokens-navbar"></app-navbar>

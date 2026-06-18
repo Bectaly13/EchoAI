@@ -1,0 +1,61 @@
+ion-content.conversations-content {
+  --background: var(--app-background);
+  // Marge basse pour ne pas passer sous la navbar fixe.
+  --padding-bottom: calc(72px + var(--safe-bottom));
+}
+
+.conversations-empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.conversations-empty-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--app-text-muted);
+}
+
+.conversations-list {
+  padding: 12px;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: var(--app-surface);
+  cursor: pointer;
+}
+
+.conversation-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.conversation-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.conversation-preview {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation-delete {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  padding: 6px;
+  cursor: pointer;
+}

@@ -87,7 +87,7 @@ npm run lint       # analyse statique (ESLint)
 
 Sous `src/app/` :
 
-- **`pages/`** — les écrans : `welcome` (splash + initialisation au lancement), `characters` (liste), `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `personas` (liste), `persona-form` (création/édition), `usage` (suivi d'utilisation des modèles).
+- **`pages/`** — les écrans : `welcome` (splash + initialisation au lancement), et les onglets `characters` (personnages), `conversations` (liste des discussions), `personas`, `tokens` (suivi d'utilisation des modèles), `settings` (paramètres) ; plus les sous-écrans `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `persona-form` (création/édition).
 - **`components/`** — composants réutilisables : `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
   - `GeminiService` — uniquement l'appel HTTP brut au modèle (texte et image), avec repli sur une liste de modèles en cas de quota épuisé.

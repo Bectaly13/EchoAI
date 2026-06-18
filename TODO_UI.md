@@ -47,7 +47,7 @@ Mettre en place le squelette de navigation à 5 onglets et rebrancher l'ossature
 - **Carte** : nom + **aperçu de la description sur une ligne max** (ellipsis) — la « description » est la personnalité (`systemPrompt`). Actions inchangées (créer, modifier, supprimer, ouvrir/créer la conversation).
 - **Ossature** : header (« Personnages ») + navbar. Les boutons actuels de l'en-tête (Personas, Tokens, + Nouveau) sont repensés : navigation principale via la navbar ; « + Nouveau » conservé (header ou bouton dédié).
 
-## 7 — Page Conversations (nouvelle) 🟡
+## 7 — Page Conversations (nouvelle) 🟡 ✅ Fait
 - **Liste** : toutes les conversations existantes, **triées par date récente** (récence = `at` du dernier message). Chaque ligne : **nom du personnage** + **aperçu du dernier message sur une ligne max**.
 - **Actions** : tap → ouvre le `chat`. **Suppression** d'une conversation (efface messages + mémoire, **conserve** le personnage) avec confirmation — méthode : `ChatService.deleteConversation(characterId)` (supprime la ligne `conversations`).
 - **Ossature** : header (« Conversations ») + navbar.
@@ -57,11 +57,11 @@ Mettre en place le squelette de navigation à 5 onglets et rebrancher l'ossature
 - **Ossature** : header (« Personas ») + navbar (remplace l'en-tête custom).
 - **Édition du persona par défaut** : éditable via `persona-form`, mais le champ **description est masqué** quand `isDefault` (le persona par défaut n'a pas de description — seul le nom est modifiable). Suppression déjà bloquée (tag « par défaut »).
 
-## 9 — Page Tokens (ex-Usage) 🟢
+## 9 — Page Tokens (ex-Usage) 🟢 ✅ Fait
 - **Renommage** : route `usage` → `tokens`, onglet/titre « Tokens ». (Le service `UsageService` et la table `usage` restent inchangés en interne.)
 - **Ossature** : header (« Tokens ») + navbar. Contenu inchangé (suivi par modèle, « X / RPD », tokens, avertissement).
 
-## 10 — Page Paramètres (nouvelle) 🟢
+## 10 — Page Paramètres (nouvelle) 🟢 ✅ Fait
 - **Contenu** : sélecteur de **thème** (boutons par thème via `ThemeService.getThemes()`, application immédiate) et affichage de la **version** (`VersionHandlerService.appVersionDisplay`).
 - **Ossature** : header (« Paramètres ») + navbar.
 
@@ -80,8 +80,8 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 | 4 | Page Welcome / splash + reroutage init | 🟡 | ✅ Fait |
 | 5 | Architecture de navigation (routes + ossature) | 🔴 | À faire |
 | 6 | Page Personnages (aperçu description 1 ligne) | 🟢 | À faire |
-| 7 | Page Conversations (nouvelle, tri récent, suppression) | 🟡 | À faire |
+| 7 | Page Conversations (nouvelle, tri récent, suppression) | 🟡 | ✅ Fait |
 | 8 | Page Personas (édition défaut sans description) | 🟢 | À faire |
-| 9 | Page Tokens (ex-Usage, renommage) | 🟢 | À faire |
-| 10 | Page Paramètres (nouvelle, thème + version) | 🟢 | À faire |
+| 9 | Page Tokens (ex-Usage, renommage) | 🟢 | ✅ Fait |
+| 10 | Page Paramètres (nouvelle, thème + version) | 🟢 | ✅ Fait |
 | 11 | Sous-pages : header avec retour (sans navbar) | 🟡 | À faire |

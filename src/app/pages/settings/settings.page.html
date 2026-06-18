@@ -1,0 +1,29 @@
+<ion-header class="settings-header-wrap">
+  <app-header class="settings-header" title="Paramètres"></app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="settings-content">
+
+  <div class="settings-container">
+
+    <section class="settings-section">
+      <h2 class="settings-section-title">Thème</h2>
+      <div class="settings-themes">
+        @for (theme of themes; track theme) {
+          <button class="settings-theme" [class.active]="theme === currentTheme" (click)="selectTheme(theme)">
+            {{ theme }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2 class="settings-section-title">À propos</h2>
+      <p class="settings-version">Version des données : {{ appVersion }}</p>
+    </section>
+
+  </div>
+
+</ion-content>
+
+<app-navbar class="settings-navbar"></app-navbar>

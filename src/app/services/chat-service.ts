@@ -33,6 +33,16 @@ export interface MemoryEntry {
   sourceMessageId: string;
 }
 
+// Résumé d'une conversation, pour la liste des conversations (page dédiée).
+export interface ConversationSummary {
+  characterId: string;
+  characterName: string;
+  // Aperçu du dernier message (texte ; « [image] » pour une illustration).
+  lastMessage: string;
+  // Date du dernier message, pour le tri par récence.
+  at: number;
+}
+
 // Une conversation rattachée à un personnage.
 interface Conversation {
   id: string;
@@ -90,6 +100,35 @@ export class ChatService {
       await this.saveConversation(conversation);
     }
     return conversation.messages;
+  }
+
+  // Renvoie un résumé de chaque conversation existante (nom du personnage +
+  // aperçu du dernier message), trié du plus récent au plus ancien. Les
+  // conversations dont le personnage a été supprimé sont ignorées.
+  async listConversations(): Promise<ConversationSummary[]> {
+    const conversations: Conversation[] = (await this.database.getTable("conversations")) || [];
+    const summaries: ConversationSummary[] = [];
+    for (const conversation of conversations) {
+      const character = await this.characterService.get(conversation.characterId);
+      if (!character) {
+        continue;
+      }
+      const last = conversation.messages[conversation.messages.length - 1];
+      const lastMessage = last ? (last.text || (last.imageData ? "[image]" : "")) : "";
+      summaries.push({
+        characterId: conversation.characterId,
+        characterName: character.name,
+        lastMessage: lastMessage,
+        at: last?.at ?? 0
+      });
+    }
+    return summaries.sort((a, b) => b.at - a.at);
+  }
+
+  // Supprime entièrement la conversation d'un personnage (messages + mémoire),
+  // sans supprimer le personnage lui-même.
+  async deleteConversation(characterId: string): Promise<void> {
+    await this.database.removeEntriesWith("conversations", "characterId", characterId);
   }
 
   // Envoie un message utilisateur, obtient la réponse de l'IA, persiste les deux,

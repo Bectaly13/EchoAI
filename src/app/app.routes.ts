@@ -7,8 +7,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/welcome/welcome.page').then((m) => m.WelcomePage),
   },
   {
+    // Onglet : liste des personnages.
     path: 'characters',
     loadComponent: () => import('./pages/characters/characters.page').then((m) => m.CharactersPage),
+  },
+  {
+    // Onglet : liste des conversations existantes.
+    path: 'conversations',
+    loadComponent: () => import('./pages/conversations/conversations.page').then((m) => m.ConversationsPage),
   },
   {
     // Création d'un personnage.
@@ -46,9 +52,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/persona-form/persona-form.page').then((m) => m.PersonaFormPage),
   },
   {
-    // Page debug : suivi (estimé) de l'utilisation des modèles.
-    path: 'usage',
-    loadComponent: () => import('./pages/usage/usage.page').then((m) => m.UsagePage),
+    // Onglet : suivi (estimé) de l'utilisation des modèles (tokens).
+    path: 'tokens',
+    loadComponent: () => import('./pages/tokens/tokens.page').then((m) => m.TokensPage),
+  },
+  {
+    // Onglet : paramètres (thème, version).
+    path: 'settings',
+    loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
   },
   {
     path: '',
