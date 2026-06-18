@@ -33,6 +33,7 @@ Améliorer les consignes de format envoyées à l'IA (`buildFormatBlock`).
 
 - **« tu »** : dans la narration, l'IA doit désigner l'utilisateur par « **tu** » (jamais « l'utilisateur » ni une 3ᵉ personne pour lui).
 - **Retours à la ligne** : passer à la ligne quand on passe de la narration à une réplique (ou inversement), pour aérer la lecture.
+- **Génération de personnage par IA** : ces mêmes conventions (« tu » + retours à la ligne) sont aussi transmises pour le message d'accueil généré (`buildDraftPrompt`).
 
 ## 6 — Mémoire permanente : éviter les doublons *(retour 7)* 🟡 ✅ Fait
 Des éléments déjà mémorisés sont ré-enregistrés → doublons qui alourdissent les requêtes suivantes. Approche retenue : **anti-doublons** (prompt + dédoublonnage côté client), qui **conserve** le rollback et les souvenirs manuels.
