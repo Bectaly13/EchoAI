@@ -46,6 +46,10 @@ interface Conversation {
 
 // Catégories de mémoire à valeur unique : une nouvelle valeur remplace l'ancienne.
 const SINGLE_VALUED_CATEGORIES: MemoryCategory[] = ["location", "relationship"];
+// Source d'une entrée de mémoire créée/éditée à la main : sentinelle qui ne
+// correspond à aucun message, donc jamais effacée par le rollback (régénération,
+// suppression). Voir applyMemoryUpdates / deleteFrom.
+const MANUAL_SOURCE = "manual";
 // Nombre maximum d'entrées conservées par catégorie à valeurs multiples (jalons,
 // consignes), pour borner la croissance de la mémoire (budget de tokens).
 const MAX_LIST_ENTRIES = 30;
@@ -163,9 +167,12 @@ export class ChatService {
     while (conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].role === "user") {
       conversation.messages.pop();
     }
-    // Oublie la mémoire produite par les messages supprimés.
+    // Oublie la mémoire produite par les messages supprimés. Les entrées manuelles
+    // (sourceMessageId sentinelle) sont conservées : elles ne dépendent d'aucun message.
     const remainingIds = new Set(conversation.messages.map(message => message.id));
-    conversation.memory = (conversation.memory ?? []).filter(entry => remainingIds.has(entry.sourceMessageId));
+    conversation.memory = (conversation.memory ?? []).filter(
+      entry => entry.sourceMessageId === MANUAL_SOURCE || remainingIds.has(entry.sourceMessageId)
+    );
     await this.saveConversation(conversation);
 
     return conversation.messages;
@@ -309,6 +316,41 @@ export class ChatService {
   async getMemory(characterId: string): Promise<MemoryEntry[]> {
     const conversation = await this.getConversation(characterId);
     return conversation?.memory ?? [];
+  }
+
+  // Ajoute manuellement une entrée de mémoire (catégorie + valeur) et renvoie la
+  // mémoire mise à jour. Suit les mêmes règles que la mémoire automatique
+  // (catégorie à valeur unique → remplacement ; à valeurs multiples → ajout borné).
+  async addMemoryEntry(characterId: string, category: MemoryCategory, value: string): Promise<MemoryEntry[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation) {
+      return [];
+    }
+    const text = value.trim();
+    if (!text) {
+      return conversation.memory ?? [];
+    }
+    this.applyMemoryUpdates(conversation, [{ category: category, value: text }], MANUAL_SOURCE);
+    await this.saveConversation(conversation);
+    return conversation.memory ?? [];
+  }
+
+  // Modifie la valeur d'une entrée de mémoire existante. L'entrée devient
+  // « manuelle » (protégée du rollback), l'utilisateur en ayant pris possession.
+  async updateMemoryEntry(characterId: string, entryId: string, value: string): Promise<MemoryEntry[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation || !conversation.memory) {
+      return [];
+    }
+    const text = value.trim();
+    const entry = conversation.memory.find(item => item.id === entryId);
+    if (!entry || !text) {
+      return conversation.memory;
+    }
+    entry.value = text;
+    entry.sourceMessageId = MANUAL_SOURCE;
+    await this.saveConversation(conversation);
+    return conversation.memory;
   }
 
   // Supprime une entrée de mémoire et renvoie la mémoire restante.

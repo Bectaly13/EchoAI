@@ -48,13 +48,13 @@ La salutation est **obligatoire**, et celle **générée par l'IA** suit les con
 - **Fait — Conventions sur la salutation générée (7a)** : l'instruction du champ `greeting` dans `buildDraftPrompt` impose désormais le format des messages (répliques `Nom : "…"`, narration entre astérisques en dehors des guillemets). `greeting` est passé en **`required`** dans `CHARACTER_DRAFT_SCHEMA`.
 - **Limite (assumée)** : les personnages **existants** sans salutation ne sont pas migrés ; la salutation leur sera demandée à la **prochaine édition** (la validation bloque l'enregistrement sans salutation). En attendant, leur conversation démarre sans premier message imposé (comportement paresseux conservé pour ces cas anciens).
 
-## 6 — Mémoire : créer et éditer un souvenir *(corrige 6b)* 🟡
-La **suppression unitaire** d'un souvenir existe déjà (🗑 par entrée) en plus de « Tout oublier ». Ajouts : **créer** et **éditer**.
+## 6 — Mémoire : créer et éditer un souvenir *(corrige 6b)* 🟡 ✅ Fait
+La **suppression unitaire** d'un souvenir existait déjà (🗑 par entrée) en plus de « Tout oublier ». Ajoutés : **créer** et **éditer**.
 
-- **Créer un souvenir** : choisir la **catégorie** (Lieu, Relation, Jalons, Consignes) et saisir la valeur. Méthode : `ChatService.addMemoryEntry(characterId, category, value)` respectant les règles existantes (catégories à valeur unique → remplacement ; à valeurs multiples → ajout borné par `capMemory`).
-- **Éditer un souvenir** : modifier la valeur d'une entrée existante. Méthode : `ChatService.updateMemoryEntry(characterId, entryId, value)`.
-- **UI** : bouton « + Ajouter un souvenir » (avec choix de catégorie) sur la page mémoire, et bouton ✎ sur chaque entrée. Saisie via `AlertController` (champ texte) ou petit formulaire.
-- **Limite (rollback)** : une entrée **créée/éditée manuellement** ne doit pas être effacée par le rollback de régénération/suppression. Méthode : marquer son `sourceMessageId` avec une **valeur sentinelle** (ex. `"manual"`) que `forgetMemoryFrom` / la purge de `deleteFrom` ignorent.
+- **Fait — Créer** : `ChatService.addMemoryEntry(characterId, category, value)` réutilise `applyMemoryUpdates` (catégorie à valeur unique → remplacement ; à valeurs multiples → ajout borné par `capMemory`), avec source `"manual"`.
+- **Fait — Éditer** : `ChatService.updateMemoryEntry(characterId, entryId, value)` modifie la valeur et marque l'entrée `"manual"` (l'utilisateur en prend possession).
+- **Fait — UI** : bouton « + Ajouter un souvenir » dans l'en-tête de la page mémoire (toujours visible) → choix de la catégorie (radios) puis saisie de la valeur (`AlertController`). Bouton ✎ sur chaque entrée pour l'éditer.
+- **Fait — Limite (rollback)** : les entrées manuelles portent `sourceMessageId = "manual"` (sentinelle) ; `forgetMemoryFrom` (régénération) ne les vise jamais, et la purge de `deleteFrom` les **conserve** explicitement. Vérifié par simulation.
 
 ## 7 — Comptabiliser TOUS les appels IA + afficher le max (RPD) par modèle *(corrige 9)* 🟡
 Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**, 7a, qui passe par `generateStructured`), et on ne voit pas la **limite** par modèle.
@@ -74,5 +74,5 @@ Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**,
 | 3 | Invariant de suppression (jamais finir sur l'utilisateur) | 3 | 🟢 | ✅ Fait |
 | 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | ✅ Fait |
 | 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | ✅ Fait |
-| 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | À faire |
+| 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | ✅ Fait |
 | 7 | Comptabiliser tous les appels IA + max RPD par modèle | 9 | 🟡 | À faire |

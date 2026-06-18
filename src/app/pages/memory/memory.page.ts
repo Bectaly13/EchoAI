@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatService, MemoryEntry } from 'src/app/services/chat-service';
 
+import { MemoryCategory } from 'src/app/utils/parse-memory';
+
 // Une catégorie de mémoire et son libellé affiché.
 interface MemoryGroup {
   label: string;
@@ -21,7 +23,7 @@ interface MemoryGroup {
 export class MemoryPage implements ViewWillEnter {
 
   // Catégories affichées, dans l'ordre, avec leur libellé.
-  private readonly categories = [
+  private readonly categories: { category: MemoryCategory; label: string }[] = [
     { category: "location", label: "Lieu actuel" },
     { category: "relationship", label: "Relation avec l'utilisateur" },
     { category: "milestone", label: "Jalons de l'histoire" },
@@ -62,6 +64,68 @@ export class MemoryPage implements ViewWillEnter {
   goBack() {
     const id = this.route.snapshot.paramMap.get("id");
     this.router.navigate(["chat", id]);
+  }
+
+  // Ajout d'un souvenir : on choisit d'abord la catégorie, puis on saisit la valeur.
+  async promptAddCategory() {
+    const alert = await this.alert.create({
+      header: "Ajouter un souvenir",
+      message: "Dans quelle catégorie ?",
+      inputs: this.categories.map((item, index) => ({
+        type: "radio" as const,
+        label: item.label,
+        value: item.category,
+        checked: index === 0
+      })),
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Suivant", handler: (category: MemoryCategory) => this.promptAddValue(category) }
+      ]
+    });
+    await alert.present();
+  }
+
+  async promptAddValue(category: MemoryCategory) {
+    const label = this.categories.find(item => item.category === category)?.label ?? "";
+    const alert = await this.alert.create({
+      header: "Nouveau souvenir",
+      message: label,
+      inputs: [{ name: "value", type: "textarea", placeholder: "Ce dont le personnage doit se souvenir." }],
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Ajouter", handler: (data: { value: string }) => this.addEntry(category, data.value) }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async addEntry(category: MemoryCategory, value: string) {
+    if (!this.character) {
+      return;
+    }
+    const memory = await this.chatService.addMemoryEntry(this.character.id, category, value);
+    this.groups = this.groupByCategory(memory);
+  }
+
+  // Édition de la valeur d'une entrée existante.
+  async promptEditEntry(entry: MemoryEntry) {
+    const alert = await this.alert.create({
+      header: "Modifier le souvenir",
+      inputs: [{ name: "value", type: "textarea", value: entry.value }],
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Enregistrer", handler: (data: { value: string }) => this.editEntry(entry, data.value) }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async editEntry(entry: MemoryEntry, value: string) {
+    if (!this.character) {
+      return;
+    }
+    const memory = await this.chatService.updateMemoryEntry(this.character.id, entry.id, value);
+    this.groups = this.groupByCategory(memory);
   }
 
   // Demande confirmation avant de supprimer une entrée de mémoire.

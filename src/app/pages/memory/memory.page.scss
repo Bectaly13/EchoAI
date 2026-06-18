@@ -32,6 +32,18 @@ ion-content.memory-content {
   color: var(--app-text-muted);
 }
 
+.memory-add {
+  align-self: flex-start;
+  border: 1px solid var(--app-accent);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--app-accent);
+  cursor: pointer;
+}
+
 .memory-empty {
   padding: 48px 24px;
   text-align: center;
@@ -78,6 +90,7 @@ ion-content.memory-content {
   color: var(--app-text);
 }
 
+.memory-entry-edit,
 .memory-entry-delete {
   flex: 0 0 auto;
   border: none;
