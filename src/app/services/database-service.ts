@@ -11,7 +11,8 @@ export class DatabaseService {
   db: any = {
     characters: [],     // les personnages créés par l'utilisateur
     conversations: [],  // une conversation (liste de messages) par personnage
-    personas: []        // les personas que l'utilisateur peut incarner
+    personas: [],       // les personas que l'utilisateur peut incarner
+    usage: []           // suivi d'utilisation des modèles (requêtes/tokens par jour)
   };
 
   constructor(

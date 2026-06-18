@@ -4,7 +4,13 @@ export const environment = {
   production: false,
   // Récupère ta clé gratuite sur https://aistudio.google.com (bouton "Get API key").
   GEMINI_API_KEY: "COLLE_TA_CLE_ICI",
-  GEMINI_MODEL: "gemini-3.1-flash-lite",
+  // Modèles de texte, du préféré au moins prioritaire : repli automatique sur le
+  // suivant si le quota du précédent est épuisé (429).
+  GEMINI_MODELS: [
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash"
+  ],
   // Modèles d'image, du plus performant au moins performant : on bascule sur
   // le suivant si le quota du précédent est épuisé (429). Ex. palier gratuit.
   GEMINI_IMAGE_MODELS: [

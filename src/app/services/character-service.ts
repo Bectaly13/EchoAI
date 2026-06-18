@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
+import { UsageService } from './usage-service';
 
 import { buildDraftPrompt, CHARACTER_DRAFT_SCHEMA } from 'src/app/utils/build-draft-prompt';
 import { buildImagePrompt } from 'src/app/utils/build-image-prompt';
@@ -44,7 +45,8 @@ export class CharacterService {
 
   constructor(
     private database: DatabaseService,
-    private gemini: GeminiService
+    private gemini: GeminiService,
+    private usage: UsageService
   ) { }
 
   // Renvoie tous les personnages, du plus récent au plus ancien.
@@ -116,7 +118,9 @@ export class CharacterService {
     if (!this.gemini.hasApiKey()) {
       throw new Error("no-api-key");
     }
-    return await this.gemini.generateImage(buildImagePrompt(fields));
+    const result = await this.gemini.generateImage(buildImagePrompt(fields));
+    await this.usage.recordImage(result);
+    return result.image;
   }
 
   // Met à jour le nom et la personnalité d'un personnage existant.

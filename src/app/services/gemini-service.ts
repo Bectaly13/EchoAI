@@ -4,6 +4,30 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 
+// Comptage de tokens renvoyé par l'API (usageMetadata) pour un appel.
+export interface GeminiUsage {
+  promptTokenCount: number;
+  candidatesTokenCount: number;
+  totalTokenCount: number;
+}
+
+// Résultat d'une génération de texte : le texte, le modèle qui a effectivement
+// répondu, l'usage de tokens et la liste des modèles épuisés (429) avant le succès.
+export interface GeminiTextResult {
+  text: string;
+  model: string;
+  usage?: GeminiUsage;
+  exhausted: string[];
+}
+
+// Résultat d'une génération d'image : l'image (data URL base64), le modèle utilisé
+// et les modèles épuisés (429) avant le succès.
+export interface GeminiImageResult {
+  image: string;
+  model: string;
+  exhausted: string[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -20,28 +44,32 @@ export class GeminiService {
     return !!environment.GEMINI_API_KEY;
   }
 
-  // Appel HTTP au modèle. Renvoie le texte de la réponse.
-  // systemPrompt : la personnalité du personnage. contents : l'historique formaté.
-  async generate(systemPrompt: string, contents: any[]): Promise<string> {
-    const url = `${environment.GEMINI_API_URL}/${environment.GEMINI_MODEL}:generateContent`;
-    const body = {
-      // La personnalité du personnage est passée comme instruction système.
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: contents
-    };
-    const response: any = await firstValueFrom(
-      this.http.post(url, body, {
-        headers: { "x-goog-api-key": environment.GEMINI_API_KEY }
-      })
-    );
-    // Chemin standard de la réponse Gemini : candidates[0].content.parts[0].text
-    return response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  // Génère du texte. Essaie chaque modèle de GEMINI_MODELS dans l'ordre et bascule
+  // sur le suivant quand le quota du modèle courant est épuisé (429). Renvoie le
+  // texte, le modèle utilisé, l'usage de tokens et les modèles épuisés rencontrés.
+  // Lève si tous les modèles échouent ou en cas d'erreur non liée au quota.
+  async generate(systemPrompt: string, contents: any[]): Promise<GeminiTextResult> {
+    const exhausted: string[] = [];
+    return await this.withFallback(environment.GEMINI_MODELS, exhausted, async model => {
+      const body = {
+        // La personnalité du personnage est passée comme instruction système.
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: contents
+      };
+      const response = await this.post(`${model}:generateContent`, body);
+      return {
+        text: response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "",
+        model: model,
+        usage: this.parseUsage(response?.usageMetadata),
+        exhausted: [...exhausted]
+      };
+    });
   }
 
   // Appel HTTP attendant une réponse JSON structurée conforme à responseSchema.
   // Renvoie l'objet déjà désérialisé (ou null si la réponse est inexploitable).
+  // Utilise le modèle préféré (premier de GEMINI_MODELS).
   async generateStructured(prompt: string, responseSchema: any): Promise<any> {
-    const url = `${environment.GEMINI_API_URL}/${environment.GEMINI_MODEL}:generateContent`;
     const body = {
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       // Force le modèle à répondre par du JSON respectant le schéma fourni.
@@ -50,11 +78,7 @@ export class GeminiService {
         responseSchema: responseSchema
       }
     };
-    const response: any = await firstValueFrom(
-      this.http.post(url, body, {
-        headers: { "x-goog-api-key": environment.GEMINI_API_KEY }
-      })
-    );
+    const response = await this.post(`${environment.GEMINI_MODELS[0]}:generateContent`, body);
     const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     try {
       return JSON.parse(text);
@@ -63,46 +87,70 @@ export class GeminiService {
     }
   }
 
-  // Génère une image (text-to-image) et la renvoie en data URL base64.
-  // Essaie chaque modèle de GEMINI_IMAGE_MODELS dans l'ordre et bascule sur le
-  // suivant quand le quota du modèle courant est épuisé (429). Lève si tous
-  // les modèles échouent ou en cas d'erreur non liée au quota.
-  async generateImage(prompt: string): Promise<string> {
+  // Génère une image (text-to-image). Essaie chaque modèle de GEMINI_IMAGE_MODELS
+  // dans l'ordre, bascule sur le suivant en cas de quota épuisé (429). Renvoie
+  // l'image (data URL base64), le modèle utilisé et les modèles épuisés rencontrés.
+  async generateImage(prompt: string): Promise<GeminiImageResult> {
+    const exhausted: string[] = [];
+    return await this.withFallback(environment.GEMINI_IMAGE_MODELS, exhausted, async model => {
+      const body = {
+        instances: [{ prompt: prompt }],
+        // Une seule image, format carré adapté à un avatar / une vignette.
+        parameters: { sampleCount: 1, aspectRatio: "1:1" }
+      };
+      const response = await this.post(`${model}:predict`, body);
+      const prediction = response?.predictions?.[0];
+      const base64 = prediction?.bytesBase64Encoded;
+      const mime = prediction?.mimeType ?? "image/png";
+      return {
+        image: base64 ? `data:${mime};base64,${base64}` : "",
+        model: model,
+        exhausted: [...exhausted]
+      };
+    });
+  }
+
+  // ----- Internes -----
+
+  // Boucle de repli : essaie chaque modèle dans l'ordre via `call`. Sur 429, ajoute
+  // le modèle à `exhausted` et tente le suivant ; toute autre erreur est remontée.
+  // Lève la dernière erreur si tous les modèles sont épuisés.
+  private async withFallback<T>(models: string[], exhausted: string[], call: (model: string) => Promise<T>): Promise<T> {
     let lastError: unknown;
-    for (const model of environment.GEMINI_IMAGE_MODELS) {
+    for (const model of models) {
       try {
-        return await this.requestImage(model, prompt);
+        return await call(model);
       } catch (error) {
         lastError = error;
-        // 429 = quota épuisé pour ce modèle → on tente le suivant.
-        // Toute autre erreur n'est pas un problème de quota → on remonte.
-        if (!(error instanceof HttpErrorResponse) || error.status !== 429) {
-          throw error;
+        if (error instanceof HttpErrorResponse && error.status === 429) {
+          exhausted.push(model);
+          continue;
         }
+        // Erreur non liée au quota → inutile de tenter les autres modèles.
+        throw error;
       }
     }
     throw lastError;
   }
 
-  // Appel HTTP brut à un modèle image (endpoint :predict d'Imagen).
-  private async requestImage(model: string, prompt: string): Promise<string> {
-    const url = `${environment.GEMINI_API_URL}/${model}:predict`;
-    const body = {
-      instances: [{ prompt: prompt }],
-      // Une seule image, format carré adapté à un avatar.
-      parameters: { sampleCount: 1, aspectRatio: "1:1" }
-    };
-    const response: any = await firstValueFrom(
-      this.http.post(url, body, {
+  // POST brut vers une méthode de l'API (ex. "gemini-3.1-flash-lite:generateContent").
+  private async post(path: string, body: any): Promise<any> {
+    return await firstValueFrom(
+      this.http.post(`${environment.GEMINI_API_URL}/${path}`, body, {
         headers: { "x-goog-api-key": environment.GEMINI_API_KEY }
       })
     );
-    const prediction = response?.predictions?.[0];
-    const base64 = prediction?.bytesBase64Encoded;
-    if (!base64) {
-      return "";
+  }
+
+  // Normalise le bloc usageMetadata de la réponse (champs absents → 0).
+  private parseUsage(usageMetadata: any): GeminiUsage | undefined {
+    if (!usageMetadata) {
+      return undefined;
     }
-    const mime = prediction?.mimeType ?? "image/png";
-    return `data:${mime};base64,${base64}`;
+    return {
+      promptTokenCount: usageMetadata.promptTokenCount ?? 0,
+      candidatesTokenCount: usageMetadata.candidatesTokenCount ?? 0,
+      totalTokenCount: usageMetadata.totalTokenCount ?? 0
+    };
   }
 }

@@ -39,6 +39,10 @@ export class CharactersPage implements ViewWillEnter {
     this.router.navigate(["personas"]);
   }
 
+  goToUsage() {
+    this.router.navigate(["usage"]);
+  }
+
   goToEdit(character: Character) {
     this.router.navigate(["character-form", character.id]);
   }

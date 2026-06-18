@@ -35,6 +35,10 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Mémoire permanente** : l'IA mémorise d'elle-même les éléments durables de l'histoire (lieu courant, évolution de la relation, jalons, consignes) et les conserve d'un message à l'autre pour une meilleure fidélité, sans rien afficher de technique. Un écran dédié (bouton 🧠) permet de **consulter cette mémoire** et d'oublier une entrée erronée.
 - **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
 
+### Robustesse & suivi
+- **Repli automatique des modèles** : texte et image s'appuient sur une **liste** de modèles ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant.
+- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les requêtes et les tokens consommés par modèle, et signale les modèles épuisés. ⚠️ L'API Gemini n'exposant pas le quota restant, ces chiffres sont une **estimation locale**, pas une lecture officielle.
+
 ---
 
 ## Prérequis
@@ -61,7 +65,7 @@ Renseigne ensuite ta clé dans `src/environments/environment.ts` :
 | Variable           | Description                                                        |
 | ------------------ | ------------------------------------------------------------------ |
 | `GEMINI_API_KEY`     | Clé API obtenue sur [Google AI Studio](https://aistudio.google.com) |
-| `GEMINI_MODEL`       | Modèle de texte utilisé (ex. `gemini-3.1-flash-lite`, palier gratuit) |
+| `GEMINI_MODELS`      | Liste de modèles de texte, du préféré au moins prioritaire (repli automatique sur `429`). Ex. : `gemini-3.1-flash-lite` puis ses remplaçants |
 | `GEMINI_IMAGE_MODELS`| Liste de modèles d'image, du plus performant au moins performant (repli automatique sur `429`). Ex. : Imagen 4 Ultra → Generate → Fast |
 | `GEMINI_API_URL`     | Racine de l'API Gemini                                             |
 
@@ -82,16 +86,17 @@ npm run lint       # analyse statique (ESLint)
 
 Sous `src/app/` :
 
-- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `personas` (liste), `persona-form` (création/édition).
+- **`pages/`** — les écrans : `characters` (liste), `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `personas` (liste), `persona-form` (création/édition), `usage` (suivi d'utilisation des modèles).
 - **`components/`** — composants réutilisables : `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
-  - `GeminiService` — uniquement l'appel HTTP brut au modèle.
+  - `GeminiService` — uniquement l'appel HTTP brut au modèle (texte et image), avec repli sur une liste de modèles en cas de quota épuisé.
   - `ChatService` — orchestration (assemble le prompt système via l'util `buildSystemPrompt`, construit l'historique, persiste les messages).
   - `CharacterService` — gestion des personnages.
   - `PersonaService` — gestion des personas incarnés par l'utilisateur.
   - `DatabaseService` — interface dev-friendly (tables/lignes) pour le stockage local.
   - `StorageService` — couche de stockage bas niveau (Ionic Storage).
   - `MessageService` — retours UI (toasts, alertes).
+  - `UsageService` — suivi (estimé) de l'utilisation des modèles : compteurs de requêtes et de tokens par jour.
   - `VersionHandlerService` — montées de version du format de la bdd (migrations exécutées au démarrage via `provideAppInitializer`).
 - **`utils/`** — fonctions utilitaires pures.
 

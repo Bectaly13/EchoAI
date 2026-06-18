@@ -4,6 +4,7 @@ import { Character, CharacterService } from './character-service';
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
 import { Persona, PersonaService } from './persona-service';
+import { UsageService } from './usage-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
 import { buildSceneImagePrompt } from '../utils/build-scene-image-prompt';
@@ -65,7 +66,8 @@ export class ChatService {
     private characterService: CharacterService,
     private database: DatabaseService,
     private gemini: GeminiService,
-    private personaService: PersonaService
+    private personaService: PersonaService,
+    private usage: UsageService
   ) { }
 
   // Renvoie les messages de la conversation d'un personnage (vide si aucune).
@@ -195,9 +197,10 @@ export class ChatService {
     const conversation = await this.getOrCreateConversation(characterId);
 
     const prompt = buildSceneImagePrompt(character, conversation.memory ?? [], conversation.messages);
-    const imageData = await this.gemini.generateImage(prompt);
-    if (imageData) {
-      conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: imageData, at: Date.now() });
+    const result = await this.gemini.generateImage(prompt);
+    await this.usage.recordImage(result);
+    if (result.image) {
+      conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: result.image, at: Date.now() });
       await this.saveConversation(conversation);
     }
     return conversation.messages;
@@ -319,7 +322,9 @@ export class ChatService {
       return this.mockReply(messages);
     }
     const contents = buildGeminiContents(messages);
-    return await this.gemini.generate(systemPrompt, contents);
+    const result = await this.gemini.generate(systemPrompt, contents);
+    await this.usage.recordText(result);
+    return result.text;
   }
 
   // Comme generateReply, mais sans nouveau message utilisateur : on ajoute un tour
@@ -330,7 +335,9 @@ export class ChatService {
     }
     const contents = buildGeminiContents(messages);
     contents.push({ role: "user", parts: [{ text: CONTINUATION_PROMPT }] });
-    return await this.gemini.generate(systemPrompt, contents);
+    const result = await this.gemini.generate(systemPrompt, contents);
+    await this.usage.recordText(result);
+    return result.text;
   }
 
   // Réponse bidon utilisée tant qu'aucune clé API n'est configurée.

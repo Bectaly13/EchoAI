@@ -14,9 +14,9 @@ export class VersionHandlerService {
 
   // Version courante du format de la bdd. À incrémenter à chaque changement de
   // format, en ajoutant la migration updateToVx() correspondante ci-dessous.
-  private readonly appVersion = 2;
+  private readonly appVersion = 3;
   // Version lisible, destinée à l'affichage (écran « à propos », debug…).
-  readonly appVersionDisplay = "2.0";
+  readonly appVersionDisplay = "3.0";
 
   constructor(
     private storage: StorageService,
@@ -47,6 +47,9 @@ export class VersionHandlerService {
     if (userVersion < 2) {
       await this.updateToV2();
     }
+    if (userVersion < 3) {
+      await this.updateToV3();
+    }
     await this.storage.set("version", this.appVersion);
   }
 
@@ -54,6 +57,13 @@ export class VersionHandlerService {
   private async updateToV2(): Promise<void> {
     const db = await this.database.get();
     db.personas = db.personas || [];
+    await this.database.update(db);
+  }
+
+  // Migration v2 → v3 : ajout de la table usage (suivi d'utilisation des modèles).
+  private async updateToV3(): Promise<void> {
+    const db = await this.database.get();
+    db.usage = db.usage || [];
     await this.database.update(db);
   }
 }

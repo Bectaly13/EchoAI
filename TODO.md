@@ -147,15 +147,15 @@ Générer une image illustrant l'état actuel de la conversation, à partir du c
 
 ## Phase 5 — Robustesse & debug
 
-### 9 — Repli des modèles + suivi d'utilisation *(demande initiale #9)* 🟡
+### 9 — Repli des modèles + suivi d'utilisation *(demande initiale #9)* 🟡 ✅ Fait
 Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses remplaçants si épuisé, 1 modèle image).
 
-- **Prérequis utile — chaîne de repli** : `GeminiService` devrait accepter une **liste** de modèles (texte) et basculer sur le suivant en cas de `429 RESOURCE_EXHAUSTED`. Cette infra sert directement le suivi ci-dessous (`environment` : `GEMINI_MODELS` au lieu d'un seul).
-- **Ce qui est faisable** :
-  - **Compteurs locaux** : table `usage` comptant les requêtes par modèle et par jour, affichée dans une page debug.
-  - **Tokens** : lire `usageMetadata` (`promptTokenCount`, `candidatesTokenCount`, `totalTokenCount`) renvoyé dans chaque réponse et les cumuler.
-  - **État « épuisé »** : sur `429`, marquer le modèle épuisé pour la journée et afficher le basculement vers le remplaçant (lire `Retry-After` / détails d'erreur si présents).
-- **⚠️ Limite forte de l'API** : l'API Gemini **n'expose pas** de point d'accès donnant le quota restant du palier gratuit (ex. « X/500 requêtes restantes aujourd'hui »). Cette info n'est visible que dans Google AI Studio / la console Cloud. Le suivi in-app sera donc **estimé** (compteurs locaux + détection des `429`), pas une lecture officielle du quota — à présenter comme tel à l'utilisateur.
+- **Fait — Chaîne de repli (texte)** : `environment.GEMINI_MODELS` (liste, du préféré au moins prioritaire) remplace `GEMINI_MODEL`. `GeminiService.generate` boucle sur la liste et bascule sur le suivant en cas de `429`, via un helper générique `withFallback` **partagé avec `generateImage`** (qui faisait déjà ce repli pour les images, 7b). `generate` renvoie désormais `{ text, model, usage, exhausted[] }` ; `generateImage` renvoie `{ image, model, exhausted[] }`.
+- **Fait — Compteurs locaux** : `UsageService` + table `usage` (migration **v3**, `appVersion` 2 → 3). Lignes agrégées par **jour × modèle × type** (`text`/`image`) : requêtes, tokens, drapeau `exhausted`. `ChatService` (réponses, tour passé, illustration) et `CharacterService` (avatar) enregistrent chaque appel.
+- **Fait — Tokens** : `usageMetadata` (`promptTokenCount`, `candidatesTokenCount`, `totalTokenCount`) lu dans chaque réponse texte et cumulé.
+- **Fait — État « épuisé »** : les modèles ayant renvoyé un `429` (remontés dans `exhausted`) sont marqués épuisés pour la journée et affichés comme tels.
+- **Fait — Page debug** : `usage` (bouton 📊 dans l'en-tête personnages) ; affiche, pour le jour, chaque modèle des deux chaînes (préféré / épuisé), ses requêtes et tokens, + total de tokens, avec l'avertissement ci-dessous.
+- **⚠️ Limite forte de l'API (assumée, affichée à l'utilisateur)** : l'API Gemini **n'expose pas** le quota restant du palier gratuit. Le suivi in-app est donc **estimé** (compteurs locaux + détection des `429`), pas une lecture officielle — c'est indiqué clairement sur la page.
 
 ---
 
@@ -177,4 +177,4 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 6b | Écran de visualisation de la mémoire | — | 🟢 | ✅ Fait |
 | 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | ✅ Fait |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | ✅ Fait |
-| 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |
+| 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | ✅ Fait |

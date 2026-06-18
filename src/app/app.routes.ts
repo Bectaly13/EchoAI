@@ -41,6 +41,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/persona-form/persona-form.page').then((m) => m.PersonaFormPage),
   },
   {
+    // Page debug : suivi (estimé) de l'utilisation des modèles.
+    path: 'usage',
+    loadComponent: () => import('./pages/usage/usage.page').then((m) => m.UsagePage),
+  },
+  {
     path: '',
     redirectTo: 'characters',
     pathMatch: 'full',
