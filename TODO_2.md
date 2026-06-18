@@ -24,12 +24,12 @@ Même cause racine que #1 (aucun modèle image accessible en gratuit).
 - **Fait — UI** : le bouton 🖼 du chat est masqué quand la génération d'image est désactivée.
 - **Parqué (jusqu'à un plan payant)** : l'illustration réelle (prompt auto-construit depuis apparence + lieu mémorisé + derniers messages). Rappel de l'écart assumé : palier gratuit = pas d'image→image, donc pas de cohérence d'apparence garantie même en payant.
 
-## 3 — Invariant de suppression : ne jamais finir sur un message utilisateur *(corrige 3)* 🟢
-La suppression d'un message du personnage fonctionne déjà (bouton 🗑 présent sur **toutes** les bulles, suppression du message **et de tous les suivants**). Manque l'invariant suivant.
+## 3 — Invariant de suppression : ne jamais finir sur un message utilisateur *(corrige 3)* 🟢 ✅ Fait
+La suppression d'un message du personnage fonctionnait déjà (bouton 🗑 sur **toutes** les bulles, suppression du message **et de tous les suivants**). Manquait l'invariant.
 
-- **Règle** : une conversation ne peut **jamais** se terminer par un message `user`. Après une suppression, si le dernier message restant est de l'utilisateur, le retirer aussi (rogner le(s) message(s) `user` final/aux).
-- **Méthode** : dans `ChatService.deleteFrom`, après le `splice` existant, retirer les messages `user` en fin de tableau (boucle « tant que le dernier est `user` »). Répercuter la **purge mémoire** sur l'ensemble final (réutiliser la logique de purge par `sourceMessageId` déjà en place).
-- **Effet attendu** : supprimer une réponse de l'IA déclenchée par un message utilisateur ramène la conversation **avant** ce message utilisateur (pas d'historique se terminant sur une question sans réponse).
+- **Fait — Règle** : une conversation ne peut **jamais** se terminer par un message `user`. Dans `ChatService.deleteFrom`, après le `splice`, une boucle « tant que le dernier message est `user` » rogne le(s) message(s) utilisateur final/aux. La **purge mémoire** par `sourceMessageId` est calculée **après** le rognage (sur l'ensemble final).
+- **Effet** : supprimer une réponse de l'IA déclenchée par un message utilisateur ramène la conversation **avant** ce message (pas d'historique se terminant sur une question sans réponse). Seul `deleteFrom` peut produire ce cas (les autres flux finissent toujours sur un `model`).
+- **Vérifié** (simulation) : suppression d'une réponse IA → retire aussi le message utilisateur déclencheur ; suppression d'un message utilisateur → reste sur la réponse précédente ; id inconnu → sans effet.
 
 ## 4 — Persona par défaut « Moi » + sélection descriptive *(corrige 4)* 🟡
 L'utilisateur doit **toujours** avoir un persona actif (au minimum pour transmettre son nom à l'IA). « Aucun persona » disparaît.
@@ -70,7 +70,7 @@ Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**,
 | ----- | --------- | ------- | ------ | ---- |
 | 1 | Génération d'image de profil : dégradation propre (gratuit) | 7b | 🟢 | ✅ Fait (dégradé) · génération parquée (plan payant) |
 | 2 | Illustration de scène : dégradation propre (gratuit) | 8 | 🟢 | ✅ Fait (dégradé) · génération parquée (plan payant) |
-| 3 | Invariant de suppression (jamais finir sur l'utilisateur) | 3 | 🟢 | À faire |
+| 3 | Invariant de suppression (jamais finir sur l'utilisateur) | 3 | 🟢 | ✅ Fait |
 | 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | À faire |
 | 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | À faire |
 | 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | À faire |

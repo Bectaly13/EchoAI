@@ -157,6 +157,12 @@ export class ChatService {
       return conversation.messages;
     }
     conversation.messages.splice(index);
+    // Une conversation ne se termine jamais par un message de l'utilisateur : on
+    // retire le(s) message(s) `user` resté(s) en fin de liste (supprimer une réponse
+    // de l'IA enlève donc aussi le message utilisateur qui l'avait déclenchée).
+    while (conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].role === "user") {
+      conversation.messages.pop();
+    }
     // Oublie la mémoire produite par les messages supprimés.
     const remainingIds = new Set(conversation.messages.map(message => message.id));
     conversation.memory = (conversation.memory ?? []).filter(entry => remainingIds.has(entry.sourceMessageId));
