@@ -157,7 +157,9 @@ export class ChatService {
       return [];
     }
     const index = conversation.messages.findIndex(message => message.id === messageId);
-    if (index === -1) {
+    // Index introuvable, ou premier message (la salutation, non supprimable :
+    // utiliser « Réinitialiser la conversation » pour repartir de zéro).
+    if (index <= 0) {
       return conversation.messages;
     }
     conversation.messages.splice(index);
@@ -221,6 +223,19 @@ export class ChatService {
       conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: result.image, at: Date.now() });
       await this.saveConversation(conversation);
     }
+    return conversation.messages;
+  }
+
+  // Réinitialise complètement la conversation : efface tous les messages ET la
+  // mémoire permanente, puis remet la salutation. Le persona actif est conservé.
+  async resetConversation(characterId: string): Promise<ChatMessage[]> {
+    const conversation = await this.getOrCreateConversation(characterId);
+    const greeting = await this.greetingFor(characterId);
+    conversation.messages = greeting
+      ? [{ id: crypto.randomUUID(), role: "model", text: greeting, at: Date.now() }]
+      : [];
+    conversation.memory = [];
+    await this.saveConversation(conversation);
     return conversation.messages;
   }
 

@@ -4,6 +4,7 @@
     <img class="chat-avatar" [src]="character?.avatarImage" [alt]="character?.name" />
   }
   <h1 class="chat-title">{{ character?.name }}</h1>
+  <button class="chat-reset" title="Réinitialiser la conversation" (click)="confirmReset()">↺</button>
   <button class="chat-memory" title="Voir la mémoire" (click)="goToMemory()">🧠</button>
   <button class="chat-persona" title="Choisir mon persona" (click)="choosePersona()">{{ activePersonaLabel() }}</button>
 </header>
@@ -15,6 +16,7 @@
         class="chat-bubble"
         [message]="message"
         [canRegenerate]="canRegenerate(message)"
+        [canDelete]="canDelete(message)"
         (regenerate)="regenerate()"
         (remove)="confirmDelete(message)">
       </app-message-bubble>

@@ -100,14 +100,15 @@ export class ChatPage implements ViewWillEnter {
     await this.chatService.setActivePersona(this.character.id, personaId);
   }
 
-  // Libellé d'une option de persona : nom + début de description (tronquée).
+  // Libellé d'une option de persona : nom (+ « (défaut) ») + début de description.
   private personaOptionLabel(persona: Persona): string {
+    const name = persona.isDefault ? `${persona.name} (défaut)` : persona.name;
     const description = persona.description?.trim();
     if (!description) {
-      return persona.name;
+      return name;
     }
     const short = description.length > 80 ? `${description.slice(0, 80).trim()}…` : description;
-    return `${persona.name} — ${short}`;
+    return `${name} — ${short}`;
   }
 
   async send() {
@@ -197,6 +198,33 @@ export class ChatPage implements ViewWillEnter {
       this.sending = false;
       this.scrollToBottom();
     }
+  }
+
+  // Le premier message (la salutation) n'est pas supprimable : pour repartir de
+  // zéro, on passe par « Réinitialiser la conversation ».
+  canDelete(message: ChatMessage): boolean {
+    return message !== this.messages[0];
+  }
+
+  // Demande confirmation avant de réinitialiser toute la conversation.
+  async confirmReset() {
+    const alert = await this.alert.create({
+      header: "Réinitialiser ?",
+      message: "Effacer tous les messages et la mémoire de cette conversation, et repartir de la salutation ?",
+      buttons: [
+        { text: "Annuler", role: "cancel" },
+        { text: "Réinitialiser", role: "destructive", handler: () => this.reset() }
+      ]
+    });
+    await alert.present();
+  }
+
+  async reset() {
+    if (!this.character) {
+      return;
+    }
+    this.messages = await this.chatService.resetConversation(this.character.id);
+    this.scrollToBottom();
   }
 
   // Demande confirmation avant de supprimer un message et tous les suivants.

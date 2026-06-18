@@ -9,7 +9,7 @@ export function buildDraftPrompt(brief: string): string {
     "Consignes :",
     "- Reste fidèle au brouillon ; comble les manques de façon plausible sans contredire ce qui est donné.",
     "- \"systemPrompt\" décrit la personnalité, la façon de parler, le ton et ce que sait le personnage (rédigé à la 3ᵉ personne, comme des instructions de jeu de rôle).",
-    "- \"greeting\" est le premier message du personnage (à la 1ʳᵉ personne), pour planter le décor. Il DOIT suivre le format des messages : préfixe chaque réplique par le nom de celui qui parle suivi d'un deux-points, puis les paroles entre guillemets droits (ex. : Alice : \"Bonjour\"), et encadre les actions / la narration entre astérisques (ex. : *elle sourit*), en dehors des guillemets.",
+    "- \"greeting\" est le message d'ouverture qui plante le décor. Il DOIT suivre le format des messages : les répliques sont préfixées par le nom de celui qui parle puis mises entre guillemets droits (ex. : Alice : \"Bonjour\"), et la narration (actions, lieux, ambiance) est écrite à la 3ᵉ personne, comme un narrateur, entre astérisques et en dehors des guillemets (ex. : *La nuit tombe sur le port.*).",
     "- Les autres champs sont concis. Laisse une chaîne vide pour un champ que le brouillon ne permet pas de remplir raisonnablement.",
     "- N'invente pas de personnages connus si le brouillon n'en mentionne pas.",
     "",

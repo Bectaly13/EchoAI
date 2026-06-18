@@ -67,6 +67,8 @@ export class MemoryPage implements ViewWillEnter {
   }
 
   // Ajout d'un souvenir : on choisit d'abord la catégorie, puis on saisit la valeur.
+  // On enchaîne via onDidDismiss (et non depuis le handler) pour éviter une
+  // présentation imbriquée d'alertes — qui empêchait le rafraîchissement de la liste.
   async promptAddCategory() {
     const alert = await this.alert.create({
       header: "Ajouter un souvenir",
@@ -79,13 +81,21 @@ export class MemoryPage implements ViewWillEnter {
       })),
       buttons: [
         { text: "Annuler", role: "cancel" },
-        { text: "Suivant", handler: (category: MemoryCategory) => this.promptAddValue(category) }
+        { text: "Suivant", role: "confirm" }
       ]
     });
     await alert.present();
+    const { data, role } = await alert.onDidDismiss<{ values: MemoryCategory }>();
+    if (role !== "confirm") {
+      return;
+    }
+    await this.promptAddValue(data?.values);
   }
 
-  async promptAddValue(category: MemoryCategory) {
+  async promptAddValue(category?: MemoryCategory) {
+    if (!category) {
+      return;
+    }
     const label = this.categories.find(item => item.category === category)?.label ?? "";
     const alert = await this.alert.create({
       header: "Nouveau souvenir",
@@ -93,10 +103,15 @@ export class MemoryPage implements ViewWillEnter {
       inputs: [{ name: "value", type: "textarea", placeholder: "Ce dont le personnage doit se souvenir." }],
       buttons: [
         { text: "Annuler", role: "cancel" },
-        { text: "Ajouter", handler: (data: { value: string }) => this.addEntry(category, data.value) }
+        { text: "Ajouter", role: "confirm" }
       ]
     });
     await alert.present();
+    const { data, role } = await alert.onDidDismiss<{ values: { value: string } }>();
+    if (role !== "confirm") {
+      return;
+    }
+    await this.addEntry(category, data?.values?.value ?? "");
   }
 
   private async addEntry(category: MemoryCategory, value: string) {

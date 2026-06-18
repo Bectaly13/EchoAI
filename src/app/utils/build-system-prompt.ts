@@ -58,7 +58,7 @@ function buildFormatBlock(): string {
   return [
     "CONSIGNES DE FORMAT",
     "Préfixe chaque réplique par le nom de celui qui parle, suivi d'un deux-points, puis mets les paroles entre guillemets droits. Exemple :\nAlice : \"Bonjour\"\nBob : \"Salut\"",
-    "Encadre les actions, gestes et passages de narration entre astérisques (par exemple : *il sourit et s'approche*), en dehors des guillemets."
+    "Encadre les actions, gestes et passages de narration entre astérisques, en dehors des guillemets. La narration est écrite à la 3ᵉ personne, comme un narrateur omniscient (jamais à la 1ʳᵉ personne) : elle décrit les actions, les lieux et les événements, et peut continuer à décrire la scène même lorsque ton personnage est absent ou que l'utilisateur se retrouve seul. Exemple : *La pièce est silencieuse ; au loin, une porte grince.*"
   ].join("\n");
 }
 

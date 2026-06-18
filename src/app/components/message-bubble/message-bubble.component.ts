@@ -15,6 +15,8 @@ export class MessageBubbleComponent {
   message = input.required<ChatMessage>();
   // Affiche le bouton de régénération (réservé au dernier message de l'IA).
   canRegenerate = input<boolean>(false);
+  // Affiche le bouton de suppression (masqué sur le premier message / salutation).
+  canDelete = input<boolean>(true);
 
   // Segments du message : alterne paroles (texte normal) et narration (astérisques).
   segments = computed<TextSegment[]>(() => formatNarration(this.message().text));

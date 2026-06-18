@@ -73,12 +73,16 @@ export class UsageService {
 
   // ----- Internes -----
 
-  // Date locale du jour au format "AAAA-MM-JJ".
+  // Date du jour au format "AAAA-MM-JJ", alignée sur le fuseau Pacifique : c'est
+  // là que le quota gratuit Gemini se réinitialise (~minuit PT). en-CA produit
+  // directement "AAAA-MM-JJ" ; le fuseau gère automatiquement l'heure d'été.
   private today(): string {
-    const now = new Date();
-    const month = `${now.getMonth() + 1}`.padStart(2, "0");
-    const day = `${now.getDate()}`.padStart(2, "0");
-    return `${now.getFullYear()}-${month}-${day}`;
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(new Date());
   }
 
   // Renvoie la ligne (date, modèle, type), en la créant à zéro si elle n'existe pas.
