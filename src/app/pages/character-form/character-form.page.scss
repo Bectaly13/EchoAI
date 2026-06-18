@@ -57,6 +57,55 @@ ion-content.character-form-content {
   opacity: 0.5;
 }
 
+.character-form-avatar {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+
+.character-form-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.character-form-avatar-preview,
+.character-form-avatar-placeholder {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.character-form-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--app-text-muted);
+  background: var(--app-surface);
+  border: 1px dashed var(--app-border);
+}
+
+.character-form-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.character-form-avatar-remove {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--app-danger);
+  cursor: pointer;
+  padding: 0;
+}
+
 .character-form-label {
   margin: 14px 0 6px;
   font-size: 14px;

@@ -122,14 +122,17 @@ Depuis une conversation, voir l'état de la mémoire permanente (et corriger si 
 
 ## Phase 4 — Assistance IA & images
 
-### 7 — Création de personnage assistée par IA *(demande initiale #6)* 🔴 — (a) ✅ Fait, (b) à faire
+### 7 — Création de personnage assistée par IA *(demande initiale #6)* 🟢 ✅ Fait
 - **(a) Brouillon → fiche structurée** ✅ **Fait** : à partir d'un prompt brouillon, générer une fiche bien formulée qui **remplit les champs de #5**.
   - **Fait — Service bas niveau** : `GeminiService.generateStructured(prompt, responseSchema)` (appel HTTP brut avec `generationConfig.responseMimeType = "application/json"` + `responseSchema`), renvoie l'objet désérialisé (ou `null` si réponse inexploitable). `GeminiService` reste cantonné à l'appel brut.
   - **Fait — Orchestration** : util pur `build-draft-prompt.ts` (`buildDraftPrompt(brief)` + `CHARACTER_DRAFT_SCHEMA` calqué sur `CharacterDraft`). `CharacterService.draftFromBrief(brief)` assemble le prompt, appelle Gemini, normalise le résultat en `CharacterDraft` (champs manquants → `""`), avec **chemin mock** sans clé API.
   - **Fait — UI** : section « Brouillon (assistance IA) » en tête de `character-form` (textarea + bouton « Générer la fiche », désactivé pendant l'attente / si vide). Le résultat **pré-remplit** tous les champs, qui restent **éditables**. Disponible en création comme en édition.
-- **(b) Image de profil générée** 🔴 *(à faire)* : à partir d'un prompt, générer une photo de profil.
-  - **Méthode** : `GeminiService.generateImage(prompt)` ; nouveau modèle image dans `environment` (`GEMINI_IMAGE_MODEL`). Stocker le résultat (data URL / base64) dans `Character.avatarImage`.
-  - **Limites** : disponibilité d'un modèle image (et sur palier gratuit ?) à confirmer ; quota dédié ; **poids du stockage** local (base64 volumineux en IndexedDB) ; politique de contenu du modèle. La pastille de couleur actuelle reste le fallback si pas d'image.
+- **(b) Image de profil générée** ✅ **Fait** : à partir des champs de la fiche, générer une photo de profil.
+  - **Fait — Service bas niveau** : `GeminiService.generateImage(prompt)` appelle l'endpoint `:predict` d'Imagen et renvoie l'image en **data URL base64** (`predictions[0].bytesBase64Encoded`). **Chaîne de repli** : `environment.GEMINI_IMAGE_MODELS` (liste ordonnée du plus performant au moins performant) ; on bascule sur le modèle suivant en cas de `429` (quota épuisé), on remonte toute autre erreur.
+  - **Fait — Modèles** : palier gratuit → seuls les **Imagen 4** (Fast/Generate/Ultra, 25 img/jour) sont accessibles ; ordre retenu Ultra → Generate → Fast.
+  - **Fait — Orchestration** : util pur `build-image-prompt.ts` (`buildImagePrompt({ name, appearance, systemPrompt })`, portrait/avatar). `CharacterService.generateAvatar(fields)` ; **pas de mode démo** (lève `no-api-key` sans clé). Image stockée dans `Character.avatarImage` (champ optionnel, **pas de migration** — même choix qu'au point 5).
+  - **Fait — UI** : section « Photo de profil » dans `character-form` (aperçu + « Générer / Régénérer / Retirer »). Avatar affiché dans la liste (`character-card`) et l'en-tête du chat ; **fallback** sur la pastille de couleur si pas d'image.
+  - **Limite assumée** : quota 25/jour ; poids du base64 en IndexedDB ; politique de contenu du modèle.
 
 ### 8 — Génération d'image dans le chat *(demande initiale #7)* 🔴
 Générer une image illustrant l'état actuel de la conversation, à partir de **(a)** la photo de profil du personnage (devient alors **obligatoire**) et **(b)** le contexte courant.
@@ -137,7 +140,8 @@ Générer une image illustrant l'état actuel de la conversation, à partir de *
 - **Dépendances** : nécessite #7(b) (image de profil) et idéalement #6 (mémoire = contexte).
 - **Données** : `ChatMessage` doit pouvoir porter une image → ajouter `imageData?` ; le `message-bubble` affiche l'image. Déclencheur : bouton « Illustrer la scène ».
 - **Méthode** : construire le prompt image à partir de la mémoire + des derniers messages, en fournissant la photo de profil comme **image de référence** (image-to-image) pour garder l'apparence du personnage.
-- **Limites** : quota/coût image ; latence ; **cohérence d'apparence** entre images (dépend du support image-de-référence du modèle) ; poids cumulé du stockage (plusieurs images par convo).
+- **⚠️ Limite forte (palier gratuit)** : les seuls modèles faisant de l'**image→image** (« Nano Banana » / modèles image de Gemini) sont à **0/0** sur la clé gratuite → **inaccessibles**. Imagen 4 (disponible) ne fait que du **text→image**. Donc, avec cette clé, l'illustration de scène sera **sans image de référence** → **pas de garantie de cohérence d'apparence** avec la photo de profil. À reconsidérer si un modèle image→image devient accessible.
+- **Limites** : quota/coût image ; latence ; poids cumulé du stockage (plusieurs images par convo).
 
 ---
 
@@ -171,6 +175,6 @@ Afficher dans l'app l'état d'utilisation des modèles (≥1 modèle texte + ses
 | 5 | Champs de création enrichis | #5 | 🟡 | ✅ Fait |
 | 6 | Mémoire permanente / contexte | #4 | 🔴 | ✅ Fait (moteur) |
 | 6b | Écran de visualisation de la mémoire | — | 🟢 | ✅ Fait |
-| 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | 🟡 (a) fiche faite · (b) image à faire |
+| 7 | Création assistée par IA (fiche + image) | #6 | 🔴 | ✅ Fait |
 | 8 | Génération d'image dans le chat | #7 | 🔴 | À faire |
 | 9 | Repli des modèles + suivi d'utilisation | #9 | 🟡 | À faire |

@@ -1,8 +1,12 @@
 <div class="character-card" (click)="open.emit()">
 
-  <div class="character-card-avatar" [style.background]="character().avatarColor">
-    <span class="character-card-initial">{{ initial() }}</span>
-  </div>
+  @if (character().avatarImage) {
+    <img class="character-card-photo" [src]="character().avatarImage" [alt]="character().name" />
+  } @else {
+    <div class="character-card-avatar" [style.background]="character().avatarColor">
+      <span class="character-card-initial">{{ initial() }}</span>
+    </div>
+  }
 
   <div class="character-card-info">
     <h2 class="character-card-name">{{ character().name }}</h2>

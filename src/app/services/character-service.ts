@@ -4,6 +4,7 @@ import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
 
 import { buildDraftPrompt, CHARACTER_DRAFT_SCHEMA } from 'src/app/utils/build-draft-prompt';
+import { buildImagePrompt } from 'src/app/utils/build-image-prompt';
 
 // Un personnage créé par l'utilisateur.
 export interface Character {
@@ -20,6 +21,9 @@ export interface Character {
   likes?: string;                 // goûts et préférences
   dislikes?: string;              // ce qu'il n'aime pas
   knownCharacters?: string;       // autres personnages qu'il connaît
+  // Photo de profil générée par l'IA, stockée en data URL base64. Optionnelle :
+  // à défaut, la pastille de couleur (avatarColor) sert d'avatar.
+  avatarImage?: string;
   // Couleur de l'avatar (pastille colorée affichée dans la liste).
   avatarColor: string;
   createdAt: number;
@@ -28,7 +32,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters"
+  "name" | "systemPrompt" | "greeting" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -104,6 +108,15 @@ export class CharacterService {
       dislikes: "",
       knownCharacters: ""
     };
+  }
+
+  // Génère une photo de profil (data URL base64) à partir des champs de la fiche.
+  // Nécessite une clé API (la génération d'image n'a pas de mode démo) → lève sinon.
+  async generateAvatar(fields: { name?: string; appearance?: string; systemPrompt?: string }): Promise<string> {
+    if (!this.gemini.hasApiKey()) {
+      throw new Error("no-api-key");
+    }
+    return await this.gemini.generateImage(buildImagePrompt(fields));
   }
 
   // Met à jour le nom et la personnalité d'un personnage existant.

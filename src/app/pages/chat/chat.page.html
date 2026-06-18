@@ -1,5 +1,8 @@
 <header class="chat-header">
   <button class="chat-back" (click)="goBack()">←</button>
+  @if (character?.avatarImage) {
+    <img class="chat-avatar" [src]="character?.avatarImage" [alt]="character?.name" />
+  }
   <h1 class="chat-title">{{ character?.name }}</h1>
   <button class="chat-memory" title="Voir la mémoire" (click)="goToMemory()">🧠</button>
   <button class="chat-persona" title="Choisir mon persona" (click)="choosePersona()">{{ activePersonaLabel() }}</button>

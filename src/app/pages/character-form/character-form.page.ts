@@ -30,6 +30,9 @@ export class CharacterFormPage implements ViewWillEnter {
   likes = "";
   dislikes = "";
   knownCharacters = "";
+  // Photo de profil générée (data URL base64) et état d'attente associé.
+  avatarImage = "";
+  generatingImage = false;
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
@@ -62,6 +65,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.likes = character.likes ?? "";
     this.dislikes = character.dislikes ?? "";
     this.knownCharacters = character.knownCharacters ?? "";
+    this.avatarImage = character.avatarImage ?? "";
   }
 
   isEditing(): boolean {
@@ -92,6 +96,39 @@ export class CharacterFormPage implements ViewWillEnter {
     }
   }
 
+  // Génère une photo de profil à partir des champs renseignés (apparence, nom…).
+  async generateImage() {
+    if (this.generatingImage) {
+      return;
+    }
+    this.generatingImage = true;
+    try {
+      const image = await this.characterService.generateAvatar({
+        name: this.name,
+        appearance: this.appearance,
+        systemPrompt: this.systemPrompt
+      });
+      if (image) {
+        this.avatarImage = image;
+      } else {
+        await this.message.error("Aucune image n'a pu être générée.");
+      }
+    } catch (error) {
+      // Sans clé API, la génération d'image est indisponible (pas de mode démo).
+      const text = (error as Error)?.message === "no-api-key"
+        ? "Génération d'image indisponible sans clé API."
+        : "Échec de la génération de l'image.";
+      await this.message.error(text);
+    } finally {
+      this.generatingImage = false;
+    }
+  }
+
+  // Retire la photo de profil (retour à la pastille de couleur).
+  removeImage() {
+    this.avatarImage = "";
+  }
+
   async save() {
     const name = this.name.trim();
     if (!name) {
@@ -106,7 +143,8 @@ export class CharacterFormPage implements ViewWillEnter {
       initialRelationship: this.initialRelationship.trim(),
       likes: this.likes.trim(),
       dislikes: this.dislikes.trim(),
-      knownCharacters: this.knownCharacters.trim()
+      knownCharacters: this.knownCharacters.trim(),
+      avatarImage: this.avatarImage
     };
     if (this.isEditing()) {
       await this.characterService.update(this.characterId, draft);

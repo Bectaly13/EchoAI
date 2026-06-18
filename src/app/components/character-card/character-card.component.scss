@@ -9,6 +9,14 @@
   cursor: pointer;
 }
 
+.character-card-photo {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .character-card-avatar {
   flex: 0 0 auto;
   width: 44px;

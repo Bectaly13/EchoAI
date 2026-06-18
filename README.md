@@ -13,6 +13,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 ### Personnages
 - **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** optionnel, et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
 - **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
+- **Photo de profil générée** : l'IA peut générer une photo de profil à partir de l'apparence et de la personnalité du personnage (modèles Imagen). À défaut, une pastille colorée sert d'avatar.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
@@ -58,9 +59,10 @@ Renseigne ensuite ta clé dans `src/environments/environment.ts` :
 
 | Variable           | Description                                                        |
 | ------------------ | ------------------------------------------------------------------ |
-| `GEMINI_API_KEY`   | Clé API obtenue sur [Google AI Studio](https://aistudio.google.com) |
-| `GEMINI_MODEL`     | Modèle utilisé (ex. `gemini-3.1-flash-lite`, palier gratuit)       |
-| `GEMINI_API_URL`   | Racine de l'API Gemini                                             |
+| `GEMINI_API_KEY`     | Clé API obtenue sur [Google AI Studio](https://aistudio.google.com) |
+| `GEMINI_MODEL`       | Modèle de texte utilisé (ex. `gemini-3.1-flash-lite`, palier gratuit) |
+| `GEMINI_IMAGE_MODELS`| Liste de modèles d'image, du plus performant au moins performant (repli automatique sur `429`). Ex. : Imagen 4 Ultra → Generate → Fast |
+| `GEMINI_API_URL`     | Racine de l'API Gemini                                             |
 
 > Sans clé, l'application fonctionne en **mode démo** (réponses simulées).
 

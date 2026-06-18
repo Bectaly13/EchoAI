@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
@@ -61,5 +61,48 @@ export class GeminiService {
     } catch {
       return null;
     }
+  }
+
+  // Génère une image (text-to-image) et la renvoie en data URL base64.
+  // Essaie chaque modèle de GEMINI_IMAGE_MODELS dans l'ordre et bascule sur le
+  // suivant quand le quota du modèle courant est épuisé (429). Lève si tous
+  // les modèles échouent ou en cas d'erreur non liée au quota.
+  async generateImage(prompt: string): Promise<string> {
+    let lastError: unknown;
+    for (const model of environment.GEMINI_IMAGE_MODELS) {
+      try {
+        return await this.requestImage(model, prompt);
+      } catch (error) {
+        lastError = error;
+        // 429 = quota épuisé pour ce modèle → on tente le suivant.
+        // Toute autre erreur n'est pas un problème de quota → on remonte.
+        if (!(error instanceof HttpErrorResponse) || error.status !== 429) {
+          throw error;
+        }
+      }
+    }
+    throw lastError;
+  }
+
+  // Appel HTTP brut à un modèle image (endpoint :predict d'Imagen).
+  private async requestImage(model: string, prompt: string): Promise<string> {
+    const url = `${environment.GEMINI_API_URL}/${model}:predict`;
+    const body = {
+      instances: [{ prompt: prompt }],
+      // Une seule image, format carré adapté à un avatar.
+      parameters: { sampleCount: 1, aspectRatio: "1:1" }
+    };
+    const response: any = await firstValueFrom(
+      this.http.post(url, body, {
+        headers: { "x-goog-api-key": environment.GEMINI_API_KEY }
+      })
+    );
+    const prediction = response?.predictions?.[0];
+    const base64 = prediction?.bytesBase64Encoded;
+    if (!base64) {
+      return "";
+    }
+    const mime = prediction?.mimeType ?? "image/png";
+    return `data:${mime};base64,${base64}`;
   }
 }
