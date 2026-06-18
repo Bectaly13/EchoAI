@@ -21,10 +21,13 @@ bootstrapApplication(AppComponent, {
     // Stockage local des personnages et conversations (utilisé par StorageService).
     importProvidersFrom(IonicStorageModule.forRoot()),
     // Applique les migrations de format de la bdd, puis garantit le persona par
-    // défaut, avant le démarrage de l'app.
-    provideAppInitializer(async () => {
-      await inject(VersionHandlerService).init();
-      await inject(PersonaService).ensureDefault();
+    // défaut, avant le démarrage de l'app. Les services sont injectés de façon
+    // synchrone (avant tout await) : inject() doit être appelé dans le contexte
+    // d'injection, donc pas après une promesse.
+    provideAppInitializer(() => {
+      const versionHandler = inject(VersionHandlerService);
+      const personaService = inject(PersonaService);
+      return versionHandler.init().then(() => personaService.ensureDefault());
     }),
   ],
 });
