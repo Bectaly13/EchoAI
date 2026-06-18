@@ -23,7 +23,7 @@ Bloquer l'application en orientation portrait, comme le projet de référence.
 - **Méthode** : ajouter la dépendance `@capacitor/screen-orientation` ; appeler `ScreenOrientation.lock({ orientation: 'portrait' })` au chargement de `app.component.ts`.
 - **Limite** : effet réel sur appareil/emulateur natif ; sans effet en simple navigateur desktop (cible = mobile).
 
-## 3 — Composants transverses Header et Navbar 🟡
+## 3 — Composants transverses Header et Navbar 🟡 ✅ Fait
 Créer deux composants réutilisables (calqués sur la référence).
 
 - **`HeaderComponent`** : `input` `title` (requis) et `showBack` (bool) ; `output` `back`. Rend un en-tête avec flèche de retour optionnelle, titre, et logo (`assets/icon/favicon.png`). `ion-icon` + `addIcons`.
@@ -76,7 +76,7 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 | ----- | ----- | ------ | ---- |
 | 1 | Fondations de thème (ThemeService + variables par thème) | 🟡 | ✅ Fait |
 | 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | ✅ Fait |
-| 3 | Composants Header + Navbar | 🟡 | À faire |
+| 3 | Composants Header + Navbar | 🟡 | ✅ Fait |
 | 4 | Page Welcome / splash + reroutage init | 🟡 | À faire |
 | 5 | Architecture de navigation (routes + ossature) | 🔴 | À faire |
 | 6 | Page Personnages (aperçu description 1 ligne) | 🟢 | À faire |

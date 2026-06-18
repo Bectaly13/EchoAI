@@ -1,0 +1,38 @@
+.navbar {
+  // Toujours collée en bas de l'écran, indépendamment du scroll de la page.
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background: var(--navbar-background);
+  border-top: 1px solid var(--navbar-border);
+
+  // Hauteur visuelle + marge pour la safe area (boutons de navigation système).
+  padding-top: 10px;
+  padding-bottom: calc(10px + var(--safe-bottom));
+}
+
+.navbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: none;
+  border: none;
+  padding: 6px 18px;
+  cursor: pointer;
+
+  // ion-icon hérite de cette taille (taille par défaut = 1em).
+  font-size: 24px;
+  color: var(--navbar-icon);
+}
+
+.navbar-button.active {
+  color: var(--navbar-icon-active);
+}

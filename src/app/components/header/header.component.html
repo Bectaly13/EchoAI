@@ -1,0 +1,9 @@
+<header class="header">
+  @if (showBack()) {
+    <button class="header-back" (click)="back.emit()">
+      <ion-icon class="header-back-icon" name="arrow-back"></ion-icon>
+    </button>
+  }
+  <h1 class="header-title">{{ title() }}</h1>
+  <img class="header-logo" src="assets/icon/favicon.png" alt="Logo" />
+</header>
