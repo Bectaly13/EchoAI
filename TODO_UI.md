@@ -30,7 +30,7 @@ Créer deux composants réutilisables (calqués sur la référence).
 - **`NavbarComponent`** : barre fixe en bas (safe-area), 5 boutons `routerLink` + `routerLinkActive="active"` vers les 5 onglets, `ion-icon` par onglet. Icônes proposées : Personnages `people`, Conversations `chatbubbles`, Personas `person-circle`, Tokens `server`, Paramètres `settings`.
 - **Règle d'usage** : les **pages principales** (5 onglets) affichent header **+ navbar** ; les **sous-pages** (formulaires, chat, mémoire) affichent header avec `showBack` **sans** navbar.
 
-## 4 — Page Welcome / splash + reroutage de l'initialisation 🟡
+## 4 — Page Welcome / splash + reroutage de l'initialisation 🟡 ✅ Fait
 Écran d'accueil au lancement, puis redirection.
 
 - **Méthode** : page `welcome` (route `''` → `welcome`) affichant le splash (logo). Dans `ionViewWillEnter` : `theme.initTheme()`, `version.init()`, puis `personaService.ensureDefault()`, un court délai (≈ 2 s), et redirection vers `characters`. Retirer le `provideAppInitializer` de `main.ts` (l'init se fait désormais dans le welcome, comme la référence).
@@ -77,7 +77,7 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 | 1 | Fondations de thème (ThemeService + variables par thème) | 🟡 | ✅ Fait |
 | 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | ✅ Fait |
 | 3 | Composants Header + Navbar | 🟡 | ✅ Fait |
-| 4 | Page Welcome / splash + reroutage init | 🟡 | À faire |
+| 4 | Page Welcome / splash + reroutage init | 🟡 | ✅ Fait |
 | 5 | Architecture de navigation (routes + ossature) | 🔴 | À faire |
 | 6 | Page Personnages (aperçu description 1 ligne) | 🟢 | À faire |
 | 7 | Page Conversations (nouvelle, tri récent, suppression) | 🟡 | À faire |

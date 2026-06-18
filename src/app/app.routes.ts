@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    // Écran de démarrage (splash) : initialise thème/bdd/persona puis redirige.
+    path: 'welcome',
+    loadComponent: () => import('./pages/welcome/welcome.page').then((m) => m.WelcomePage),
+  },
+  {
     path: 'characters',
     loadComponent: () => import('./pages/characters/characters.page').then((m) => m.CharactersPage),
   },
@@ -47,7 +52,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'characters',
+    redirectTo: 'welcome',
     pathMatch: 'full',
   },
 ];

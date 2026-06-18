@@ -1,0 +1,17 @@
+ion-content.welcome-content {
+  --background: var(--app-background);
+}
+
+.welcome-splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.welcome-logo {
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  border-radius: 28px;
+}
