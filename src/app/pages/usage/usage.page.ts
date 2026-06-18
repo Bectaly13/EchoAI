@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 // Utilisation d'un modèle sur la journée (vue dérivée pour l'affichage).
 interface ModelUsage {
   model: string;
+  // Limite de requêtes/jour configurée (palier gratuit), affichée comme « X / rpd ».
+  rpd: number;
   requests: number;
   totalTokens: number;
   exhausted: boolean;
@@ -55,10 +57,11 @@ export class UsagePage implements ViewWillEnter {
   }
 
   // Construit la vue d'un modèle (compteurs à zéro si aucune ligne pour aujourd'hui).
-  private viewFor(rows: UsageRow[], model: string, kind: "text" | "image"): ModelUsage {
-    const row = rows.find(item => item.model === model && item.kind === kind);
+  private viewFor(rows: UsageRow[], model: { id: string; rpd: number }, kind: "text" | "image"): ModelUsage {
+    const row = rows.find(item => item.model === model.id && item.kind === kind);
     return {
-      model: model,
+      model: model.id,
+      rpd: model.rpd,
       requests: row?.requests ?? 0,
       totalTokens: row?.totalTokens ?? 0,
       exhausted: row?.exhausted ?? false

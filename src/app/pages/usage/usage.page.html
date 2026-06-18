@@ -9,7 +9,8 @@
   <p class="usage-disclaimer">
     ⚠️ L'API Gemini n'expose pas le quota restant du palier gratuit. Ces chiffres sont
     une <strong>estimation locale</strong> (requêtes comptées dans l'app + tokens lus dans
-    les réponses), pas une lecture officielle. Le quota exact reste visible dans Google AI Studio.
+    les réponses) ; le maximum « / jour » est une valeur <strong>configurée à la main</strong>
+    (dans l'environnement), pas une lecture officielle. Le quota exact reste visible dans Google AI Studio.
   </p>
 
   @if (!hasApiKey) {
@@ -25,7 +26,7 @@
           @if (first) { <span class="usage-tag">préféré</span> }
           @if (model.exhausted) { <span class="usage-tag usage-tag-exhausted">épuisé</span> }
         </span>
-        <span class="usage-stats">{{ model.requests }} req · {{ model.totalTokens }} tokens</span>
+        <span class="usage-stats">{{ model.requests }} / {{ model.rpd }} req · {{ model.totalTokens }} tokens</span>
       </div>
     }
   </section>
@@ -39,7 +40,7 @@
           @if (first) { <span class="usage-tag">préféré</span> }
           @if (model.exhausted) { <span class="usage-tag usage-tag-exhausted">épuisé</span> }
         </span>
-        <span class="usage-stats">{{ model.requests }} req</span>
+        <span class="usage-stats">{{ model.requests }} / {{ model.rpd }} req</span>
       </div>
     }
   </section>

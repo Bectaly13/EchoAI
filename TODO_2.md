@@ -56,12 +56,12 @@ La **suppression unitaire** d'un souvenir existait déjà (🗑 par entrée) en 
 - **Fait — UI** : bouton « + Ajouter un souvenir » dans l'en-tête de la page mémoire (toujours visible) → choix de la catégorie (radios) puis saisie de la valeur (`AlertController`). Bouton ✎ sur chaque entrée pour l'éditer.
 - **Fait — Limite (rollback)** : les entrées manuelles portent `sourceMessageId = "manual"` (sentinelle) ; `forgetMemoryFrom` (régénération) ne les vise jamais, et la purge de `deleteFrom` les **conserve** explicitement. Vérifié par simulation.
 
-## 7 — Comptabiliser TOUS les appels IA + afficher le max (RPD) par modèle *(corrige 9)* 🟡
-Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**, 7a, qui passe par `generateStructured`), et on ne voit pas la **limite** par modèle.
+## 7 — Comptabiliser TOUS les appels IA + afficher le max (RPD) par modèle *(corrige 9)* 🟡 ✅ Fait
+Le suivi de tokens ignorait certains appels (ex. la **création de fiche par IA**, 7a, via `generateStructured`), et on ne voyait pas la **limite** par modèle.
 
-- **Comptabiliser tous les appels** : aucun chemin d'appel à l'IA ne doit échapper au suivi. `GeminiService.generateStructured` doit remonter `{ data, model, usage, exhausted }` (comme `generate`), et `CharacterService.draftFromBrief` doit appeler `UsageService.recordText`. Vérifier qu'il ne reste **aucun** appel non comptabilisé (audit des usages de `GeminiService`).
-- **Afficher le max (RPD) par modèle** : déclarer la limite **requêtes/jour** de chaque modèle dans `environment` (l'API n'exposant pas le quota restant). Méthode : transformer `GEMINI_MODELS` / `GEMINI_IMAGE_MODELS` en objets `{ id, rpd }` (ou table parallèle de limites), répercuter dans `example`/`prod`, et adapter `GeminiService` (qui lit `model.id`). La page `usage` affiche alors « X / RPD » par modèle.
-- **⚠️ Limite forte (rappel)** : le RPD affiché est une **valeur configurée à la main** ; combiné aux compteurs locaux, cela reste une **estimation**, pas une lecture officielle du quota (l'API ne l'expose pas). À garder explicite sur la page.
+- **Fait — Tous les appels comptés** : `GeminiService.generateStructured` remonte désormais `{ data, model, usage, exhausted }` (même chaîne de repli que `generate`), et `CharacterService.draftFromBrief` appelle `UsageService.recordText`. `recordText` accepte le tronc commun `{ model, usage?, exhausted }` (texte ou JSON structuré). Audit fait : les 5 appels IA directs (`generate` ×2, `generateStructured`, `generateImage` ×2) sont tous suivis d'un `record…`.
+- **Fait — Max (RPD) par modèle** : `GEMINI_MODELS` / `GEMINI_IMAGE_MODELS` sont passés en objets `{ id, rpd }` (3 fichiers env). `GeminiService` lit `model.id` (boucles de repli sur `.map(m => m.id)`). La page `usage` affiche « X / RPD req » par modèle.
+- **⚠️ Limite forte (rappel, affiché)** : le RPD est une **valeur configurée à la main** ; combiné aux compteurs locaux, cela reste une **estimation**, pas une lecture officielle (l'API n'expose pas le quota). C'est explicite dans l'avertissement de la page.
 
 ---
 
@@ -75,4 +75,4 @@ Le suivi de tokens ignore certains appels (ex. la **création de fiche par IA**,
 | 4 | Persona par défaut « Moi » + sélection descriptive | 4 | 🟡 | ✅ Fait |
 | 5 | Salutation obligatoire + conventions sur la salutation générée | 1, 7a | 🟡 | ✅ Fait |
 | 6 | Mémoire : créer et éditer un souvenir | 6b | 🟡 | ✅ Fait |
-| 7 | Comptabiliser tous les appels IA + max RPD par modèle | 9 | 🟡 | À faire |
+| 7 | Comptabiliser tous les appels IA + max RPD par modèle | 9 | 🟡 | ✅ Fait |

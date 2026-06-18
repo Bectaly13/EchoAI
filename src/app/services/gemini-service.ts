@@ -20,6 +20,15 @@ export interface GeminiTextResult {
   exhausted: string[];
 }
 
+// Résultat d'une génération JSON structurée : l'objet désérialisé (ou null), le
+// modèle utilisé, l'usage de tokens et les modèles épuisés (429) avant le succès.
+export interface GeminiStructuredResult {
+  data: any;
+  model: string;
+  usage?: GeminiUsage;
+  exhausted: string[];
+}
+
 // Résultat d'une génération d'image : l'image (data URL base64), le modèle utilisé
 // et les modèles épuisés (429) avant le succès.
 export interface GeminiImageResult {
@@ -56,7 +65,7 @@ export class GeminiService {
   // Lève si tous les modèles échouent ou en cas d'erreur non liée au quota.
   async generate(systemPrompt: string, contents: any[]): Promise<GeminiTextResult> {
     const exhausted: string[] = [];
-    return await this.withFallback(environment.GEMINI_MODELS, exhausted, async model => {
+    return await this.withFallback(environment.GEMINI_MODELS.map(model => model.id), exhausted, async model => {
       const body = {
         // La personnalité du personnage est passée comme instruction système.
         systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -73,24 +82,34 @@ export class GeminiService {
   }
 
   // Appel HTTP attendant une réponse JSON structurée conforme à responseSchema.
-  // Renvoie l'objet déjà désérialisé (ou null si la réponse est inexploitable).
-  // Utilise le modèle préféré (premier de GEMINI_MODELS).
-  async generateStructured(prompt: string, responseSchema: any): Promise<any> {
-    const body = {
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      // Force le modèle à répondre par du JSON respectant le schéma fourni.
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: responseSchema
+  // Même chaîne de repli que generate(). Renvoie l'objet désérialisé (ou null),
+  // le modèle utilisé et l'usage, pour que l'appelant comptabilise la requête.
+  async generateStructured(prompt: string, responseSchema: any): Promise<GeminiStructuredResult> {
+    const exhausted: string[] = [];
+    return await this.withFallback(environment.GEMINI_MODELS.map(model => model.id), exhausted, async model => {
+      const body = {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        // Force le modèle à répondre par du JSON respectant le schéma fourni.
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema
+        }
+      };
+      const response = await this.post(`${model}:generateContent`, body);
+      const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
       }
-    };
-    const response = await this.post(`${environment.GEMINI_MODELS[0]}:generateContent`, body);
-    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    try {
-      return JSON.parse(text);
-    } catch {
-      return null;
-    }
+      return {
+        data: data,
+        model: model,
+        usage: this.parseUsage(response?.usageMetadata),
+        exhausted: [...exhausted]
+      };
+    });
   }
 
   // Génère une image (text-to-image). Essaie chaque modèle de GEMINI_IMAGE_MODELS
@@ -98,7 +117,7 @@ export class GeminiService {
   // l'image (data URL base64), le modèle utilisé et les modèles épuisés rencontrés.
   async generateImage(prompt: string): Promise<GeminiImageResult> {
     const exhausted: string[] = [];
-    return await this.withFallback(environment.GEMINI_IMAGE_MODELS, exhausted, async model => {
+    return await this.withFallback(environment.GEMINI_IMAGE_MODELS.map(model => model.id), exhausted, async model => {
       const body = {
         instances: [{ prompt: prompt }],
         // Une seule image, format carré adapté à un avatar / une vignette.

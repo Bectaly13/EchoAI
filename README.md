@@ -37,7 +37,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 
 ### Robustesse & suivi
 - **Repli automatique des modèles** : texte et image s'appuient sur une **liste** de modèles ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant.
-- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les requêtes et les tokens consommés par modèle, et signale les modèles épuisés. ⚠️ L'API Gemini n'exposant pas le quota restant, ces chiffres sont une **estimation locale**, pas une lecture officielle.
+- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les requêtes (sous la forme « X / max par jour ») et les tokens consommés par modèle, et signale les modèles épuisés. Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche). ⚠️ L'API Gemini n'exposant pas le quota restant, ces chiffres — y compris le max par jour, saisi à la main — sont une **estimation locale**, pas une lecture officielle.
 
 ---
 
@@ -65,9 +65,9 @@ Renseigne ensuite ta clé dans `src/environments/environment.ts` :
 | Variable           | Description                                                        |
 | ------------------ | ------------------------------------------------------------------ |
 | `GEMINI_API_KEY`     | Clé API obtenue sur [Google AI Studio](https://aistudio.google.com) |
-| `GEMINI_MODELS`      | Liste de modèles de texte, du préféré au moins prioritaire (repli automatique sur `429`). Ex. : `gemini-3.1-flash-lite` puis ses remplaçants |
+| `GEMINI_MODELS`      | Liste de modèles de texte `{ id, rpd }`, du préféré au moins prioritaire (repli automatique sur `429`). `rpd` = requêtes/jour du palier gratuit (saisi à la main, affiché dans le suivi). Ex. : `{ id: "gemini-3.1-flash-lite", rpd: 500 }` |
 | `GEMINI_IMAGE_ENABLED`| Active la génération d'image. `false` sur le palier gratuit (aucun modèle image accessible) ; à passer à `true` avec un plan payant |
-| `GEMINI_IMAGE_MODELS`| Liste de modèles d'image, du plus performant au moins performant (repli automatique sur `429`). Ex. : Imagen 4 Ultra → Generate → Fast |
+| `GEMINI_IMAGE_MODELS`| Liste de modèles d'image `{ id, rpd }`, du plus performant au moins performant (repli automatique sur `429`). Ex. : Imagen 4 Ultra → Generate → Fast |
 | `GEMINI_API_URL`     | Racine de l'API Gemini                                             |
 
 > Sans clé, l'application fonctionne en **mode démo** (réponses simulées).

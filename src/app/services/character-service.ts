@@ -80,7 +80,9 @@ export class CharacterService {
       return this.mockDraft(text);
     }
     const result = await this.gemini.generateStructured(buildDraftPrompt(text), CHARACTER_DRAFT_SCHEMA);
-    return this.normalizeDraft(result);
+    // Comptabilise cet appel (auparavant non suivi) dans le suivi d'utilisation.
+    await this.usage.recordText(result);
+    return this.normalizeDraft(result.data);
   }
 
   // Convertit la réponse brute de l'IA en CharacterDraft (champs manquants → "").
