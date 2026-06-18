@@ -44,6 +44,12 @@ export class GeminiService {
     return !!environment.GEMINI_API_KEY;
   }
 
+  // Indique si la génération d'image est disponible (drapeau d'environnement + clé).
+  // false sur le palier gratuit, où aucun modèle image n'est accessible.
+  imageEnabled(): boolean {
+    return environment.GEMINI_IMAGE_ENABLED && this.hasApiKey();
+  }
+
   // Génère du texte. Essaie chaque modèle de GEMINI_MODELS dans l'ordre et bascule
   // sur le suivant quand le quota du modèle courant est épuisé (429). Renvoie le
   // texte, le modèle utilisé, l'usage de tokens et les modèles épuisés rencontrés.

@@ -20,22 +20,26 @@
 
     <div class="character-form-avatar">
       <p class="character-form-label">Photo de profil (optionnelle)</p>
-      <div class="character-form-avatar-row">
-        @if (avatarImage) {
-          <img class="character-form-avatar-preview" [src]="avatarImage" alt="Aperçu de la photo de profil" />
-        } @else {
-          <div class="character-form-avatar-placeholder">?</div>
-        }
-        <div class="character-form-avatar-actions">
-          <button class="character-form-generate" type="button"
-            (click)="generateImage()" [disabled]="generatingImage">
-            {{ generatingImage ? "Génération…" : (avatarImage ? "Régénérer l'image" : "Générer une image") }}
-          </button>
+      @if (imageEnabled) {
+        <div class="character-form-avatar-row">
           @if (avatarImage) {
-            <button class="character-form-avatar-remove" type="button" (click)="removeImage()">Retirer</button>
+            <img class="character-form-avatar-preview" [src]="avatarImage" alt="Aperçu de la photo de profil" />
+          } @else {
+            <div class="character-form-avatar-placeholder">?</div>
           }
+          <div class="character-form-avatar-actions">
+            <button class="character-form-generate" type="button"
+              (click)="generateImage()" [disabled]="generatingImage">
+              {{ generatingImage ? "Génération…" : (avatarImage ? "Régénérer l'image" : "Générer une image") }}
+            </button>
+            @if (avatarImage) {
+              <button class="character-form-avatar-remove" type="button" (click)="removeImage()">Retirer</button>
+            }
+          </div>
         </div>
-      </div>
+      } @else {
+        <p class="character-form-avatar-note">Génération d'image indisponible sur le palier gratuit (nécessite un plan payant Gemini).</p>
+      }
     </div>
 
     <label class="character-form-label" for="name">Nom</label>

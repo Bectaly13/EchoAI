@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CharacterService } from 'src/app/services/character-service';
 import { MessageService } from 'src/app/services/message-service';
 
+import { describeApiError } from 'src/app/utils/describe-api-error';
+
 @Component({
   selector: 'app-character-form',
   templateUrl: './character-form.page.html',
@@ -33,6 +35,8 @@ export class CharacterFormPage implements ViewWillEnter {
   // Photo de profil générée (data URL base64) et état d'attente associé.
   avatarImage = "";
   generatingImage = false;
+  // Génération d'image disponible (false sur le palier gratuit).
+  imageEnabled = false;
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
@@ -47,6 +51,7 @@ export class CharacterFormPage implements ViewWillEnter {
 
   // Mode édition : pré-remplit le formulaire si un id est présent dans l'URL.
   async loadIfEditing() {
+    this.imageEnabled = this.characterService.canGenerateImage();
     const id = this.route.snapshot.paramMap.get("id");
     if (!id) {
       return;
@@ -114,10 +119,11 @@ export class CharacterFormPage implements ViewWillEnter {
         await this.message.error("Aucune image n'a pu être générée.");
       }
     } catch (error) {
-      // Sans clé API, la génération d'image est indisponible (pas de mode démo).
-      const text = (error as Error)?.message === "no-api-key"
-        ? "Génération d'image indisponible sans clé API."
-        : "Échec de la génération de l'image.";
+      // Trace complète en console pour le diagnostic.
+      console.error("Échec génération avatar :", error);
+      const text = (error as Error)?.message === "image-disabled"
+        ? "Génération d'image indisponible (nécessite un plan payant Gemini)."
+        : `Échec de la génération de l'image. ${describeApiError(error)}`;
       await this.message.error(text);
     } finally {
       this.generatingImage = false;

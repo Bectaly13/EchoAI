@@ -112,11 +112,16 @@ export class CharacterService {
     };
   }
 
+  // Indique si la génération d'avatar est disponible (cf. GeminiService.imageEnabled).
+  canGenerateImage(): boolean {
+    return this.gemini.imageEnabled();
+  }
+
   // Génère une photo de profil (data URL base64) à partir des champs de la fiche.
-  // Nécessite une clé API (la génération d'image n'a pas de mode démo) → lève sinon.
+  // Nécessite la génération d'image activée (indisponible sur le palier gratuit) → lève sinon.
   async generateAvatar(fields: { name?: string; appearance?: string; systemPrompt?: string }): Promise<string> {
-    if (!this.gemini.hasApiKey()) {
-      throw new Error("no-api-key");
+    if (!this.gemini.imageEnabled()) {
+      throw new Error("image-disabled");
     }
     const result = await this.gemini.generateImage(buildImagePrompt(fields));
     await this.usage.recordImage(result);

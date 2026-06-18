@@ -183,12 +183,17 @@ export class ChatService {
     return conversation.messages;
   }
 
+  // Indique si l'illustration de scène est disponible (cf. GeminiService.imageEnabled).
+  canIllustrate(): boolean {
+    return this.gemini.imageEnabled();
+  }
+
   // Génère une illustration de la scène courante et l'ajoute comme message-image,
-  // puis persiste. Nécessite une clé API (pas de mode démo pour les images) → lève
-  // `no-api-key` sinon. Le message produit a un texte vide et porte `imageData`.
+  // puis persiste. Nécessite la génération d'image activée (indisponible sur le
+  // palier gratuit) → lève sinon. Le message produit a un texte vide et porte `imageData`.
   async illustrateScene(characterId: string): Promise<ChatMessage[]> {
-    if (!this.gemini.hasApiKey()) {
-      throw new Error("no-api-key");
+    if (!this.gemini.imageEnabled()) {
+      throw new Error("image-disabled");
     }
     const character = await this.characterService.get(characterId);
     if (!character) {

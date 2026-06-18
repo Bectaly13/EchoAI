@@ -10,6 +10,8 @@ import { Persona, PersonaService } from 'src/app/services/persona-service';
 
 import { MessageBubbleComponent } from 'src/app/components/message-bubble/message-bubble.component';
 
+import { describeApiError } from 'src/app/utils/describe-api-error';
+
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.page.html',
@@ -30,6 +32,8 @@ export class ChatPage implements ViewWillEnter {
   // Personas disponibles et id de celui incarné dans cette conversation.
   personas: Persona[] = [];
   activePersonaId?: string;
+  // Illustration de scène disponible (false sur le palier gratuit).
+  imageEnabled = false;
 
   async ionViewWillEnter() {
     await this.loadConversation();
@@ -47,6 +51,7 @@ export class ChatPage implements ViewWillEnter {
 
   // Charge le personnage et l'historique à partir de l'id présent dans l'URL.
   async loadConversation() {
+    this.imageEnabled = this.chatService.canIllustrate();
     const id = this.route.snapshot.paramMap.get("id");
     if (!id) {
       this.goBack();
@@ -131,10 +136,11 @@ export class ChatPage implements ViewWillEnter {
     try {
       this.messages = await this.chatService.illustrateScene(this.character.id);
     } catch (error) {
-      // Sans clé API, la génération d'image est indisponible (pas de mode démo).
-      const text = (error as Error)?.message === "no-api-key"
-        ? "Génération d'image indisponible sans clé API."
-        : "Échec de la génération de l'illustration.";
+      // Trace complète en console pour le diagnostic.
+      console.error("Échec génération illustration :", error);
+      const text = (error as Error)?.message === "image-disabled"
+        ? "Illustration indisponible (nécessite un plan payant Gemini)."
+        : `Échec de la génération de l'illustration. ${describeApiError(error)}`;
       await this.message.error(text);
     } finally {
       this.sending = false;
