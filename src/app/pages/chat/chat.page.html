@@ -1,13 +1,12 @@
-<header class="chat-header">
-  <button class="chat-back" (click)="goBack()">←</button>
-  @if (character?.avatarImage) {
-    <img class="chat-avatar" [src]="character?.avatarImage" [alt]="character?.name" />
-  }
-  <h1 class="chat-title">{{ character?.name }}</h1>
-  <button class="chat-reset" title="Réinitialiser la conversation" (click)="confirmReset()">↺</button>
-  <button class="chat-memory" title="Voir la mémoire" (click)="goToMemory()">🧠</button>
+<ion-header class="chat-header-wrap">
+  <app-header class="chat-header" [title]="character?.name ?? ''" [showBack]="true" (back)="goBack()"></app-header>
+</ion-header>
+
+<div class="chat-actions">
   <button class="chat-persona" title="Choisir mon persona" (click)="choosePersona()">{{ activePersonaLabel() }}</button>
-</header>
+  <button class="chat-memory" title="Voir la mémoire" (click)="goToMemory()">🧠</button>
+  <button class="chat-reset" title="Réinitialiser la conversation" (click)="confirmReset()">↺</button>
+</div>
 
 <ion-content class="chat-content">
   <div class="chat-messages">

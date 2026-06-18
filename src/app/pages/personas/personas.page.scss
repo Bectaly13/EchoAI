@@ -1,38 +1,24 @@
 ion-content.personas-content {
   --background: var(--app-background);
+  --padding-bottom: calc(72px + var(--safe-bottom));
 }
 
-.personas-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-}
-
-.personas-back {
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  font-size: 15px;
-  color: var(--app-accent);
-  cursor: pointer;
-  padding: 0;
-}
-
-.personas-titlebar {
+.personas-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
 }
 
-.personas-title {
+.personas-hint {
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--app-text);
+  font-size: 13px;
+  color: var(--app-text-muted);
 }
 
 .personas-add {
+  flex: 0 0 auto;
   border: none;
   border-radius: 10px;
   padding: 8px 14px;
@@ -43,18 +29,8 @@ ion-content.personas-content {
   cursor: pointer;
 }
 
-.personas-hint {
-  margin: 0;
-  font-size: 13px;
-  color: var(--app-text-muted);
-}
-
 .personas-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 60px 24px;
+  padding: 48px 24px;
   text-align: center;
 }
 
@@ -62,17 +38,6 @@ ion-content.personas-content {
   margin: 0;
   font-size: 15px;
   color: var(--app-text-muted);
-}
-
-.personas-empty-button {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 18px;
-  font-size: 15px;
-  font-weight: 600;
-  background: var(--app-accent);
-  color: var(--app-on-accent);
-  cursor: pointer;
 }
 
 .personas-list {

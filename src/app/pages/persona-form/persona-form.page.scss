@@ -2,34 +2,10 @@ ion-content.persona-form-content {
   --background: var(--app-background);
 }
 
-.persona-form-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-}
-
-.persona-form-back {
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  font-size: 15px;
-  color: var(--app-accent);
-  cursor: pointer;
-  padding: 0;
-}
-
-.persona-form-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--app-text);
-}
-
 .persona-form-body {
   display: flex;
   flex-direction: column;
-  padding: 0 16px 24px;
+  padding: 16px 16px 24px;
 }
 
 .persona-form-label {

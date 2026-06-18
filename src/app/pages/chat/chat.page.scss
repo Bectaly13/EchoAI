@@ -1,59 +1,19 @@
 // La page routée reçoit la classe .ion-page (flex column, plein écran) :
 // header et footer en hauteur auto, ion-content en flex:1 pour occuper le reste.
 
-.chat-header {
+// Barre d'actions de la conversation (sous l'en-tête) : persona, mémoire, reset.
+.chat-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 8px 12px;
   background: var(--app-surface);
   border-bottom: 1px solid var(--app-border);
 }
 
-.chat-back {
-  border: none;
-  background: transparent;
-  font-size: 22px;
-  color: var(--app-accent);
-  cursor: pointer;
-  padding: 0;
-}
-
-.chat-avatar {
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.chat-title {
+.chat-persona {
   flex: 1 1 auto;
   min-width: 0;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--app-text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.chat-reset,
-.chat-memory {
-  flex: 0 0 auto;
-  border: 1px solid var(--app-border);
-  border-radius: 14px;
-  padding: 6px 8px;
-  font-size: 15px;
-  line-height: 1;
-  background: var(--app-background);
-  cursor: pointer;
-}
-
-.chat-persona {
-  flex: 0 0 auto;
-  max-width: 45%;
   border: 1px solid var(--app-border);
   border-radius: 14px;
   padding: 6px 10px;
@@ -64,6 +24,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.chat-memory,
+.chat-reset {
+  flex: 0 0 auto;
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 6px 8px;
+  font-size: 15px;
+  line-height: 1;
+  background: var(--app-background);
+  cursor: pointer;
 }
 
 ion-content.chat-content {

@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
@@ -8,6 +8,7 @@ import { ChatMessage, ChatService } from 'src/app/services/chat-service';
 import { MessageService } from 'src/app/services/message-service';
 import { Persona, PersonaService } from 'src/app/services/persona-service';
 
+import { HeaderComponent } from 'src/app/components/header/header.component';
 import { MessageBubbleComponent } from 'src/app/components/message-bubble/message-bubble.component';
 
 import { describeApiError } from 'src/app/utils/describe-api-error';
@@ -17,7 +18,7 @@ import { describeApiError } from 'src/app/utils/describe-api-error';
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
   standalone: true,
-  imports: [IonContent, FormsModule, MessageBubbleComponent]
+  imports: [IonContent, IonHeader, FormsModule, HeaderComponent, MessageBubbleComponent]
 })
 export class ChatPage implements ViewWillEnter {
 

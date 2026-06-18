@@ -36,14 +36,14 @@ Créer deux composants réutilisables (calqués sur la référence).
 - **Méthode** : page `welcome` (route `''` → `welcome`) affichant le splash (logo). Dans `ionViewWillEnter` : `theme.initTheme()`, `version.init()`, puis `personaService.ensureDefault()`, un court délai (≈ 2 s), et redirection vers `characters`. Retirer le `provideAppInitializer` de `main.ts` (l'init se fait désormais dans le welcome, comme la référence).
 - **Limite** : l'init n'est garantie que via le flux normal (lancement → welcome). Un accès direct à une sous-route (deep link / reload dev) ne rejouerait pas l'init — acceptable pour une app mobile qui démarre toujours sur welcome ; à garder en tête.
 
-## 5 — Architecture de navigation (routes + ossature header/navbar) 🔴
+## 5 — Architecture de navigation (routes + ossature header/navbar) 🔴 ✅ Fait
 Mettre en place le squelette de navigation à 5 onglets et rebrancher l'ossature sur toutes les pages.
 
 - **Routes** : `''`→`welcome` ; onglets `characters`, `conversations`, `personas`, `tokens`, `settings` ; sous-pages `character-form(/:id)`, `chat/:id`, `memory/:id`, `persona-form(/:id)`.
 - **Rebranchement** : remplacer les en-têtes custom actuels de chaque page par `<ion-header><app-header …></app-header></ion-header>` ; ajouter `<app-navbar>` sur les 5 onglets ; `showBack` + `(back)` sur les sous-pages (retour cohérent). Prévoir le padding bas des pages à onglets pour ne pas passer sous la navbar fixe.
 - **Volume** : c'est le gros du chantier (mécanique). Les points 6–11 détaillent les spécificités par page.
 
-## 6 — Page Personnages 🟢
+## 6 — Page Personnages 🟢 ✅ Fait
 - **Carte** : nom + **aperçu de la description sur une ligne max** (ellipsis) — la « description » est la personnalité (`systemPrompt`). Actions inchangées (créer, modifier, supprimer, ouvrir/créer la conversation).
 - **Ossature** : header (« Personnages ») + navbar. Les boutons actuels de l'en-tête (Personas, Tokens, + Nouveau) sont repensés : navigation principale via la navbar ; « + Nouveau » conservé (header ou bouton dédié).
 
@@ -53,7 +53,7 @@ Mettre en place le squelette de navigation à 5 onglets et rebrancher l'ossature
 - **Ossature** : header (« Conversations ») + navbar.
 - **Limite** : un message-image (illustration) a un texte vide → l'aperçu affichera un libellé de repli (ex. « [image] »).
 
-## 8 — Page Personas 🟢
+## 8 — Page Personas 🟢 ✅ Fait
 - **Ossature** : header (« Personas ») + navbar (remplace l'en-tête custom).
 - **Édition du persona par défaut** : éditable via `persona-form`, mais le champ **description est masqué** quand `isDefault` (le persona par défaut n'a pas de description — seul le nom est modifiable). Suppression déjà bloquée (tag « par défaut »).
 
@@ -65,7 +65,7 @@ Mettre en place le squelette de navigation à 5 onglets et rebrancher l'ossature
 - **Contenu** : sélecteur de **thème** (boutons par thème via `ThemeService.getThemes()`, application immédiate) et affichage de la **version** (`VersionHandlerService.appVersionDisplay`).
 - **Ossature** : header (« Paramètres ») + navbar.
 
-## 11 — Sous-pages : header avec retour 🟡
+## 11 — Sous-pages : header avec retour 🟡 ✅ Fait
 Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar : `character-form`, `persona-form`, `chat`, `memory`. Conserver les actions spécifiques (ex. dans le chat : reset ↺, mémoire 🧠, persona ; pied de saisie). Le bouton retour du header remplace les boutons « ← » custom actuels.
 
 ---
@@ -78,10 +78,10 @@ Rebrancher les pages non-onglets sur `app-header` (`showBack`), **sans** navbar 
 | 2 | Blocage portrait (Capacitor ScreenOrientation) | 🟢 | ✅ Fait |
 | 3 | Composants Header + Navbar | 🟡 | ✅ Fait |
 | 4 | Page Welcome / splash + reroutage init | 🟡 | ✅ Fait |
-| 5 | Architecture de navigation (routes + ossature) | 🔴 | À faire |
-| 6 | Page Personnages (aperçu description 1 ligne) | 🟢 | À faire |
+| 5 | Architecture de navigation (routes + ossature) | 🔴 | ✅ Fait |
+| 6 | Page Personnages (aperçu description 1 ligne) | 🟢 | ✅ Fait |
 | 7 | Page Conversations (nouvelle, tri récent, suppression) | 🟡 | ✅ Fait |
-| 8 | Page Personas (édition défaut sans description) | 🟢 | À faire |
+| 8 | Page Personas (édition défaut sans description) | 🟢 | ✅ Fait |
 | 9 | Page Tokens (ex-Usage, renommage) | 🟢 | ✅ Fait |
 | 10 | Page Paramètres (nouvelle, thème + version) | 🟢 | ✅ Fait |
-| 11 | Sous-pages : header avec retour (sans navbar) | 🟡 | À faire |
+| 11 | Sous-pages : header avec retour (sans navbar) | 🟡 | ✅ Fait |

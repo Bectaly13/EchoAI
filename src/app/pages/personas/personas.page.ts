@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
-import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
 import { Persona, PersonaService } from 'src/app/services/persona-service';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-personas',
   templateUrl: './personas.page.html',
   styleUrls: ['./personas.page.scss'],
   standalone: true,
-  imports: [IonContent]
+  imports: [IonContent, IonHeader, HeaderComponent, NavbarComponent]
 })
 export class PersonasPage implements ViewWillEnter {
 
@@ -27,10 +30,6 @@ export class PersonasPage implements ViewWillEnter {
 
   async loadPersonas() {
     this.personas = await this.personaService.list();
-  }
-
-  goBack() {
-    this.router.navigate(["characters"]);
   }
 
   goToCreate() {

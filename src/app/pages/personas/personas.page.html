@@ -1,18 +1,17 @@
+<ion-header class="personas-header-wrap">
+  <app-header class="personas-header" title="Personas"></app-header>
+</ion-header>
+
 <ion-content [fullscreen]="true" class="personas-content">
 
-  <header class="personas-header">
-    <button class="personas-back" (click)="goBack()">← Personnages</button>
-    <div class="personas-titlebar">
-      <h1 class="personas-title">Mes personas</h1>
-      <button class="personas-add" (click)="goToCreate()">+ Nouveau</button>
-    </div>
-    <p class="personas-hint">Un persona indique au personnage IA qui tu es. Tu choisis lequel incarner dans chaque conversation.</p>
-  </header>
+  <div class="personas-toolbar">
+    <p class="personas-hint">Un persona indique au personnage IA qui tu es.</p>
+    <button class="personas-add" (click)="goToCreate()">+ Nouveau</button>
+  </div>
 
   @if (personas.length === 0) {
     <div class="personas-empty">
       <p class="personas-empty-text">Aucun persona pour l'instant.</p>
-      <button class="personas-empty-button" (click)="goToCreate()">Créer mon premier persona</button>
     </div>
   } @else {
     <div class="personas-list">
@@ -40,3 +39,5 @@
   }
 
 </ion-content>
+
+<app-navbar class="personas-navbar"></app-navbar>

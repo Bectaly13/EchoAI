@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, ViewWillEnter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { MessageService } from 'src/app/services/message-service';
 import { PersonaService } from 'src/app/services/persona-service';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-persona-form',
   templateUrl: './persona-form.page.html',
   styleUrls: ['./persona-form.page.scss'],
   standalone: true,
-  imports: [IonContent, FormsModule]
+  imports: [IonContent, IonHeader, FormsModule, HeaderComponent]
 })
 export class PersonaFormPage implements ViewWillEnter {
 
@@ -19,6 +21,8 @@ export class PersonaFormPage implements ViewWillEnter {
   personaId = "";
   name = "";
   description = "";
+  // Vrai si on édite le persona par défaut (« Moi ») : il n'a pas de description.
+  isDefault = false;
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
@@ -44,6 +48,7 @@ export class PersonaFormPage implements ViewWillEnter {
     this.personaId = persona.id;
     this.name = persona.name;
     this.description = persona.description;
+    this.isDefault = persona.isDefault ?? false;
   }
 
   isEditing(): boolean {

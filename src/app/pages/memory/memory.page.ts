@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
-import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatService, MemoryEntry } from 'src/app/services/chat-service';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 import { MemoryCategory } from 'src/app/utils/parse-memory';
 
@@ -18,7 +20,7 @@ interface MemoryGroup {
   templateUrl: './memory.page.html',
   styleUrls: ['./memory.page.scss'],
   standalone: true,
-  imports: [IonContent]
+  imports: [IonContent, IonHeader, HeaderComponent]
 })
 export class MemoryPage implements ViewWillEnter {
 

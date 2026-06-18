@@ -1,9 +1,10 @@
-<ion-content [fullscreen]="true" class="persona-form-content">
+<ion-header class="persona-form-header-wrap">
+  <app-header class="persona-form-header"
+    [title]="isEditing() ? 'Modifier le persona' : 'Nouveau persona'"
+    [showBack]="true" (back)="cancel()"></app-header>
+</ion-header>
 
-  <header class="persona-form-header">
-    <button class="persona-form-back" (click)="cancel()">← Annuler</button>
-    <h1 class="persona-form-title">{{ isEditing() ? "Modifier le persona" : "Nouveau persona" }}</h1>
-  </header>
+<ion-content [fullscreen]="true" class="persona-form-content">
 
   <form class="persona-form-body" (ngSubmit)="save()">
 
@@ -11,10 +12,12 @@
     <input class="persona-form-input" id="name" name="name" type="text"
       [(ngModel)]="name" placeholder="Ex. : Capitaine Léa Marchand" />
 
-    <label class="persona-form-label" for="description">Description</label>
-    <textarea class="persona-form-textarea" id="description" name="description" rows="8"
-      [(ngModel)]="description"
-      placeholder="Qui es-tu : comment on t'appelle, ton histoire, tes pouvoirs, ton rôle…"></textarea>
+    @if (!isDefault) {
+      <label class="persona-form-label" for="description">Description</label>
+      <textarea class="persona-form-textarea" id="description" name="description" rows="8"
+        [(ngModel)]="description"
+        placeholder="Qui es-tu : comment on t'appelle, ton histoire, tes pouvoirs, ton rôle…"></textarea>
+    }
 
     <button class="persona-form-save" type="submit">Enregistrer</button>
 

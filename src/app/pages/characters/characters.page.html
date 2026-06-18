@@ -1,18 +1,16 @@
+<ion-header class="characters-header-wrap">
+  <app-header class="characters-header" title="Personnages"></app-header>
+</ion-header>
+
 <ion-content [fullscreen]="true" class="characters-content">
 
-  <header class="characters-header">
-    <h1 class="characters-title">Mes personnages</h1>
-    <div class="characters-actions">
-      <button class="characters-usage" title="Utilisation des modèles" (click)="goToUsage()">📊</button>
-      <button class="characters-personas" (click)="goToPersonas()">Personas</button>
-      <button class="characters-add" (click)="goToCreate()">+ Nouveau</button>
-    </div>
-  </header>
+  <div class="characters-toolbar">
+    <button class="characters-add" (click)="goToCreate()">+ Nouveau personnage</button>
+  </div>
 
   @if (characters.length === 0) {
     <div class="characters-empty">
       <p class="characters-empty-text">Aucun personnage pour l'instant.</p>
-      <button class="characters-empty-button" (click)="goToCreate()">Créer mon premier personnage</button>
     </div>
   } @else {
     <div class="characters-list">
@@ -29,3 +27,5 @@
   }
 
 </ion-content>
+
+<app-navbar class="characters-navbar"></app-navbar>

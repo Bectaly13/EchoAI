@@ -2,34 +2,10 @@ ion-content.character-form-content {
   --background: var(--app-background);
 }
 
-.character-form-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-}
-
-.character-form-back {
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  font-size: 15px;
-  color: var(--app-accent);
-  cursor: pointer;
-  padding: 0;
-}
-
-.character-form-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--app-text);
-}
-
 .character-form-body {
   display: flex;
   flex-direction: column;
-  padding: 0 16px 24px;
+  padding: 16px 16px 24px;
 }
 
 .character-form-assist {

@@ -1,11 +1,14 @@
+<ion-header class="memory-header-wrap">
+  <app-header class="memory-header" [title]="'Mémoire — ' + (character?.name ?? '')"
+    [showBack]="true" (back)="goBack()"></app-header>
+</ion-header>
+
 <ion-content [fullscreen]="true" class="memory-content">
 
-  <header class="memory-header">
-    <button class="memory-back" (click)="goBack()">← Conversation</button>
-    <h1 class="memory-title">Mémoire — {{ character?.name }}</h1>
+  <div class="memory-toolbar">
     <p class="memory-hint">Ce que le personnage garde en tête au fil de l'histoire. Tu peux ajouter, modifier ou oublier une entrée.</p>
     <button class="memory-add" (click)="promptAddCategory()">+ Ajouter un souvenir</button>
-  </header>
+  </div>
 
   @if (isEmpty()) {
     <div class="memory-empty">

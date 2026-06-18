@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, ViewWillEnter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { CharacterService } from 'src/app/services/character-service';
 import { MessageService } from 'src/app/services/message-service';
+
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 import { describeApiError } from 'src/app/utils/describe-api-error';
 
@@ -13,7 +15,7 @@ import { describeApiError } from 'src/app/utils/describe-api-error';
   templateUrl: './character-form.page.html',
   styleUrls: ['./character-form.page.scss'],
   standalone: true,
-  imports: [IonContent, FormsModule]
+  imports: [IonContent, IonHeader, FormsModule, HeaderComponent]
 })
 export class CharacterFormPage implements ViewWillEnter {
 

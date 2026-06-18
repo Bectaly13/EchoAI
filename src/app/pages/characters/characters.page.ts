@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
-import { IonContent, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { PersonaService } from 'src/app/services/persona-service';
 
 import { CharacterCardComponent } from 'src/app/components/character-card/character-card.component';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-characters',
   templateUrl: './characters.page.html',
   styleUrls: ['./characters.page.scss'],
   standalone: true,
-  imports: [IonContent, CharacterCardComponent]
+  imports: [IonContent, IonHeader, CharacterCardComponent, HeaderComponent, NavbarComponent]
 })
 export class CharactersPage implements ViewWillEnter {
 
@@ -67,14 +69,6 @@ export class CharactersPage implements ViewWillEnter {
 
   goToCreate() {
     this.router.navigate(["character-form"]);
-  }
-
-  goToPersonas() {
-    this.router.navigate(["personas"]);
-  }
-
-  goToUsage() {
-    this.router.navigate(["usage"]);
   }
 
   goToEdit(character: Character) {
