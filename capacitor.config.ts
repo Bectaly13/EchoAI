@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'character-chat',
+  appId: 'com.echoai.app',
+  appName: 'EchoAI',
   webDir: 'www'
 };
 

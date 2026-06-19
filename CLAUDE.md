@@ -1,4 +1,4 @@
-# Character Chat — Conventions de code
+# EchoAI — Conventions de code
 
 Application Ionic 8 / Angular 20 (standalone) : un chatbot IA où l'utilisateur crée des
 personnages (chacun avec sa personnalité) et discute avec eux. Le modèle IA est Gemini

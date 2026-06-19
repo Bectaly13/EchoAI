@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="EchoAI">
+  <defs>
+    <linearGradient id="echoaiBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5d6bff"/>
+      <stop offset="1" stop-color="#4752e0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond carré arrondi -->
+  <rect width="512" height="512" rx="116" fill="url(#echoaiBg)"/>
+
+  <!-- Anneaux « écho » derrière la mascotte (clin d'œil au nom) -->
+  <g fill="none" stroke="#ffffff">
+    <circle cx="256" cy="266" r="188" stroke-width="10" opacity="0.12"/>
+    <circle cx="256" cy="266" r="224" stroke-width="10" opacity="0.07"/>
+  </g>
+
+  <!-- Oreilles de chat (pointes arrondies) + intérieur rose -->
+  <g fill="#ffffff">
+    <path d="M150 200 L182.3 111.6 Q188 96 197.3 106.8 L250 168 Z"/>
+    <path d="M362 200 L329.7 111.6 Q324 96 314.7 106.8 L262 168 Z"/>
+  </g>
+  <g fill="#ff9bb0" opacity="0.85">
+    <path d="M176 178 L196 124 L226 166 Z"/>
+    <path d="M336 178 L316 124 L286 166 Z"/>
+  </g>
+
+  <!-- Tige de la bulle : goutte lissée pointant vers le coin inférieur droit -->
+  <path d="M366 360 C406 374 416 398 416 416 C398 404 364 400 330 396 Z"
+        fill="#ffffff" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+
+  <!-- Tête = bulle de dialogue -->
+  <circle cx="256" cy="272" r="146" fill="#ffffff"/>
+
+  <!-- Grands yeux kawaii -->
+  <ellipse cx="208" cy="262" rx="33" ry="43" fill="#2c2f6e"/>
+  <ellipse cx="304" cy="262" rx="33" ry="43" fill="#2c2f6e"/>
+  <circle cx="220" cy="248" r="12" fill="#ffffff"/>
+  <circle cx="316" cy="248" r="12" fill="#ffffff"/>
+
+  <!-- Joues -->
+  <circle cx="160" cy="310" r="21" fill="#ff9bb0" opacity="0.6"/>
+  <circle cx="352" cy="310" r="21" fill="#ff9bb0" opacity="0.6"/>
+
+  <!-- Sourire -->
+  <path d="M228 330 Q256 360 284 330" fill="none" stroke="#2c2f6e" stroke-width="14" stroke-linecap="round"/>
+</svg>
