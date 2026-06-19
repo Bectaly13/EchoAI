@@ -9,7 +9,7 @@ Légende effort : 🟢 faible · 🟡 moyen · 🔴 élevé.
 ---
 
 ## 1 — Génération d'image de profil *(corrige 7b)* 🟢 ✅ Fait — réactivée via Cloudflare
-> **Mise à jour** : la génération d'image, d'abord parquée (aucun modèle Gemini gratuit), est désormais **réactivée via Cloudflare Workers AI** (FLUX‑1 Schnell, ~10 000 neurons/jour gratuits). Nouveau `ImageService` (découplé de `GeminiService`) ; `CharacterService.canGenerateImage()`/`generateAvatar()` l'utilisent ; UI avatar réactivée (visible si clés Cloudflare présentes). Le « prompt image dédié » (TODO_2 #1b) reste optionnel/à faire — l'avatar utilise pour l'instant apparence + nom + personnalité. CORS : `CapacitorHttp` (natif) + proxy de dev (`ionic serve`).
+> **Mise à jour** : la génération d'image, d'abord parquée (aucun modèle Gemini gratuit), est désormais **réactivée via Cloudflare Workers AI** (FLUX‑1 Schnell, ~10 000 neurons/jour gratuits). Nouveau `ImageService` (découplé de `GeminiService`) ; `CharacterService.canGenerateImage()`/`generateAvatar()` l'utilisent ; UI avatar réactivée (visible si clés Cloudflare présentes). Le « prompt image dédié » (TODO_2 #1b) est **abandonné** : l'avatar est généré à partir de l'apparence + nom + personnalité (comportement final). CORS : `CapacitorHttp` (natif) + proxy de dev (`ionic serve`).
 
 Diagnostic initial (conservé pour trace) : ce n'était **pas un bug de code**. La génération d'image est **inaccessible sur le palier gratuit Gemini**.
 
