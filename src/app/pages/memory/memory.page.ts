@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
+import { Location } from '@angular/common';
 import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatService, MemoryEntry } from 'src/app/services/chat-service';
@@ -43,8 +44,8 @@ export class MemoryPage implements ViewWillEnter {
     private alert: AlertController,
     private characterService: CharacterService,
     private chatService: ChatService,
-    private route: ActivatedRoute,
-    private router: Router
+    private location: Location,
+    private route: ActivatedRoute
   ) { }
 
   async loadMemory() {
@@ -63,9 +64,9 @@ export class MemoryPage implements ViewWillEnter {
     return this.groups.length === 0;
   }
 
+  // Retour à la page précédente (le chat d'où l'on vient).
   goBack() {
-    const id = this.route.snapshot.paramMap.get("id");
-    this.router.navigate(["chat", id]);
+    this.location.back();
   }
 
   // Ajout d'un souvenir : on choisit d'abord la catégorie, puis on saisit la valeur.

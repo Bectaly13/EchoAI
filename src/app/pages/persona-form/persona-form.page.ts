@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,6 +30,7 @@ export class PersonaFormPage implements ViewWillEnter {
   }
 
   constructor(
+    private location: Location,
     private messageService: MessageService,
     private personaService: PersonaService,
     private route: ActivatedRoute,
@@ -70,7 +72,8 @@ export class PersonaFormPage implements ViewWillEnter {
     this.router.navigate(["personas"]);
   }
 
+  // Retour (bouton de l'en-tête) : revient à la page précédente.
   cancel() {
-    this.router.navigate(["personas"]);
+    this.location.back();
   }
 }
