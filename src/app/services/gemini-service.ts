@@ -4,6 +4,16 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 
+// Désactive le filtrage de contenu configurable de Gemini sur toutes les catégories
+// (app de fiction/roleplay). Les limites non configurables de l'API (ex. contenus
+// illégaux) restent appliquées côté Google quoi qu'il arrive.
+const SAFETY_SETTINGS = [
+  { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+  { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+  { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+  { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+];
+
 // Comptage de tokens renvoyé par l'API (usageMetadata) pour un appel.
 export interface GeminiUsage {
   promptTokenCount: number;
@@ -55,7 +65,8 @@ export class GeminiService {
       const body = {
         // La personnalité du personnage est passée comme instruction système.
         systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: contents
+        contents: contents,
+        safetySettings: SAFETY_SETTINGS
       };
       const response = await this.post(`${model}:generateContent`, body);
       return {
@@ -79,7 +90,8 @@ export class GeminiService {
         generationConfig: {
           responseMimeType: "application/json",
           responseSchema: responseSchema
-        }
+        },
+        safetySettings: SAFETY_SETTINGS
       };
       const response = await this.post(`${model}:generateContent`, body);
       const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
