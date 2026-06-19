@@ -29,14 +29,6 @@ export interface GeminiStructuredResult {
   exhausted: string[];
 }
 
-// Résultat d'une génération d'image : l'image (data URL base64), le modèle utilisé
-// et les modèles épuisés (429) avant le succès.
-export interface GeminiImageResult {
-  image: string;
-  model: string;
-  exhausted: string[];
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -51,12 +43,6 @@ export class GeminiService {
   // Indique si une clé API est configurée. Sans clé, l'app retombe sur un mock.
   hasApiKey(): boolean {
     return !!environment.GEMINI_API_KEY;
-  }
-
-  // Indique si la génération d'image est disponible (drapeau d'environnement + clé).
-  // false sur le palier gratuit, où aucun modèle image n'est accessible.
-  imageEnabled(): boolean {
-    return environment.GEMINI_IMAGE_ENABLED && this.hasApiKey();
   }
 
   // Génère du texte. Essaie chaque modèle de GEMINI_MODELS dans l'ordre et bascule
@@ -107,29 +93,6 @@ export class GeminiService {
         data: data,
         model: model,
         usage: this.parseUsage(response?.usageMetadata),
-        exhausted: [...exhausted]
-      };
-    });
-  }
-
-  // Génère une image (text-to-image). Essaie chaque modèle de GEMINI_IMAGE_MODELS
-  // dans l'ordre, bascule sur le suivant en cas de quota épuisé (429). Renvoie
-  // l'image (data URL base64), le modèle utilisé et les modèles épuisés rencontrés.
-  async generateImage(prompt: string): Promise<GeminiImageResult> {
-    const exhausted: string[] = [];
-    return await this.withFallback(environment.GEMINI_IMAGE_MODELS.map(model => model.id), exhausted, async model => {
-      const body = {
-        instances: [{ prompt: prompt }],
-        // Une seule image, format carré adapté à un avatar / une vignette.
-        parameters: { sampleCount: 1, aspectRatio: "1:1" }
-      };
-      const response = await this.post(`${model}:predict`, body);
-      const prediction = response?.predictions?.[0];
-      const base64 = prediction?.bytesBase64Encoded;
-      const mime = prediction?.mimeType ?? "image/png";
-      return {
-        image: base64 ? `data:${mime};base64,${base64}` : "",
-        model: model,
         exhausted: [...exhausted]
       };
     });

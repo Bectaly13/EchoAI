@@ -12,15 +12,11 @@ export const environment = {
     { id: "gemini-2.5-flash-lite", rpd: 20 },
     { id: "gemini-2.5-flash", rpd: 20 }
   ],
-  // Génération d'image : false sur le palier gratuit (Imagen = réservé aux plans
-  // payants, modèles « Nano Banana » = quota 0). Passer à true avec un plan payant.
-  GEMINI_IMAGE_ENABLED: false,
-  // Modèles d'image, du plus performant au moins performant : on bascule sur
-  // le suivant si le quota du précédent est épuisé (429). Ex. palier gratuit.
-  GEMINI_IMAGE_MODELS: [
-    { id: "imagen-4.0-ultra-generate-001", rpd: 25 },
-    { id: "imagen-4.0-generate-001", rpd: 25 },
-    { id: "imagen-4.0-fast-generate-001", rpd: 25 }
-  ],
-  GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta/models"
+  GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta/models",
+  // Génération d'image via Cloudflare Workers AI (gratuit, ~10 000 neurons/jour).
+  // account id + token sur dash.cloudflare.com → AI → Workers AI → "Use REST API".
+  // Vides = génération d'image désactivée.
+  CLOUDFLARE_ACCOUNT_ID: "COLLE_TON_ACCOUNT_ID_ICI",
+  CLOUDFLARE_API_TOKEN: "COLLE_TON_TOKEN_ICI",
+  CLOUDFLARE_IMAGE_MODEL: "@cf/black-forest-labs/flux-1-schnell"
 };

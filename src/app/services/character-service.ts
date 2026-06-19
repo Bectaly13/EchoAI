@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
+import { ImageService } from './image-service';
 import { UsageService } from './usage-service';
 
 import { buildDraftPrompt, CHARACTER_DRAFT_SCHEMA } from 'src/app/utils/build-draft-prompt';
@@ -46,6 +47,7 @@ export class CharacterService {
   constructor(
     private database: DatabaseService,
     private gemini: GeminiService,
+    private image: ImageService,
     private usage: UsageService
   ) { }
 
@@ -114,19 +116,19 @@ export class CharacterService {
     };
   }
 
-  // Indique si la génération d'avatar est disponible (cf. GeminiService.imageEnabled).
+  // Indique si la génération d'avatar est disponible (clés Cloudflare configurées).
   canGenerateImage(): boolean {
-    return this.gemini.imageEnabled();
+    return this.image.enabled();
   }
 
-  // Génère une photo de profil (data URL base64) à partir des champs de la fiche.
-  // Nécessite la génération d'image activée (indisponible sur le palier gratuit) → lève sinon.
+  // Génère une photo de profil (data URL) à partir des champs de la fiche.
+  // Nécessite la génération d'image configurée → lève sinon.
   async generateAvatar(fields: { name?: string; appearance?: string; systemPrompt?: string }): Promise<string> {
-    if (!this.gemini.imageEnabled()) {
+    if (!this.image.enabled()) {
       throw new Error("image-disabled");
     }
-    const result = await this.gemini.generateImage(buildImagePrompt(fields));
-    await this.usage.recordImage(result);
+    const result = await this.image.generate(buildImagePrompt(fields));
+    await this.usage.recordImage(result.model);
     return result.image;
   }
 

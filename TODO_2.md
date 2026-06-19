@@ -8,8 +8,10 @@ Légende effort : 🟢 faible · 🟡 moyen · 🔴 élevé.
 
 ---
 
-## 1 — Génération d'image de profil : dégradation propre sur le palier gratuit *(corrige 7b)* 🟢 ✅ Fait (dégradé) — fonctionnalité parquée
-Diagnostic mené : ce n'est **pas un bug de code**. La génération d'image est **inaccessible sur le palier gratuit** de la clé.
+## 1 — Génération d'image de profil *(corrige 7b)* 🟢 ✅ Fait — réactivée via Cloudflare
+> **Mise à jour** : la génération d'image, d'abord parquée (aucun modèle Gemini gratuit), est désormais **réactivée via Cloudflare Workers AI** (FLUX‑1 Schnell, ~10 000 neurons/jour gratuits). Nouveau `ImageService` (découplé de `GeminiService`) ; `CharacterService.canGenerateImage()`/`generateAvatar()` l'utilisent ; UI avatar réactivée (visible si clés Cloudflare présentes). Le « prompt image dédié » (TODO_2 #1b) reste optionnel/à faire — l'avatar utilise pour l'instant apparence + nom + personnalité. CORS : `CapacitorHttp` (natif) + proxy de dev (`ionic serve`).
+
+Diagnostic initial (conservé pour trace) : ce n'était **pas un bug de code**. La génération d'image est **inaccessible sur le palier gratuit Gemini**.
 
 - **Cause racine (vérifiée par appel direct à l'API)** : Imagen 4 (`:predict`) renvoie **HTTP 400 « only available on paid plans »** ; les modèles image en `generateContent` (« Nano Banana » : `gemini-2.5-flash-image`, `gemini-3.1-flash-image`, `gemini-3-pro-image`) renvoient **HTTP 429** avec un quota gratuit de **0**. Aucun modèle image n'est donc utilisable sans plan payant.
 - **Fait — Surfaçage des erreurs** : util `describe-api-error.ts` (statut + message de l'API) branché sur les échecs image, + `console.error` pour le diagnostic. Améliore aussi les futurs messages d'erreur réels.
@@ -17,8 +19,10 @@ Diagnostic mené : ce n'est **pas un bug de code**. La génération d'image est 
 - **Fait — UI** : quand c'est désactivé, le formulaire masque les boutons de génération et affiche une note claire (« indisponible sur le palier gratuit, nécessite un plan payant ») ; la **pastille de couleur** reste l'avatar.
 - **Parqué (jusqu'à un plan payant)** : la génération réelle de l'avatar **et le prompt image dédié** (champ « prompt image » non vide transmis à la place de « Apparence », persisté en `Character.avatarPrompt` pour régénérer). À faire quand `GEMINI_IMAGE_ENABLED` passera à true.
 
-## 2 — Illustration de scène : dégradation propre *(corrige 8)* 🟢 ✅ Fait (dégradé) — fonctionnalité parquée
-Même cause racine que #1 (aucun modèle image accessible en gratuit).
+## 2 — Illustration de scène *(corrige 8)* 🟢 ✅ Fait — réactivée via Cloudflare
+> **Mise à jour** : réactivée via Cloudflare Workers AI (même `ImageService`). `ChatService.canIllustrate()`/`illustrateScene()` l'utilisent ; bouton 🖼 visible si clés Cloudflare présentes.
+
+Diagnostic initial (conservé pour trace) : même cause que #1 (aucun modèle image Gemini gratuit).
 
 - **Fait — Drapeau** : `ChatService.canIllustrate()` (= `GeminiService.imageEnabled()`) ; `illustrateScene` lève `image-disabled` si désactivé.
 - **Fait — UI** : le bouton 🖼 du chat est masqué quand la génération d'image est désactivée.

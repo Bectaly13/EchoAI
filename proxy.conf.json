@@ -1,0 +1,9 @@
+{
+  "/cf-ai": {
+    "target": "https://api.cloudflare.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": { "^/cf-ai": "" },
+    "cookieDomainRewrite": "localhost"
+  }
+}

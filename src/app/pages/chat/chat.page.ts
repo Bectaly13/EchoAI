@@ -149,7 +149,7 @@ export class ChatPage implements ViewWillEnter {
       // Trace complète en console pour le diagnostic.
       console.error("Échec génération illustration :", error);
       const text = (error as Error)?.message === "image-disabled"
-        ? "Illustration indisponible (nécessite un plan payant Gemini)."
+        ? "Illustration non configurée (clés Cloudflare manquantes)."
         : `Échec de la génération de l'illustration. ${describeApiError(error)}`;
       await this.message.error(text);
     } finally {

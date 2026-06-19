@@ -49,7 +49,7 @@ Trois blocs séparés par une ligne vide :
 ### Services
 - Un service est **suffixé par `Service`** : classe `XxxService`, fichier `xxx-service.ts` (kebab + `-service`).
 - Objectif : l'import d'un service contient toujours le mot « Service », ce qui le distingue d'un type, d'un composant, etc.
-- **Séparation des responsabilités IA** : `GeminiService` ne fait que l'**appel HTTP brut** au modèle ; `ChatService` **orchestre** (construit le prompt système + l'historique, persiste les messages). Changer de modèle ou de fournisseur ne doit toucher que `GeminiService` + l'`environment`.
+- **Séparation des responsabilités IA** : `GeminiService` ne fait que l'**appel HTTP brut** au modèle **texte** (Gemini) ; `ImageService` fait l'appel **image** (Cloudflare Workers AI / FLUX), découplé de Gemini ; `ChatService` **orchestre** (construit le prompt système + l'historique, persiste les messages). Changer de fournisseur texte ne touche que `GeminiService` + l'`environment` ; idem image et `ImageService`.
 
 ### Inputs / Outputs
 - Utiliser l'API **signal** : `title = input.required<string>();` (import de `input`) plutôt que `@Input()`.

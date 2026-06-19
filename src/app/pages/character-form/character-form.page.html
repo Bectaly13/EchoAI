@@ -21,11 +21,9 @@
       </div>
     }
 
-    <!-- Génération de photo de profil : désactivée tant que la génération d'image
-         n'est pas disponible (palier gratuit). Code conservé pour réactivation future.
-    <div class="character-form-avatar">
-      <p class="character-form-label">Photo de profil (optionnelle)</p>
-      @if (imageEnabled) {
+    @if (imageEnabled) {
+      <div class="character-form-avatar">
+        <p class="character-form-label">Photo de profil (optionnelle)</p>
         <div class="character-form-avatar-row">
           @if (avatarImage) {
             <img class="character-form-avatar-preview" [src]="avatarImage" alt="Aperçu de la photo de profil" />
@@ -42,11 +40,8 @@
             }
           </div>
         </div>
-      } @else {
-        <p class="character-form-avatar-note">Génération d'image indisponible sur le palier gratuit (nécessite un plan payant Gemini).</p>
-      }
-    </div>
-    -->
+      </div>
+    }
 
     <label class="character-form-label" for="name">Nom</label>
     <input class="character-form-input" id="name" name="name" type="text"

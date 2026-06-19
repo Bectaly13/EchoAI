@@ -124,7 +124,7 @@ export class CharacterFormPage implements ViewWillEnter {
       // Trace complète en console pour le diagnostic.
       console.error("Échec génération avatar :", error);
       const text = (error as Error)?.message === "image-disabled"
-        ? "Génération d'image indisponible (nécessite un plan payant Gemini)."
+        ? "Génération d'image non configurée (clés Cloudflare manquantes)."
         : `Échec de la génération de l'image. ${describeApiError(error)}`;
       await this.message.error(text);
     } finally {

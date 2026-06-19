@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { DatabaseService } from './database-service';
-import { GeminiImageResult, GeminiUsage } from './gemini-service';
+import { GeminiUsage } from './gemini-service';
 
 // Type d'appel suivi : génération de texte ou d'image.
 export type UsageKind = "text" | "image";
@@ -49,14 +49,12 @@ export class UsageService {
     await this.save(rows);
   }
 
-  // Enregistre un appel image réussi et marque les modèles épuisés rencontrés.
+  // Enregistre un appel image réussi (compte une requête pour le modèle donné).
   // (Les modèles image ne renvoient pas de comptage de tokens.)
-  async recordImage(result: GeminiImageResult): Promise<void> {
+  async recordImage(model: string): Promise<void> {
     const date = this.today();
     const rows = await this.load();
-    const row = this.upsert(rows, date, result.model, "image");
-    row.requests += 1;
-    this.markExhausted(rows, date, result.exhausted, "image");
+    this.upsert(rows, date, model, "image").requests += 1;
     await this.save(rows);
   }
 

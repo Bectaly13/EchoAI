@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Character, CharacterService } from './character-service';
 import { DatabaseService } from './database-service';
 import { GeminiService } from './gemini-service';
+import { ImageService } from './image-service';
 import { Persona, PersonaService } from './persona-service';
 import { UsageService } from './usage-service';
 
@@ -83,6 +84,7 @@ export class ChatService {
     private characterService: CharacterService,
     private database: DatabaseService,
     private gemini: GeminiService,
+    private image: ImageService,
     private personaService: PersonaService,
     private usage: UsageService
   ) { }
@@ -242,16 +244,16 @@ export class ChatService {
     return conversation.messages;
   }
 
-  // Indique si l'illustration de scène est disponible (cf. GeminiService.imageEnabled).
+  // Indique si l'illustration de scène est disponible (génération d'image configurée).
   canIllustrate(): boolean {
-    return this.gemini.imageEnabled();
+    return this.image.enabled();
   }
 
   // Génère une illustration de la scène courante et l'ajoute comme message-image,
-  // puis persiste. Nécessite la génération d'image activée (indisponible sur le
-  // palier gratuit) → lève sinon. Le message produit a un texte vide et porte `imageData`.
+  // puis persiste. Nécessite la génération d'image configurée → lève sinon.
+  // Le message produit a un texte vide et porte `imageData`.
   async illustrateScene(characterId: string): Promise<ChatMessage[]> {
-    if (!this.gemini.imageEnabled()) {
+    if (!this.image.enabled()) {
       throw new Error("image-disabled");
     }
     const character = await this.characterService.get(characterId);
@@ -261,8 +263,8 @@ export class ChatService {
     const conversation = await this.getOrCreateConversation(characterId);
 
     const prompt = buildSceneImagePrompt(character, conversation.memory ?? [], conversation.messages);
-    const result = await this.gemini.generateImage(prompt);
-    await this.usage.recordImage(result);
+    const result = await this.image.generate(prompt);
+    await this.usage.recordImage(result.model);
     if (result.image) {
       conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: result.image, at: Date.now() });
       await this.saveConversation(conversation);

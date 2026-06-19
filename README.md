@@ -13,7 +13,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 ### Personnages
 - **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** (obligatoire), et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
 - **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
-- **Photo de profil générée** : l'IA peut générer une photo de profil du personnage (modèles Imagen). ⚠️ Indisponible sur le palier gratuit Gemini (génération d'image réservée aux plans payants) : par défaut, une pastille colorée sert d'avatar. Réactivable via `GEMINI_IMAGE_ENABLED` avec un plan payant.
+- **Photo de profil générée** : l'IA peut générer une photo de profil du personnage via **Cloudflare Workers AI** (modèle FLUX, palier gratuit). Activée dès que les identifiants Cloudflare sont renseignés ; sinon une pastille colorée sert d'avatar.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
@@ -31,12 +31,12 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Affichage optimiste** : le message de l'utilisateur apparaît immédiatement, puis la réponse du modèle ; la zone défile automatiquement vers le dernier message.
 - **Régénérer / supprimer / réinitialiser** : on peut régénérer la dernière réponse de l'IA, ou supprimer un message (et tous les suivants, avec confirmation). Une conversation ne se termine jamais sur un message de l'utilisateur : supprimer une réponse de l'IA retire aussi le message qui l'avait déclenchée. La salutation (premier message) n'est pas supprimable ; pour repartir de zéro, un bouton ↺ **réinitialise** la conversation (efface messages et mémoire, puis remet la salutation).
 - **Passer son tour** : un bouton laisse le personnage IA enchaîner un message de lui-même, sans qu'on ait à écrire.
-- **Illustrer la scène** : un bouton génère une image illustrant l'état courant de la conversation (apparence du personnage, lieu mémorisé, derniers messages), affichée dans le fil comme un message. ⚠️ Comme la photo de profil, indisponible sur le palier gratuit (réservé aux plans payants) ; le bouton est alors masqué.
+- **Illustrer la scène** : un bouton génère une image illustrant l'état courant de la conversation (apparence du personnage, lieu mémorisé, derniers messages), affichée dans le fil comme un message. Utilise Cloudflare Workers AI ; le bouton est masqué si les identifiants Cloudflare ne sont pas renseignés. (Génération text→image : pas de cohérence d'apparence garantie.)
 - **Mémoire permanente** : l'IA mémorise d'elle-même les éléments durables de l'histoire (lieu courant, évolution de la relation, jalons, consignes) et les conserve d'un message à l'autre pour une meilleure fidélité, sans rien afficher de technique. Un écran dédié (bouton 🧠) permet de **consulter cette mémoire**, d'**ajouter** un souvenir (dans la catégorie voulue), d'**éditer** ou d'**oublier** une entrée. Les souvenirs ajoutés ou édités à la main sont préservés lors des régénérations/suppressions.
 - **Mode démo (sans clé API)** : tant qu'aucune clé Gemini n'est configurée, l'application répond avec un message simulé — l'interface reste utilisable pour le développement.
 
 ### Robustesse & suivi
-- **Repli automatique des modèles** : texte et image s'appuient sur une **liste** de modèles ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant.
+- **Repli automatique des modèles (texte)** : la génération de texte s'appuie sur une **liste** de modèles Gemini ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant. (La génération d'image utilise Cloudflare Workers AI, un seul modèle.)
 - **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les requêtes (sous la forme « X / max par jour ») et les tokens consommés par modèle, et signale les modèles épuisés. Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche). ⚠️ L'API Gemini n'exposant pas le quota restant, ces chiffres — y compris le max par jour, saisi à la main — sont une **estimation locale**, pas une lecture officielle.
 
 ---
@@ -66,8 +66,9 @@ Renseigne ensuite ta clé dans `src/environments/environment.ts` :
 | ------------------ | ------------------------------------------------------------------ |
 | `GEMINI_API_KEY`     | Clé API obtenue sur [Google AI Studio](https://aistudio.google.com) |
 | `GEMINI_MODELS`      | Liste de modèles de texte `{ id, rpd }`, du préféré au moins prioritaire (repli automatique sur `429`). `rpd` = requêtes/jour du palier gratuit (saisi à la main, affiché dans le suivi). Ex. : `{ id: "gemini-3.1-flash-lite", rpd: 500 }` |
-| `GEMINI_IMAGE_ENABLED`| Active la génération d'image. `false` sur le palier gratuit (aucun modèle image accessible) ; à passer à `true` avec un plan payant |
-| `GEMINI_IMAGE_MODELS`| Liste de modèles d'image `{ id, rpd }`, du plus performant au moins performant (repli automatique sur `429`). Ex. : Imagen 4 Ultra → Generate → Fast |
+| `CLOUDFLARE_ACCOUNT_ID` | ID de compte Cloudflare (génération d'image). Vide = génération d'image désactivée |
+| `CLOUDFLARE_API_TOKEN`  | Token API Workers AI (dash.cloudflare.com → AI → Workers AI → « Use REST API ») |
+| `CLOUDFLARE_IMAGE_MODEL`| Modèle d'image. Ex. : `@cf/black-forest-labs/flux-1-schnell` |
 | `GEMINI_API_URL`     | Racine de l'API Gemini                                             |
 
 > Sans clé, l'application fonctionne en **mode démo** (réponses simulées).
@@ -90,7 +91,8 @@ Sous `src/app/` :
 - **`pages/`** — les écrans : `welcome` (splash + initialisation au lancement), et les onglets `characters` (personnages), `conversations` (liste des discussions), `personas`, `tokens` (suivi d'utilisation des modèles), `settings` (paramètres) ; plus les sous-écrans `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `persona-form` (création/édition).
 - **`components/`** — composants réutilisables : `header` (en-tête de page, titre + retour optionnel), `navbar` (barre d'onglets en bas), `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
-  - `GeminiService` — uniquement l'appel HTTP brut au modèle (texte et image), avec repli sur une liste de modèles en cas de quota épuisé.
+  - `GeminiService` — uniquement l'appel HTTP brut au modèle **texte** Gemini, avec repli sur une liste de modèles en cas de quota épuisé.
+  - `ImageService` — génération d'image via **Cloudflare Workers AI** (FLUX), découplé de Gemini.
   - `ChatService` — orchestration (assemble le prompt système via l'util `buildSystemPrompt`, construit l'historique, persiste les messages).
   - `CharacterService` — gestion des personnages.
   - `PersonaService` — gestion des personas incarnés par l'utilisateur.

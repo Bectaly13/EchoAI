@@ -29,11 +29,14 @@ export class TokensPage implements ViewWillEnter {
 
   // Vrai si une clé API est configurée (sinon, aucun appel réel n'est suivi).
   hasApiKey = false;
-  // Utilisation du jour, par modèle de texte puis par modèle d'image.
+  // Utilisation du jour, par modèle de texte (Gemini).
   textModels: ModelUsage[] = [];
-  imageModels: ModelUsage[] = [];
   // Total de tokens consommés aujourd'hui (texte).
   totalTokens = 0;
+  // Génération d'image (Cloudflare) : disponible, modèle, et requêtes du jour.
+  imageEnabled = false;
+  imageModel = "";
+  imageRequests = 0;
 
   async ionViewWillEnter() {
     await this.load();
@@ -48,8 +51,11 @@ export class TokensPage implements ViewWillEnter {
     this.hasApiKey = !!environment.GEMINI_API_KEY;
     const rows = await this.usageService.getToday();
     this.textModels = environment.GEMINI_MODELS.map(model => this.viewFor(rows, model, "text"));
-    this.imageModels = environment.GEMINI_IMAGE_MODELS.map(model => this.viewFor(rows, model, "image"));
     this.totalTokens = rows.reduce((sum, row) => sum + row.totalTokens, 0);
+    // Image (Cloudflare) : suivi par nombre de requêtes (quota en neurons, pas en requêtes).
+    this.imageEnabled = !!environment.CLOUDFLARE_ACCOUNT_ID && !!environment.CLOUDFLARE_API_TOKEN;
+    this.imageModel = environment.CLOUDFLARE_IMAGE_MODEL;
+    this.imageRequests = rows.find(row => row.model === this.imageModel && row.kind === "image")?.requests ?? 0;
   }
 
   // Construit la vue d'un modèle (compteurs à zéro si aucune ligne pour aujourd'hui).

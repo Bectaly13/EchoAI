@@ -29,22 +29,15 @@
     }
   </section>
 
-  <!-- Section Image : masquée tant que la génération d'image est désactivée
-       (palier gratuit). Code conservé pour réactivation future.
-  <section class="tokens-section">
-    <h2 class="tokens-section-title">Image</h2>
-    @for (model of imageModels; track model.model; let first = $first) {
+  @if (imageEnabled) {
+    <section class="tokens-section">
+      <h2 class="tokens-section-title">Image (Cloudflare)</h2>
       <div class="tokens-row">
-        <span class="tokens-model">
-          {{ model.model }}
-          @if (first) { <span class="tokens-tag">préféré</span> }
-          @if (model.exhausted) { <span class="tokens-tag tokens-tag-exhausted">épuisé</span> }
-        </span>
-        <span class="tokens-stats">{{ model.requests }} / {{ model.rpd }} req</span>
+        <span class="tokens-model">{{ imageModel }}</span>
+        <span class="tokens-stats">{{ imageRequests }} req aujourd'hui</span>
       </div>
-    }
-  </section>
-  -->
+    </section>
+  }
 
 
 </ion-content>
