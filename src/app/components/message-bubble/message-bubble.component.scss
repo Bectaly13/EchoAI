@@ -1,6 +1,14 @@
+// L'hôte est l'élément flex dans .chat-messages : c'est lui qui doit porter
+// l'alignement gauche/droite (sinon la bulle reste collée à gauche).
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
 .message-bubble {
   align-self: flex-start;
-  max-width: 78%;
+  // Largeur constante (et non un simple plafond) pour des bulles homogènes.
+  width: 78%;
   margin-bottom: 8px;
   padding: 10px 14px;
   border-radius: 16px;
@@ -49,17 +57,27 @@
   margin-top: 4px;
 }
 
+// Contour pour le contraste (cf. point 2), couleur adaptée à l'émetteur.
 .message-bubble-regenerate,
 .message-bubble-delete {
-  border: none;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   padding: 0;
+  border: 1px solid var(--icon-btn-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--app-text);
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
-  opacity: 0.55;
 }
 
-.message-bubble-regenerate {
-  color: var(--app-text-muted);
+// Bulle utilisateur (fond accent) : contour et glyphe en couleur sur-accent.
+.message-bubble-user .message-bubble-regenerate,
+.message-bubble-user .message-bubble-delete {
+  border-color: var(--app-on-accent);
+  color: var(--app-on-accent);
 }

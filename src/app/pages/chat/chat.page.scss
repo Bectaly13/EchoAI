@@ -35,6 +35,8 @@
   font-size: 15px;
   line-height: 1;
   background: var(--app-background);
+  // Couleur explicite pour que le glyphe monochrome (↺) suive le thème.
+  color: var(--app-text);
   cursor: pointer;
 }
 
@@ -58,11 +60,24 @@ ion-content.chat-content {
 }
 
 .chat-footer {
+  position: relative;
   display: flex;
   gap: 8px;
   padding: 10px 12px;
+  // Marge basse pour ne pas passer sous les boutons de navigation du téléphone.
+  padding-bottom: calc(10px + var(--safe-bottom));
   background: var(--app-surface);
   border-top: 1px solid var(--app-border);
+}
+
+// Actions rapides (passer mon tour / illustrer) : ancrées juste au-dessus de la
+// zone de saisie, en position fixe quel que soit le défilement.
+.chat-quick {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 8px);
+  display: flex;
+  gap: 8px;
 }
 
 .chat-skip {
@@ -97,6 +112,7 @@ ion-content.chat-content {
 
 .chat-input {
   flex: 1 1 auto;
+  min-width: 0;
   border: 1px solid var(--app-border);
   border-radius: 20px;
   padding: 10px 14px;

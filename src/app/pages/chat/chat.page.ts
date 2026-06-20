@@ -166,15 +166,15 @@ export class ChatPage implements ViewWillEnter {
     }
   }
 
-  // Vrai pour le dernier message s'il vient de l'IA et qu'un message utilisateur
-  // le précède : on n'autorise pas la régénération de la salutation « ancrée ».
+  // Vrai pour le dernier message s'il vient de l'IA : on régénère uniquement la
+  // dernière réponse, hors salutation « ancrée » (premier message) et hors image.
   canRegenerate(message: ChatMessage): boolean {
     const last = this.messages[this.messages.length - 1];
     return !this.sending
       && message === last
       && message.role === "model"
       && !message.imageData
-      && this.messages.some(item => item.role === "user");
+      && message !== this.messages[0];
   }
 
   // Régénère la dernière réponse de l'IA.

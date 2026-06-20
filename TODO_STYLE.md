@@ -49,12 +49,15 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 - ✅ Mettre le bouton **« Retirer »** (avatar) **sur la même ligne** que « Générer une image » (`.character-form-avatar-actions` en `row`), dans un **style similaire** mais **contour arrondi rouge** (`var(--app-danger)`).
 - ✅ **Largeur fixe** du bouton de génération d'image (170 px, texte centré) pour qu'il ne saute plus selon son libellé (« Générer une image » / « Régénérer l'image » / « Génération… »).
 
-## 5 — /chat/{id} 🟡
-- **Passer mon tour** + **Illustrer la scène** : les sortir du footer et les placer **au-dessus** du footer de saisie, en **sticky**, **en bas à droite** de la zone de conversation (ils restent visibles au scroll).
-- **Footer & zone sûre** : aujourd'hui `.chat-footer` ne tient **pas** compte des boutons de navigation du téléphone → ajouter un `padding-bottom: calc(... + var(--safe-bottom))` (comme la navbar) pour éviter le chevauchement.
-- **Régénérer / Supprimer** (`message-bubble`) : ajouter un **contour** pour le contraste (cf. point 2), avec des couleurs **adaptées à l'émetteur** du message (bulle utilisateur sur fond accent vs bulle IA sur fond surface).
-- **Bulles utilisateur** : les **coller à droite** de l'écran.
-- **Débordement** : s'assurer que l'**input texte + bouton Envoyer** ne **débordent plus** de `.chat-footer` (régression depuis le retour du bouton « Illustrer la scène » — résolue en partie en sortant les boutons du footer, point ci-dessus).
+## 5 — /chat/{id} 🟡 ✅ Fait
+- ✅ **Passer mon tour** + **Illustrer la scène** : sortis du footer, placés dans `.chat-quick` ancré en **position absolue** juste au-dessus de la zone de saisie (`bottom: calc(100% + 8px)`), **en bas à droite** — position fixe quel que soit le défilement.
+- 🟡 **Footer & zone sûre** : `padding-bottom: calc(10px + var(--safe-bottom))` ajouté sur `.chat-footer`. *(À confirmer sur le build mobile.)*
+- ✅ **Régénérer / Supprimer** (`message-bubble`) : contour (cf. point 2) avec couleurs **adaptées à l'émetteur** (`--icon-btn-border` + `--app-text` sur bulle IA, `--app-on-accent` sur bulle utilisateur).
+- ✅ **Bulles utilisateur** : alignées à droite (correctif : `align-self` porté sur `:host`, qui est le vrai élément flex) + **largeur constante** (`width: 78%`).
+- ✅ **Débordement** : footer réduit à input + Envoyer ; `min-width: 0` sur `.chat-input` → plus de débordement.
+- ✅ **Bonus** : bug de régénération (bouton parfois masqué sur la dernière réponse IA) corrigé (`message !== this.messages[0]` au lieu du test `some(role === "user")`) ; icône `↺` (réinitialiser) qui restait blanche en thème clair → `color: var(--app-text)`.
+
+> **À tester sur mobile** : safe-area du footer (#5) **et** safe-area des flash d'erreur (toasts Ionic en bas) — Ionic dérive `--ion-safe-area-bottom` de `env()`, donc *a priori* géré, à confirmer.
 
 ## 6 — /memory/{id} 🟢 ✅ Fait
 - Contour des boutons éditer/supprimer par entrée (cf. point 2).
@@ -91,7 +94,7 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 2 | Boutons icônes : contour pour le contraste (variable + transverse) | 🟢 | ✅ Fait |
 | 3 | /characters : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 4 | /character-form : margin avatar + bouton « Retirer » inline rouge + largeur fixe bouton image | 🟢 | ✅ Fait |
-| 5 | /chat : sticky passer/illustrer, safe-area footer, contour boutons, bulles user à droite, débordement input | 🟡 | À faire |
+| 5 | /chat : passer/illustrer fixes, safe-area footer, contour boutons, bulles user à droite + largeur fixe, débordement input | 🟡 | ✅ Fait (safe-area à tester mobile) |
 | 6 | /memory : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 7 | /conversations : contour bouton supprimer | 🟢 | ✅ Fait |
 | 8 | /personas : contour boutons (✅) + défaut en haut + « Par défaut » | 🟢 | 🟡 Partiel |
