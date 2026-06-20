@@ -44,9 +44,10 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 ## 3 — /characters 🟢 ✅ Fait
 - Appliquer le contour des boutons éditer/supprimer (cf. point 2) sur les cartes de personnage + marges pour les espacer.
 
-## 4 — /character-form 🟢
-- Retirer le **`margin-top` inutile** sur `.character-form-avatar`.
-- Mettre le bouton **« Retirer »** (avatar) **sur la même ligne** que « Générer une image », dans un **style similaire** mais **contour arrondi rouge** (`var(--app-danger)`).
+## 4 — /character-form 🟢 ✅ Fait
+- ✅ Retirer le **`margin-top` inutile** sur `.character-form-avatar` (le label interne porte déjà sa marge haute).
+- ✅ Mettre le bouton **« Retirer »** (avatar) **sur la même ligne** que « Générer une image » (`.character-form-avatar-actions` en `row`), dans un **style similaire** mais **contour arrondi rouge** (`var(--app-danger)`).
+- ✅ **Largeur fixe** du bouton de génération d'image (170 px, texte centré) pour qu'il ne saute plus selon son libellé (« Générer une image » / « Régénérer l'image » / « Génération… »).
 
 ## 5 — /chat/{id} 🟡
 - **Passer mon tour** + **Illustrer la scène** : les sortir du footer et les placer **au-dessus** du footer de saisie, en **sticky**, **en bas à droite** de la zone de conversation (ils restent visibles au scroll).
@@ -89,7 +90,7 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 1 | Modales custom en remplacement des AlertController | 🔴 | ✅ Fait |
 | 2 | Boutons icônes : contour pour le contraste (variable + transverse) | 🟢 | ✅ Fait |
 | 3 | /characters : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
-| 4 | /character-form : margin avatar + bouton « Retirer » inline rouge | 🟢 | À faire |
+| 4 | /character-form : margin avatar + bouton « Retirer » inline rouge + largeur fixe bouton image | 🟢 | ✅ Fait |
 | 5 | /chat : sticky passer/illustrer, safe-area footer, contour boutons, bulles user à droite, débordement input | 🟡 | À faire |
 | 6 | /memory : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 7 | /conversations : contour bouton supprimer | 🟢 | ✅ Fait |

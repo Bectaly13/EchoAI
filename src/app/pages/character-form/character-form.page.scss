@@ -36,7 +36,6 @@ ion-content.character-form-content {
 .character-form-avatar {
   display: flex;
   flex-direction: column;
-  margin-top: 14px;
 }
 
 .character-form-avatar-row {
@@ -68,18 +67,32 @@ ion-content.character-form-content {
 
 .character-form-avatar-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
+// Dans la rangée d'actions, le bouton « Générer » ne doit pas hériter de la marge haute.
+// Largeur fixe pour que le bouton ne change pas de taille selon son libellé
+// (« Générer une image » / « Régénérer l'image » / « Génération… »).
+.character-form-avatar-actions .character-form-generate {
+  margin-top: 0;
+  width: 170px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+// Même allure que « Générer une image », mais contour rouge.
 .character-form-avatar-remove {
-  align-self: flex-start;
-  border: none;
+  border: 1px solid var(--app-danger);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
   background: transparent;
-  font-size: 13px;
   color: var(--app-danger);
   cursor: pointer;
-  padding: 0;
 }
 
 .character-form-avatar-note {
