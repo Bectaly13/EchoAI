@@ -73,15 +73,6 @@ ion-content.memory-content {
   color: var(--app-text);
 }
 
-.memory-entry-edit,
-.memory-entry-delete {
-  flex: 0 0 auto;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  padding: 4px;
-  cursor: pointer;
-}
 
 .memory-clear {
   display: block;

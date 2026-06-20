@@ -57,14 +57,5 @@
 .character-card-actions {
   flex: 0 0 auto;
   display: flex;
-  gap: 4px;
-}
-
-.character-card-edit,
-.character-card-delete {
-  border: none;
-  background: transparent;
-  font-size: 18px;
-  padding: 6px;
-  cursor: pointer;
+  gap: 8px;
 }

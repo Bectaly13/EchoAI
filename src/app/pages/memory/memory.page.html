@@ -22,8 +22,8 @@
           @for (entry of group.entries; track entry.id) {
             <div class="memory-entry">
               <p class="memory-entry-value">{{ entry.value }}</p>
-              <button class="memory-entry-edit" (click)="promptEditEntry(entry)">✎</button>
-              <button class="memory-entry-delete" (click)="confirmDeleteEntry(entry)">🗑</button>
+              <button class="memory-entry-edit icon-btn" (click)="promptEditEntry(entry)">✎</button>
+              <button class="memory-entry-delete icon-btn" (click)="confirmDeleteEntry(entry)">🗑</button>
             </div>
           }
         </section>

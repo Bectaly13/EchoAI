@@ -28,9 +28,9 @@
             <p class="persona-item-description">{{ persona.description }}</p>
           </div>
           <div class="persona-item-actions">
-            <button class="persona-item-edit" (click)="goToEdit(persona)">✎</button>
+            <button class="persona-item-edit icon-btn" (click)="goToEdit(persona)">✎</button>
             @if (!persona.isDefault) {
-              <button class="persona-item-delete" (click)="confirmRemove(persona)">🗑</button>
+              <button class="persona-item-delete icon-btn" (click)="confirmRemove(persona)">🗑</button>
             }
           </div>
         </div>

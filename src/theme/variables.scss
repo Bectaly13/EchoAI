@@ -37,6 +37,8 @@ body.theme-default {
   --navbar-border: #1e1f22;
   --navbar-icon: #b5bac1;
   --navbar-icon-active: #5865f2;
+
+  --icon-btn-border: #4e5058; // contour des boutons icônes (gris foncé)
 }
 
 // Thème clair (reprend la palette d'origine de l'application).
@@ -61,6 +63,8 @@ body.theme-light {
   --navbar-border: #e3e3ee;
   --navbar-icon: #8a8a9e;
   --navbar-icon-active: #6c5ce7;
+
+  --icon-btn-border: #c8c8d4; // contour des boutons icônes (gris clair)
 }
 
 // Thème sombre neutre.
@@ -85,4 +89,6 @@ body.theme-dark {
   --navbar-border: #2a2a2a;
   --navbar-icon: #9a9aac;
   --navbar-icon-active: #8b7cf6;
+
+  --icon-btn-border: #3f3f46; // contour des boutons icônes (gris foncé)
 }

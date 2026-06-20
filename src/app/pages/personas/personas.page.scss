@@ -105,14 +105,6 @@ ion-content.personas-content {
 .persona-item-actions {
   flex: 0 0 auto;
   display: flex;
-  gap: 4px;
+  gap: 8px;
 }
 
-.persona-item-edit,
-.persona-item-delete {
-  border: none;
-  background: transparent;
-  font-size: 18px;
-  padding: 6px;
-  cursor: pointer;
-}

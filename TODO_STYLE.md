@@ -33,13 +33,15 @@ Remplacer tous les `AlertController` par des **modales applicatives** : une fen�
   - confirmation de **suppression** de souvenir (Mémoire).
 - **Limite** : gros morceau (≈ toutes les pages touchées). Le style définitif des modales viendra ensuite.
 
-## 2 — Boutons icônes (éditer / supprimer) : contour pour le contraste 🟢
+## 2 — Boutons icônes (éditer / supprimer) : contour pour le contraste 🟢 ✅ Fait
+> **Fait** : variable `--icon-btn-border` par thème (gris foncé en Défaut/Sombre, gris clair en Clair) + classe globale **`.icon-btn`** (contour, **taille carrée fixe 34×34**, glyphe centré, `color: var(--app-text)` pour que ✎ reste visible en thème clair). Appliquée à `character-card`, **Mémoire**, **Conversations**, **Personas**. Le `message-bubble` (régénérer/supprimer) est traité au **#5** (couleur selon l'émetteur).
+
 Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **contour carré aux coins arrondis**, avec une couleur **thème-dépendante** : **gris foncé** en thèmes **Défaut** et **Sombre**, **gris clair** en thème **Clair**. Ajouter de petites **marges** entre les boutons si besoin.
 
 - **Méthode** : introduire une variable CSS dédiée (ex. `--icon-btn-border`) définie par thème dans `variables.scss`, puis appliquer un style commun (contour + rayon + padding) aux boutons concernés.
-- **Pages/composants concernés** : `character-card` (éditer/supprimer), page **Mémoire** (éditer/supprimer par entrée), page **Conversations** (supprimer), page **Personas** (éditer/supprimer), et `message-bubble` (régénérer/supprimer — cf. point 4, couleur selon l'émetteur du message).
+- **Pages/composants concernés** : `character-card` (éditer/supprimer), page **Mémoire** (éditer/supprimer par entrée), page **Conversations** (supprimer), page **Personas** (éditer/supprimer), et `message-bubble` (régénérer/supprimer — cf. point 5, couleur selon l'émetteur du message).
 
-## 3 — /characters 🟢
+## 3 — /characters 🟢 ✅ Fait
 - Appliquer le contour des boutons éditer/supprimer (cf. point 2) sur les cartes de personnage + marges pour les espacer.
 
 ## 4 — /character-form 🟢
@@ -53,16 +55,16 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 - **Bulles utilisateur** : les **coller à droite** de l'écran.
 - **Débordement** : s'assurer que l'**input texte + bouton Envoyer** ne **débordent plus** de `.chat-footer` (régression depuis le retour du bouton « Illustrer la scène » — résolue en partie en sortant les boutons du footer, point ci-dessus).
 
-## 6 — /memory/{id} 🟢
+## 6 — /memory/{id} 🟢 ✅ Fait
 - Contour des boutons éditer/supprimer par entrée (cf. point 2).
 
-## 7 — /conversations 🟢
+## 7 — /conversations 🟢 ✅ Fait
 - Contour du bouton supprimer (cf. point 2).
 
 ## 8 — /personas 🟢
-- Contour des boutons éditer/supprimer (cf. point 2).
-- **Toujours afficher le persona par défaut en haut** de la liste (tri : défaut d'abord, puis le reste).
-- Renommer l'étiquette « par défaut » en « **Par défaut** » (P majuscule).
+- ✅ Contour des boutons éditer/supprimer (cf. point 2).
+- ⬜ **Toujours afficher le persona par défaut en haut** de la liste (tri : défaut d'abord, puis le reste).
+- ⬜ Renommer l'étiquette « par défaut » en « **Par défaut** » (P majuscule).
 
 ## 9 — /persona-form 🟢
 - Corriger le placeholder « Qui es-tu… » → « **Qui tu es**… ».
@@ -73,6 +75,11 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 ## 11 — /settings 🟢
 - Les **boutons de thème** s'élargissent pour occuper **toute la largeur** disponible (en tenant compte des marges), **sur une seule ligne**, tous de **largeur égale**.
 
+## 12 — Sous-pages : marge basse pour la zone sûre 🟢
+Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'ont **pas** de marge basse pour la safe-area → le dernier élément (Enregistrer, Tout oublier…) peut passer **sous la barre de navigation** du téléphone.
+
+- **Méthode** : ajouter un `--padding-bottom` (≈ `calc(16px + var(--safe-bottom))`) à l'`ion-content` de ces sous-pages. *(Le chat est traité au #5 via son footer.)*
+
 ---
 
 ## Récapitulatif de l'ordre
@@ -80,13 +87,14 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 | Ordre | Tâche | Effort | État |
 | ----- | ----- | ------ | ---- |
 | 1 | Modales custom en remplacement des AlertController | 🔴 | ✅ Fait |
-| 2 | Boutons icônes : contour pour le contraste (variable + transverse) | 🟢 | À faire |
-| 3 | /characters : contour boutons éditer/supprimer | 🟢 | À faire |
+| 2 | Boutons icônes : contour pour le contraste (variable + transverse) | 🟢 | ✅ Fait |
+| 3 | /characters : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 4 | /character-form : margin avatar + bouton « Retirer » inline rouge | 🟢 | À faire |
 | 5 | /chat : sticky passer/illustrer, safe-area footer, contour boutons, bulles user à droite, débordement input | 🟡 | À faire |
-| 6 | /memory : contour boutons éditer/supprimer | 🟢 | À faire |
-| 7 | /conversations : contour bouton supprimer | 🟢 | À faire |
-| 8 | /personas : contour boutons + défaut en haut + « Par défaut » | 🟢 | À faire |
+| 6 | /memory : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
+| 7 | /conversations : contour bouton supprimer | 🟢 | ✅ Fait |
+| 8 | /personas : contour boutons (✅) + défaut en haut + « Par défaut » | 🟢 | 🟡 Partiel |
 | 9 | /persona-form : placeholder « Qui tu es » | 🟢 | À faire |
 | 10 | /tokens : étiquette « Préféré » | 🟢 | À faire |
 | 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | À faire |
+| 12 | Sous-pages (form, mémoire) : marge basse pour la safe-area | 🟢 | À faire |

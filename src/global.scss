@@ -59,3 +59,22 @@
   border-color: var(--app-danger);
   color: var(--app-danger);
 }
+
+/* Bouton icône (éditer, supprimer…) : contour, taille carrée fixe, glyphe centré.
+   color = texte du thème pour que les glyphes monochromes (ex. ✎) soient visibles. */
+.icon-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--icon-btn-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
