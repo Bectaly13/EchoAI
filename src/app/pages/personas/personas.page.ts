@@ -30,7 +30,10 @@ export class PersonasPage implements ViewWillEnter {
   ) { }
 
   async loadPersonas() {
-    this.personas = await this.personaService.list();
+    const personas = await this.personaService.list();
+    // Toujours afficher le persona par défaut en tête de liste.
+    // (isDefault peut être undefined : on le ramène à un booléen pour éviter un NaN.)
+    this.personas = personas.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
   }
 
   goToCreate() {

@@ -65,10 +65,10 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 ## 7 — /conversations 🟢 ✅ Fait
 - Contour du bouton supprimer (cf. point 2).
 
-## 8 — /personas 🟢
+## 8 — /personas 🟢 ✅ Fait
 - ✅ Contour des boutons éditer/supprimer (cf. point 2).
-- ⬜ **Toujours afficher le persona par défaut en haut** de la liste (tri : défaut d'abord, puis le reste).
-- ⬜ Renommer l'étiquette « par défaut » en « **Par défaut** » (P majuscule).
+- ✅ **Toujours afficher le persona par défaut en haut** de la liste (tri dans `loadPersonas`, robuste au `isDefault` `undefined`).
+- ✅ Renommer l'étiquette « par défaut » en « **Par défaut** » (P majuscule).
 
 ## 9 — /persona-form 🟢
 - Corriger le placeholder « Qui es-tu… » → « **Qui tu es**… ».
@@ -97,7 +97,7 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 5 | /chat : passer/illustrer fixes, safe-area footer, contour boutons, bulles user à droite + largeur fixe, débordement input | 🟡 | ✅ Fait (safe-area à tester mobile) |
 | 6 | /memory : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 7 | /conversations : contour bouton supprimer | 🟢 | ✅ Fait |
-| 8 | /personas : contour boutons (✅) + défaut en haut + « Par défaut » | 🟢 | 🟡 Partiel |
+| 8 | /personas : contour boutons + défaut en haut + « Par défaut » | 🟢 | ✅ Fait |
 | 9 | /persona-form : placeholder « Qui tu es » | 🟢 | À faire |
 | 10 | /tokens : étiquette « Préféré » | 🟢 | À faire |
 | 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | À faire |
