@@ -89,7 +89,7 @@ npm run lint       # analyse statique (ESLint)
 Sous `src/app/` :
 
 - **`pages/`** — les écrans : `welcome` (splash + initialisation au lancement), et les onglets `characters` (personnages), `conversations` (liste des discussions), `personas`, `tokens` (suivi d'utilisation des modèles), `settings` (paramètres) ; plus les sous-écrans `character-form` (création/édition), `chat` (conversation), `memory` (mémoire d'une conversation), `persona-form` (création/édition).
-- **`components/`** — composants réutilisables : `header` (en-tête de page, titre + retour optionnel), `navbar` (barre d'onglets en bas), `character-card`, `message-bubble`.
+- **`components/`** — composants réutilisables : `header` (en-tête de page, titre + retour optionnel), `navbar` (barre d'onglets en bas), `modal` / `confirm-modal` (boîtes de dialogue applicatives, en remplacement des pop-ups natifs), `character-card`, `message-bubble`.
 - **`services/`** — la logique applicative, avec une séparation nette des responsabilités IA :
   - `GeminiService` — uniquement l'appel HTTP brut au modèle **texte** Gemini, avec repli sur une liste de modèles en cas de quota épuisé.
   - `ImageService` — génération d'image via **Cloudflare Workers AI** (FLUX), découplé de Gemini.

@@ -121,3 +121,30 @@ ion-content.chat-content {
 .chat-send[disabled] {
   opacity: 0.5;
 }
+
+.chat-persona-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-persona-option {
+  text-align: left;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--app-background);
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.chat-persona-option.active {
+  border-color: var(--app-accent);
+  color: var(--app-accent);
+}
+
+.chat-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}

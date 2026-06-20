@@ -35,3 +35,25 @@
     [(ngModel)]="draft" (keyup.enter)="send()" placeholder="Écris un message…" />
   <button class="chat-send" (click)="send()" [disabled]="sending">Envoyer</button>
 </footer>
+
+<app-modal [open]="personaModal.open" title="Quel persona incarnes-tu ?" (dismiss)="personaModal.open = false">
+  <div class="chat-persona-list">
+    @for (persona of personas; track persona.id) {
+      <button class="chat-persona-option" [class.active]="persona.id === activePersonaId" type="button" (click)="applyPersona(persona.id)">
+        {{ personaOptionLabel(persona) }}
+      </button>
+    }
+  </div>
+  <div class="chat-modal-actions">
+    <button class="modal-btn" type="button" (click)="personaModal.open = false">Fermer</button>
+  </div>
+</app-modal>
+
+<app-confirm-modal
+  [open]="confirmModal.open"
+  [title]="confirmModal.title"
+  [message]="confirmModal.message"
+  [confirmLabel]="confirmModal.confirmLabel"
+  (confirm)="runConfirm()"
+  (cancelled)="confirmModal.open = false">
+</app-confirm-modal>

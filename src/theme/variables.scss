@@ -5,10 +5,12 @@
 // (theme-default / theme-light / theme-dark) ; chaque classe redéfinit les
 // variables CSS ci-dessous. Jamais de couleur codée en dur ailleurs.
 
-// Variables indépendantes du thème : marges des zones sûres (encoche, barre système).
+// Variables indépendantes du thème : marges des zones sûres (encoche, barre système)
+// et fond assombri des modales (backdrop).
 :root {
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
+  --app-backdrop: rgba(0, 0, 0, 0.5);
 }
 
 // Thème par défaut (« Défaut », façon Discord : bleu + sombre).

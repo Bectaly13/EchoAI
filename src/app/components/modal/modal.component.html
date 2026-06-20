@@ -1,0 +1,12 @@
+@if (open()) {
+  <div class="modal-backdrop" (click)="dismiss.emit()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      @if (title()) {
+        <h2 class="modal-title">{{ title() }}</h2>
+      }
+      <div class="modal-content">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+}

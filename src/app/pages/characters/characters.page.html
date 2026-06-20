@@ -29,3 +29,21 @@
 </ion-content>
 
 <app-navbar class="characters-navbar"></app-navbar>
+
+<app-modal [open]="namePrompt.open" title="Comment t'appelles-tu ?" (dismiss)="namePrompt.open = false">
+  <p class="characters-modal-text">Ce nom est ton persona par défaut, transmis aux personnages. Tu pourras le modifier dans « Personas ».</p>
+  <input class="characters-modal-input" type="text" name="userName" [(ngModel)]="namePrompt.value" placeholder="Ton nom" />
+  <div class="characters-modal-actions">
+    <button class="modal-btn" type="button" (click)="namePrompt.open = false">Plus tard</button>
+    <button class="modal-btn modal-btn-primary" type="button" (click)="saveUserName()">Valider</button>
+  </div>
+</app-modal>
+
+<app-confirm-modal
+  [open]="confirmModal.open"
+  [title]="confirmModal.title"
+  [message]="confirmModal.message"
+  [confirmLabel]="confirmModal.confirmLabel"
+  (confirm)="runConfirm()"
+  (cancelled)="confirmModal.open = false">
+</app-confirm-modal>

@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
-import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatService, MemoryEntry } from 'src/app/services/chat-service';
 
+import { ConfirmModalComponent } from 'src/app/components/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { ModalComponent } from 'src/app/components/modal/modal.component';
 
 import { MemoryCategory } from 'src/app/utils/parse-memory';
 
@@ -21,12 +24,12 @@ interface MemoryGroup {
   templateUrl: './memory.page.html',
   styleUrls: ['./memory.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, HeaderComponent]
+  imports: [IonContent, IonHeader, FormsModule, ConfirmModalComponent, HeaderComponent, ModalComponent]
 })
 export class MemoryPage implements ViewWillEnter {
 
   // Catégories affichées, dans l'ordre, avec leur libellé.
-  private readonly categories: { category: MemoryCategory; label: string }[] = [
+  readonly categories: { category: MemoryCategory; label: string }[] = [
     { category: "location", label: "Lieu actuel" },
     { category: "relationship", label: "Relation avec l'utilisateur" },
     { category: "milestone", label: "Jalons de l'histoire" },
@@ -36,12 +39,26 @@ export class MemoryPage implements ViewWillEnter {
   character?: Character;
   groups: MemoryGroup[] = [];
 
+  // Modale de choix de catégorie (ajout d'un souvenir).
+  addCategoryModal = { open: false };
+  // Modale de saisie (réutilisée pour ajout et édition d'un souvenir).
+  valueModal = {
+    open: false,
+    mode: "add" as "add" | "edit",
+    title: "",
+    hint: "",
+    category: undefined as MemoryCategory | undefined,
+    entry: null as MemoryEntry | null,
+    value: ""
+  };
+  // Modale de confirmation (oublier une entrée / tout oublier).
+  confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
+
   async ionViewWillEnter() {
     await this.loadMemory();
   }
 
   constructor(
-    private alert: AlertController,
     private characterService: CharacterService,
     private chatService: ChatService,
     private location: Location,
@@ -69,107 +86,52 @@ export class MemoryPage implements ViewWillEnter {
     this.location.back();
   }
 
-  // Ajout d'un souvenir : on choisit d'abord la catégorie, puis on saisit la valeur.
-  // On enchaîne via onDidDismiss (et non depuis le handler) pour éviter une
-  // présentation imbriquée d'alertes — qui empêchait le rafraîchissement de la liste.
-  async promptAddCategory() {
-    const alert = await this.alert.create({
-      header: "Ajouter un souvenir",
-      message: "Dans quelle catégorie ?",
-      inputs: this.categories.map((item, index) => ({
-        type: "radio" as const,
-        label: item.label,
-        value: item.category,
-        checked: index === 0
-      })),
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Suivant", role: "confirm" }
-      ]
-    });
-    await alert.present();
-    const { data, role } = await alert.onDidDismiss<{ values: MemoryCategory }>();
-    if (role !== "confirm") {
-      return;
-    }
-    await this.promptAddValue(data?.values);
+  // ----- Ajout / édition d'un souvenir -----
+
+  // Étape 1 : ouvrir le choix de catégorie.
+  promptAddCategory() {
+    this.addCategoryModal.open = true;
   }
 
-  async promptAddValue(category?: MemoryCategory) {
-    if (!category) {
-      return;
-    }
+  // Étape 2 : catégorie choisie → ouvrir la saisie de la valeur.
+  selectCategory(category: MemoryCategory) {
+    this.addCategoryModal.open = false;
     const label = this.categories.find(item => item.category === category)?.label ?? "";
-    const alert = await this.alert.create({
-      header: "Nouveau souvenir",
-      message: label,
-      inputs: [{ name: "value", type: "textarea", placeholder: "Ce dont le personnage doit se souvenir." }],
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Ajouter", role: "confirm" }
-      ]
-    });
-    await alert.present();
-    const { data, role } = await alert.onDidDismiss<{ values: { value: string } }>();
-    if (role !== "confirm") {
-      return;
-    }
-    await this.addEntry(category, data?.values?.value ?? "");
+    this.valueModal = { open: true, mode: "add", title: "Nouveau souvenir", hint: label, category: category, entry: null, value: "" };
   }
 
-  private async addEntry(category: MemoryCategory, value: string) {
-    if (!this.character) {
+  // Édition d'une entrée existante.
+  promptEditEntry(entry: MemoryEntry) {
+    this.valueModal = { open: true, mode: "edit", title: "Modifier le souvenir", hint: "", category: entry.category, entry: entry, value: entry.value };
+  }
+
+  // Validation de la modale de saisie (ajout ou édition selon le mode).
+  async submitValue() {
+    const value = this.valueModal.value.trim();
+    const modal = this.valueModal;
+    this.valueModal.open = false;
+    if (!value || !this.character) {
       return;
     }
-    const memory = await this.chatService.addMemoryEntry(this.character.id, category, value);
+    let memory: MemoryEntry[];
+    if (modal.mode === "add" && modal.category) {
+      memory = await this.chatService.addMemoryEntry(this.character.id, modal.category, value);
+    } else if (modal.mode === "edit" && modal.entry) {
+      memory = await this.chatService.updateMemoryEntry(this.character.id, modal.entry.id, value);
+    } else {
+      return;
+    }
     this.groups = this.groupByCategory(memory);
   }
 
-  // Édition de la valeur d'une entrée existante.
-  async promptEditEntry(entry: MemoryEntry) {
-    const alert = await this.alert.create({
-      header: "Modifier le souvenir",
-      inputs: [{ name: "value", type: "textarea", value: entry.value }],
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Enregistrer", handler: (data: { value: string }) => this.editEntry(entry, data.value) }
-      ]
-    });
-    await alert.present();
+  // ----- Suppression -----
+
+  confirmDeleteEntry(entry: MemoryEntry) {
+    this.askConfirm("Oublier ?", `Oublier « ${entry.value} » ?`, "Oublier", () => this.deleteEntry(entry));
   }
 
-  private async editEntry(entry: MemoryEntry, value: string) {
-    if (!this.character) {
-      return;
-    }
-    const memory = await this.chatService.updateMemoryEntry(this.character.id, entry.id, value);
-    this.groups = this.groupByCategory(memory);
-  }
-
-  // Demande confirmation avant de supprimer une entrée de mémoire.
-  async confirmDeleteEntry(entry: MemoryEntry) {
-    const alert = await this.alert.create({
-      header: "Oublier ?",
-      message: `Oublier « ${entry.value} » ?`,
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Oublier", role: "destructive", handler: () => this.deleteEntry(entry) }
-      ]
-    });
-    await alert.present();
-  }
-
-  // Demande confirmation avant de vider toute la mémoire.
-  async confirmClear() {
-    const alert = await this.alert.create({
-      header: "Tout oublier ?",
-      message: "Vider toute la mémoire permanente de cette conversation ?",
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Tout oublier", role: "destructive", handler: () => this.clear() }
-      ]
-    });
-    await alert.present();
+  confirmClear() {
+    this.askConfirm("Tout oublier ?", "Vider toute la mémoire permanente de cette conversation ?", "Tout oublier", () => this.clear());
   }
 
   private async deleteEntry(entry: MemoryEntry) {
@@ -186,6 +148,17 @@ export class MemoryPage implements ViewWillEnter {
     }
     await this.chatService.clearMemory(this.character.id);
     this.groups = [];
+  }
+
+  // ----- Modale de confirmation -----
+  private askConfirm(title: string, message: string, confirmLabel: string, action: () => void) {
+    this.confirmModal = { open: true, title, message, confirmLabel, action };
+  }
+
+  runConfirm() {
+    const action = this.confirmModal.action;
+    this.confirmModal.open = false;
+    action();
   }
 
   // Répartit les entrées par catégorie (dans l'ordre défini), en ignorant les vides.

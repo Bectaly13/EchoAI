@@ -96,3 +96,45 @@ ion-content.memory-content {
   color: var(--app-danger);
   cursor: pointer;
 }
+
+.memory-modal-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--app-text-muted);
+}
+
+.memory-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memory-category-option {
+  text-align: left;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--app-background);
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.memory-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--app-background);
+  color: var(--app-text);
+  resize: vertical;
+}
+
+.memory-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

@@ -41,3 +41,12 @@
 </ion-content>
 
 <app-navbar class="personas-navbar"></app-navbar>
+
+<app-confirm-modal
+  [open]="confirmModal.open"
+  [title]="confirmModal.title"
+  [message]="confirmModal.message"
+  [confirmLabel]="confirmModal.confirmLabel"
+  (confirm)="runConfirm()"
+  (cancelled)="confirmModal.open = false">
+</app-confirm-modal>

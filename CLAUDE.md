@@ -68,6 +68,7 @@ Trois blocs séparés par une ligne vide :
 - **Éviter les balises `<ion-xxx>`** : privilégier du HTML classique quand c'est possible (et ne pas importer les `IonXxx` correspondants dans le `.ts`). **Exception** : `<ion-icon>` est autorisé pour les icônes (header, navbar…) ; les icônes sont enregistrées via `addIcons({ … })` dans le constructeur du composant standalone.
 - **Control flow** : utiliser `@for`, `@if`, `@switch` — **pas** `*ngFor`, `*ngIf`.
 - **Classes sur toutes les balises** : chaque balise porte un nom de classe. **Exception** : les fichiers HTML générés de base (ex. `app.component.html`) sont laissés tels quels.
+- **Boîtes de dialogue** : utiliser les modales applicatives `app-modal` (coquille) et `app-confirm-modal` (confirmation) — **jamais** `AlertController` (pop-ups natifs). Chaque page pilote ses modales via un état local.
 
 ### Fichiers SCSS
 - Les classes sont ordonnées selon leur **ordre d'apparition dans le HTML**.

@@ -38,3 +38,28 @@ ion-content.characters-content {
 .characters-list {
   padding: 12px;
 }
+
+.characters-modal-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--app-text-muted);
+}
+
+.characters-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--app-background);
+  color: var(--app-text);
+}
+
+.characters-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

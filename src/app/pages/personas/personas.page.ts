@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
 import { Persona, PersonaService } from 'src/app/services/persona-service';
 
+import { ConfirmModalComponent } from 'src/app/components/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 
@@ -12,18 +13,18 @@ import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
   templateUrl: './personas.page.html',
   styleUrls: ['./personas.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, HeaderComponent, NavbarComponent]
+  imports: [IonContent, IonHeader, ConfirmModalComponent, HeaderComponent, NavbarComponent]
 })
 export class PersonasPage implements ViewWillEnter {
 
   personas: Persona[] = [];
+  confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
 
   async ionViewWillEnter() {
     await this.loadPersonas();
   }
 
   constructor(
-    private alert: AlertController,
     private personaService: PersonaService,
     private router: Router
   ) { }
@@ -46,20 +47,28 @@ export class PersonasPage implements ViewWillEnter {
   }
 
   // Demande confirmation avant de supprimer un persona.
-  async confirmRemove(persona: Persona) {
-    const alert = await this.alert.create({
-      header: "Supprimer ?",
-      message: `Supprimer le persona « ${persona.name} » ?`,
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Supprimer", role: "destructive", handler: () => this.remove(persona) }
-      ]
-    });
-    await alert.present();
+  confirmRemove(persona: Persona) {
+    this.askConfirm(
+      "Supprimer ?",
+      `Supprimer le persona « ${persona.name} » ?`,
+      "Supprimer",
+      () => this.remove(persona)
+    );
   }
 
   async remove(persona: Persona) {
     await this.personaService.remove(persona.id);
     await this.loadPersonas();
+  }
+
+  // ----- Modale de confirmation -----
+  private askConfirm(title: string, message: string, confirmLabel: string, action: () => void) {
+    this.confirmModal = { open: true, title, message, confirmLabel, action };
+  }
+
+  runConfirm() {
+    const action = this.confirmModal.action;
+    this.confirmModal.open = false;
+    action();
   }
 }

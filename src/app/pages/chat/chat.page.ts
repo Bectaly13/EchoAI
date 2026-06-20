@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
@@ -9,8 +9,10 @@ import { ChatMessage, ChatService } from 'src/app/services/chat-service';
 import { MessageService } from 'src/app/services/message-service';
 import { Persona, PersonaService } from 'src/app/services/persona-service';
 
+import { ConfirmModalComponent } from 'src/app/components/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { MessageBubbleComponent } from 'src/app/components/message-bubble/message-bubble.component';
+import { ModalComponent } from 'src/app/components/modal/modal.component';
 
 import { describeApiError } from 'src/app/utils/describe-api-error';
 
@@ -19,7 +21,7 @@ import { describeApiError } from 'src/app/utils/describe-api-error';
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, FormsModule, HeaderComponent, MessageBubbleComponent]
+  imports: [IonContent, IonHeader, FormsModule, ConfirmModalComponent, HeaderComponent, MessageBubbleComponent, ModalComponent]
 })
 export class ChatPage implements ViewWillEnter {
 
@@ -36,13 +38,16 @@ export class ChatPage implements ViewWillEnter {
   activePersonaId?: string;
   // Illustration de scène disponible (false sur le palier gratuit).
   imageEnabled = false;
+  // Modale de sélection du persona.
+  personaModal = { open: false };
+  // Modale de confirmation (réutilisée pour reset / suppression de message).
+  confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
 
   async ionViewWillEnter() {
     await this.loadConversation();
   }
 
   constructor(
-    private alert: AlertController,
     private characterService: CharacterService,
     private chatService: ChatService,
     private location: Location,
@@ -73,26 +78,11 @@ export class ChatPage implements ViewWillEnter {
     return persona ? persona.name : "Persona";
   }
 
-  // Ouvre le choix du persona incarné dans la conversation (nom + description).
-  async choosePersona() {
-    if (!this.character) {
-      return;
+  // Ouvre la modale de choix du persona incarné dans la conversation.
+  choosePersona() {
+    if (this.character) {
+      this.personaModal.open = true;
     }
-    const inputs = this.personas.map(persona => ({
-      type: "radio" as const,
-      label: this.personaOptionLabel(persona),
-      value: persona.id,
-      checked: persona.id === this.activePersonaId
-    }));
-    const alert = await this.alert.create({
-      header: "Quel persona incarnes-tu ?",
-      inputs: inputs,
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Valider", handler: (value: string) => this.applyPersona(value) }
-      ]
-    });
-    await alert.present();
   }
 
   async applyPersona(personaId: string) {
@@ -101,10 +91,11 @@ export class ChatPage implements ViewWillEnter {
     }
     this.activePersonaId = personaId;
     await this.chatService.setActivePersona(this.character.id, personaId);
+    this.personaModal.open = false;
   }
 
   // Libellé d'une option de persona : nom (+ « (défaut) ») + début de description.
-  private personaOptionLabel(persona: Persona): string {
+  personaOptionLabel(persona: Persona): string {
     const name = persona.isDefault ? `${persona.name} (défaut)` : persona.name;
     const description = persona.description?.trim();
     if (!description) {
@@ -210,16 +201,13 @@ export class ChatPage implements ViewWillEnter {
   }
 
   // Demande confirmation avant de réinitialiser toute la conversation.
-  async confirmReset() {
-    const alert = await this.alert.create({
-      header: "Réinitialiser ?",
-      message: "Effacer tous les messages et la mémoire de cette conversation, et repartir de la salutation ?",
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Réinitialiser", role: "destructive", handler: () => this.reset() }
-      ]
-    });
-    await alert.present();
+  confirmReset() {
+    this.askConfirm(
+      "Réinitialiser ?",
+      "Effacer tous les messages et la mémoire de cette conversation, et repartir de la salutation ?",
+      "Réinitialiser",
+      () => this.reset()
+    );
   }
 
   async reset() {
@@ -231,16 +219,13 @@ export class ChatPage implements ViewWillEnter {
   }
 
   // Demande confirmation avant de supprimer un message et tous les suivants.
-  async confirmDelete(message: ChatMessage) {
-    const alert = await this.alert.create({
-      header: "Supprimer ?",
-      message: "Supprimer ce message et tous les suivants ?",
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Supprimer", role: "destructive", handler: () => this.deleteFrom(message) }
-      ]
-    });
-    await alert.present();
+  confirmDelete(message: ChatMessage) {
+    this.askConfirm(
+      "Supprimer ?",
+      "Supprimer ce message et tous les suivants ?",
+      "Supprimer",
+      () => this.deleteFrom(message)
+    );
   }
 
   async deleteFrom(message: ChatMessage) {
@@ -254,6 +239,17 @@ export class ChatPage implements ViewWillEnter {
     if (this.character) {
       this.router.navigate(["memory", this.character.id]);
     }
+  }
+
+  // ----- Modale de confirmation -----
+  private askConfirm(title: string, message: string, confirmLabel: string, action: () => void) {
+    this.confirmModal = { open: true, title, message, confirmLabel, action };
+  }
+
+  runConfirm() {
+    const action = this.confirmModal.action;
+    this.confirmModal.open = false;
+    action();
   }
 
   // Retour à la page d'origine (Personnages ou Conversations selon d'où l'on vient).

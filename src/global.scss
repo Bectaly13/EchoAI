@@ -35,3 +35,27 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Boutons des modales applicatives (app-modal) — style fonctionnel,
+   à affiner dans le TODO de style des modales. */
+.modal-btn {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--app-background);
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.modal-btn-primary {
+  border-color: var(--app-accent);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+}
+
+.modal-btn-danger {
+  border-color: var(--app-danger);
+  color: var(--app-danger);
+}

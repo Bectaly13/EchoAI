@@ -1,12 +1,15 @@
 import { Component } from '@angular/core';
-import { IonContent, IonHeader, ViewWillEnter, AlertController } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { PersonaService } from 'src/app/services/persona-service';
 
 import { CharacterCardComponent } from 'src/app/components/character-card/character-card.component';
+import { ConfirmModalComponent } from 'src/app/components/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { ModalComponent } from 'src/app/components/modal/modal.component';
 import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 
 @Component({
@@ -14,11 +17,15 @@ import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
   templateUrl: './characters.page.html',
   styleUrls: ['./characters.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, CharacterCardComponent, HeaderComponent, NavbarComponent]
+  imports: [IonContent, IonHeader, FormsModule, CharacterCardComponent, ConfirmModalComponent, HeaderComponent, ModalComponent, NavbarComponent]
 })
 export class CharactersPage implements ViewWillEnter {
 
   characters: Character[] = [];
+  // Modale de saisie du nom (persona par défaut) au premier lancement.
+  namePrompt = { open: false, personaId: "", value: "" };
+  // Modale de confirmation (réutilisée).
+  confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
 
   async ionViewWillEnter() {
     await this.loadCharacters();
@@ -28,8 +35,7 @@ export class CharactersPage implements ViewWillEnter {
   constructor(
     private characterService: CharacterService,
     private personaService: PersonaService,
-    private router: Router,
-    private alert: AlertController
+    private router: Router
   ) { }
 
   async loadCharacters() {
@@ -48,23 +54,15 @@ export class CharactersPage implements ViewWillEnter {
     if (!persona) {
       return;
     }
-    const alert = await this.alert.create({
-      header: "Comment t'appelles-tu ?",
-      message: "Ce nom est ton persona par défaut, transmis aux personnages. Tu pourras le modifier dans « Personas ».",
-      inputs: [{ name: "name", type: "text", value: persona.name, placeholder: "Ton nom" }],
-      buttons: [
-        { text: "Plus tard", role: "cancel" },
-        { text: "Valider", handler: (data: { name: string }) => this.saveUserName(persona.id, data.name) }
-      ]
-    });
-    await alert.present();
+    this.namePrompt = { open: true, personaId: persona.id, value: persona.name };
   }
 
-  private async saveUserName(personaId: string, name: string) {
-    const trimmed = (name || "").trim();
+  async saveUserName() {
+    const trimmed = this.namePrompt.value.trim();
     if (trimmed) {
-      await this.personaService.update(personaId, { name: trimmed });
+      await this.personaService.update(this.namePrompt.personaId, { name: trimmed });
     }
+    this.namePrompt.open = false;
   }
 
   goToCreate() {
@@ -80,20 +78,28 @@ export class CharactersPage implements ViewWillEnter {
   }
 
   // Demande confirmation avant de supprimer un personnage.
-  async confirmRemove(character: Character) {
-    const alert = await this.alert.create({
-      header: "Supprimer ?",
-      message: `Supprimer « ${character.name} » et sa conversation ?`,
-      buttons: [
-        { text: "Annuler", role: "cancel" },
-        { text: "Supprimer", role: "destructive", handler: () => this.remove(character) }
-      ]
-    });
-    await alert.present();
+  confirmRemove(character: Character) {
+    this.askConfirm(
+      "Supprimer ?",
+      `Supprimer « ${character.name} » et sa conversation ?`,
+      "Supprimer",
+      () => this.remove(character)
+    );
   }
 
   async remove(character: Character) {
     await this.characterService.remove(character.id);
     await this.loadCharacters();
+  }
+
+  // ----- Modale de confirmation -----
+  private askConfirm(title: string, message: string, confirmLabel: string, action: () => void) {
+    this.confirmModal = { open: true, title, message, confirmLabel, action };
+  }
+
+  runConfirm() {
+    const action = this.confirmModal.action;
+    this.confirmModal.open = false;
+    action();
   }
 }

@@ -34,3 +34,36 @@
   }
 
 </ion-content>
+
+<app-modal [open]="addCategoryModal.open" title="Ajouter un souvenir" (dismiss)="addCategoryModal.open = false">
+  <p class="memory-modal-hint">Dans quelle catégorie ?</p>
+  <div class="memory-category-list">
+    @for (item of categories; track item.category) {
+      <button class="memory-category-option" type="button" (click)="selectCategory(item.category)">{{ item.label }}</button>
+    }
+  </div>
+  <div class="memory-modal-actions">
+    <button class="modal-btn" type="button" (click)="addCategoryModal.open = false">Annuler</button>
+  </div>
+</app-modal>
+
+<app-modal [open]="valueModal.open" [title]="valueModal.title" (dismiss)="valueModal.open = false">
+  @if (valueModal.hint) {
+    <p class="memory-modal-hint">{{ valueModal.hint }}</p>
+  }
+  <textarea class="memory-modal-input" name="memValue" rows="3"
+    [(ngModel)]="valueModal.value" placeholder="Ce dont le personnage doit se souvenir."></textarea>
+  <div class="memory-modal-actions">
+    <button class="modal-btn" type="button" (click)="valueModal.open = false">Annuler</button>
+    <button class="modal-btn modal-btn-primary" type="button" (click)="submitValue()">{{ valueModal.mode === 'add' ? 'Ajouter' : 'Enregistrer' }}</button>
+  </div>
+</app-modal>
+
+<app-confirm-modal
+  [open]="confirmModal.open"
+  [title]="confirmModal.title"
+  [message]="confirmModal.message"
+  [confirmLabel]="confirmModal.confirmLabel"
+  (confirm)="runConfirm()"
+  (cancelled)="confirmModal.open = false">
+</app-confirm-modal>
