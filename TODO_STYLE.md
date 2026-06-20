@@ -76,8 +76,8 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 ## 10 — /tokens 🟢 ✅ Fait
 - ✅ Renommer l'étiquette « préféré » en « **Préféré** » (P majuscule).
 
-## 11 — /settings 🟢
-- Les **boutons de thème** s'élargissent pour occuper **toute la largeur** disponible (en tenant compte des marges), **sur une seule ligne**, tous de **largeur égale**.
+## 11 — /settings 🟢 ✅ Fait
+- ✅ Les **boutons de thème** occupent **toute la largeur** disponible (`flex: 1 1 0`), **sur une seule ligne** (suppression de `flex-wrap`), tous de **largeur égale**, texte centré.
 
 ## 12 — Sous-pages : marge basse pour la zone sûre 🟢
 Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'ont **pas** de marge basse pour la safe-area → le dernier élément (Enregistrer, Tout oublier…) peut passer **sous la barre de navigation** du téléphone.
@@ -100,5 +100,5 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 8 | /personas : contour boutons + défaut en haut + « Par défaut » | 🟢 | ✅ Fait |
 | 9 | /persona-form : placeholder « Qui tu es » | 🟢 | ✅ Fait |
 | 10 | /tokens : étiquette « Préféré » | 🟢 | ✅ Fait |
-| 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | À faire |
+| 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | ✅ Fait |
 | 12 | Sous-pages (form, mémoire) : marge basse pour la safe-area | 🟢 | À faire |
