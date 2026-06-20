@@ -79,10 +79,10 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 ## 11 — /settings 🟢 ✅ Fait
 - ✅ Les **boutons de thème** occupent **toute la largeur** disponible (`flex: 1 1 0`), **sur une seule ligne** (suppression de `flex-wrap`), tous de **largeur égale**, texte centré.
 
-## 12 — Sous-pages : marge basse pour la zone sûre 🟢
+## 12 — Sous-pages : marge basse pour la zone sûre 🟢 ✅ Fait (à valider mobile)
 Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'ont **pas** de marge basse pour la safe-area → le dernier élément (Enregistrer, Tout oublier…) peut passer **sous la barre de navigation** du téléphone.
 
-- **Méthode** : ajouter un `--padding-bottom` (≈ `calc(16px + var(--safe-bottom))`) à l'`ion-content` de ces sous-pages. *(Le chat est traité au #5 via son footer.)*
+- ✅ `--padding-bottom: calc(16px + var(--safe-bottom))` ajouté sur l'`ion-content` des trois sous-pages. *(Le chat est traité au #5 via son footer.)* **À confirmer sur le build mobile.**
 
 ---
 
@@ -101,4 +101,4 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 9 | /persona-form : placeholder « Qui tu es » | 🟢 | ✅ Fait |
 | 10 | /tokens : étiquette « Préféré » | 🟢 | ✅ Fait |
 | 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | ✅ Fait |
-| 12 | Sous-pages (form, mémoire) : marge basse pour la safe-area | 🟢 | À faire |
+| 12 | Sous-pages (form, mémoire) : marge basse pour la safe-area | 🟢 | ✅ Fait (à valider mobile) |

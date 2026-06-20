@@ -1,5 +1,7 @@
 ion-content.character-form-content {
   --background: var(--app-background);
+  // Sous-page sans navbar : marge basse pour la zone sûre du téléphone.
+  --padding-bottom: calc(16px + var(--safe-bottom));
 }
 
 .character-form-body {
