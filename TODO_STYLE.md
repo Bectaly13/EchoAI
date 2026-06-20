@@ -70,11 +70,11 @@ Cross-cutting — les boutons icônes manquent de contraste. Leur ajouter un **c
 - ✅ **Toujours afficher le persona par défaut en haut** de la liste (tri dans `loadPersonas`, robuste au `isDefault` `undefined`).
 - ✅ Renommer l'étiquette « par défaut » en « **Par défaut** » (P majuscule).
 
-## 9 — /persona-form 🟢
-- Corriger le placeholder « Qui es-tu… » → « **Qui tu es**… ».
+## 9 — /persona-form 🟢 ✅ Fait
+- ✅ Corriger le placeholder « Qui es-tu… » → « **Qui tu es**… ».
 
-## 10 — /tokens 🟢
-- Renommer l'étiquette « préféré » en « **Préféré** » (P majuscule).
+## 10 — /tokens 🟢 ✅ Fait
+- ✅ Renommer l'étiquette « préféré » en « **Préféré** » (P majuscule).
 
 ## 11 — /settings 🟢
 - Les **boutons de thème** s'élargissent pour occuper **toute la largeur** disponible (en tenant compte des marges), **sur une seule ligne**, tous de **largeur égale**.
@@ -98,7 +98,7 @@ Les sous-pages **sans navbar** (`character-form`, `persona-form`, `memory`) n'on
 | 6 | /memory : contour boutons éditer/supprimer | 🟢 | ✅ Fait |
 | 7 | /conversations : contour bouton supprimer | 🟢 | ✅ Fait |
 | 8 | /personas : contour boutons + défaut en haut + « Par défaut » | 🟢 | ✅ Fait |
-| 9 | /persona-form : placeholder « Qui tu es » | 🟢 | À faire |
-| 10 | /tokens : étiquette « Préféré » | 🟢 | À faire |
+| 9 | /persona-form : placeholder « Qui tu es » | 🟢 | ✅ Fait |
+| 10 | /tokens : étiquette « Préféré » | 🟢 | ✅ Fait |
 | 11 | /settings : boutons de thème pleine largeur, égaux, une ligne | 🟢 | À faire |
 | 12 | Sous-pages (form, mémoire) : marge basse pour la safe-area | 🟢 | À faire |
