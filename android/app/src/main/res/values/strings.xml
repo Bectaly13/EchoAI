@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EchoAI</string>
+    <string name="title_activity_main">EchoAI</string>
+    <string name="package_name">com.echoai.app</string>
+    <string name="custom_url_scheme">com.echoai.app</string>
+</resources>
