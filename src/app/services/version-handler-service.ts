@@ -20,7 +20,7 @@ export class VersionHandlerService {
   // Version **commerciale**, destinée à l'utilisateur (illustre l'ampleur des mises
   // à jour). Sans rapport avec appVersion. Reste « 1.0 » jusqu'à la finalisation de
   // l'app et les premiers tests utilisateur.
-  readonly appVersionDisplay = "1.0";
+  readonly appVersionDisplay = "1.1";
 
   constructor(
     private storage: StorageService,

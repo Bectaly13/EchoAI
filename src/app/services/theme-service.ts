@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 import { StorageService } from './storage-service';
 
@@ -19,6 +21,15 @@ export class ThemeService {
     "Sombre": "theme-dark"
   };
 
+  // Style des icônes de la barre d'état Android par thème. Nommage Capacitor
+  // contre-intuitif : Style.Dark = icônes CLAIRES (sur fond sombre), Style.Light
+  // = icônes SOMBRES (sur fond clair).
+  private statusBarStyles: Record<Theme, Style> = {
+    "Défaut": Style.Dark,
+    "Clair": Style.Light,
+    "Sombre": Style.Dark
+  };
+
   constructor(
     private storage: StorageService
   ) { }
@@ -33,6 +44,29 @@ export class ThemeService {
     await this.storage.set("theme", theme);
     document.body.classList.remove(...Object.values(this.themeClasses));
     document.body.classList.add(this.themeClasses[theme]);
+    await this.updateStatusBar(theme);
+  }
+
+  // Accorde la barre d'état (Android) au thème : style des icônes + couleur de fond
+  // reprise du header. Sans effet hors plateforme native (web/tests) ; toute erreur
+  // de l'API est ignorée pour ne jamais bloquer l'application du thème.
+  private async updateStatusBar(theme: Theme): Promise<void> {
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+    try {
+      await StatusBar.setStyle({ style: this.statusBarStyles[theme] });
+      // setBackgroundColor n'existe que sur Android : on lit la couleur du header
+      // du thème courant (pas de couleur en dur → suit variables.scss).
+      if (Capacitor.getPlatform() === "android") {
+        const color = getComputedStyle(document.body).getPropertyValue("--header-background").trim();
+        if (color) {
+          await StatusBar.setBackgroundColor({ color: color });
+        }
+      }
+    } catch {
+      // Barre d'état non disponible : on ignore.
+    }
   }
 
   // Renvoie le thème mémorisé, ou le thème par défaut.

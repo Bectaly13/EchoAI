@@ -9,9 +9,8 @@ export function buildDraftPrompt(brief: string): string {
     "Consignes :",
     "- Reste fidèle au brouillon ; comble les manques de façon plausible sans contredire ce qui est donné.",
     "- \"systemPrompt\" décrit la personnalité, la façon de parler, le ton et ce que sait le personnage (rédigé à la 3ᵉ personne, comme des instructions de jeu de rôle).",
-    "- \"greeting\" est le message d'ouverture qui plante le décor. Il DOIT suivre le format des messages : les répliques sont préfixées par le nom de celui qui parle puis mises entre guillemets droits (ex. : Alice : \"Bonjour\"), et la narration (actions, lieux, ambiance) est écrite à la 3ᵉ personne, comme un narrateur, entre astérisques et en dehors des guillemets (ex. : *La nuit tombe sur le port.*). Dans la narration, désigne l'utilisateur par « tu ». Passe à la ligne entre la narration et une réplique (et inversement).",
+    "- \"greeting\" est le message d'ouverture qui plante le décor. Il DOIT suivre le format des messages : les répliques sont préfixées par le nom de celui qui parle puis mises entre guillemets droits (ex. : Alice : \"Bonjour\"), et la narration (actions, lieux, ambiance) est écrite à la 3ᵉ personne, comme un narrateur, entre astérisques et en dehors des guillemets (ex. : *La nuit tombe sur le port.*). Dans la narration, désigne l'utilisateur par « tu ». Passe à la ligne entre la narration et une réplique (et inversement). La salutation peut faire intervenir des personnages secondaires (qui parlent et agissent), pas seulement le personnage principal, pour planter un décor vivant.",
     "- Les autres champs sont concis. Laisse une chaîne vide pour un champ que le brouillon ne permet pas de remplir raisonnablement.",
-    "- N'invente pas de personnages connus si le brouillon n'en mentionne pas.",
     "",
     "Brouillon :",
     brief.trim()

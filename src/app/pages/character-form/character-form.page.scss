@@ -7,7 +7,8 @@ ion-content.character-form-content {
 .character-form-body {
   display: flex;
   flex-direction: column;
-  padding: 16px 16px 24px;
+  // Pas de padding bas : l'espace de zone sûre vient du --padding-bottom de l'ion-content.
+  padding: 16px 16px 0px;
 }
 
 .character-form-assist {

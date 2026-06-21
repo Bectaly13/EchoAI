@@ -81,7 +81,29 @@ Trois blocs séparés par une ligne vide :
 
 ---
 
+## Workflow
+
+- **Toujours démarrer un correctif ou une fonctionnalité par un TODO structuré** : un fichier `TODO_*.md` à la racine, points **ordonnés par priorité**, avec pour chacun le **constat/symptôme**, la **méthode**, les **limites** et les **questions à trancher**. On formalise (et on tranche les questions) **avant** d'implémenter, puis on coche les points au fur et à mesure.
+- **Nommage des TODO** : pour une version, `TODO_vX_Y.md` (ex. `TODO_v1_1.md`) ; les autres chantiers gardent un nom descriptif (`TODO_STYLE.md`, `TODO_UI.md`…). Préfixer les versions par `v` pour éviter les conflits de noms.
+- **Implémentation** : un point à la fois, en vérifiant `npx tsc --noEmit -p tsconfig.app.json` + `npm run lint` (+ `npm run build` pour un changement SCSS ou de structure) après chaque point.
+
+---
+
+## Versionnage
+
+Deux numéros **indépendants**, tous deux dans `VersionHandlerService` :
+- **`appVersion`** (entier) : version du **format de la bdd**. **N'évolue QUE si nécessaire**, c'est-à-dire uniquement quand une **migration** de données est requise (nouvelle table, nouveau champ…). On l'incrémente d'1 et on ajoute la migration `updateToVx()` correspondante.
+- **`appVersionDisplay`** (chaîne) : version **commerciale** affichée à l'utilisateur (notes de version). Doit **toujours correspondre** au `versionName` de `android/app/build.gradle`.
+
+**À chaque changement de version commerciale** (procédure à appliquer automatiquement) :
+1. **Demander à l'utilisateur l'ampleur** de la version pour choisir le numéro : **majeure** (ex. `2.0`), **mineure** (ex. `1.2`) ou **correctif** (ex. `1.1.1`).
+2. Mettre à jour **de façon synchronisée** : `appVersionDisplay` (`VersionHandlerService`), `versionName` **et** `versionCode` (incrémenté de 1, toujours croissant) dans `android/app/build.gradle`, et une entrée **en tête** de `RELEASE_NOTES` (`utils/release-notes.ts`) listant les points revus (liste vide réservée à la toute première version).
+3. Ne **pas** toucher `appVersion` sauf migration de bdd réellement nécessaire.
+
+---
+
 ## GitHub
 
 - **Jamais** la clé API dans un commit (`environment.ts` git-ignoré).
 - **Jamais** de trailer `Co-Authored-By: Claude` dans les commits.
+- **Commit de version** : le message ne contient **que** le nom de la version (ex. `1.1`), rien d'autre.

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 
 import { Theme, ThemeService } from 'src/app/services/theme-service';
 import { VersionHandlerService } from 'src/app/services/version-handler-service';
@@ -24,6 +25,7 @@ export class SettingsPage implements ViewWillEnter {
   }
 
   constructor(
+    private router: Router,
     private theme: ThemeService,
     private version: VersionHandlerService
   ) { }
@@ -42,5 +44,10 @@ export class SettingsPage implements ViewWillEnter {
   // Version (lisible) du format de données, affichée dans « À propos ».
   get appVersion(): string {
     return this.version.appVersionDisplay;
+  }
+
+  // Ouvre la sous-page des notes de version.
+  goToVersions() {
+    this.router.navigate(["versions"]);
   }
 }

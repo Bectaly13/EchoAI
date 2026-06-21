@@ -62,6 +62,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
   },
   {
+    // Notes de version (sous-page de Paramètres).
+    path: 'versions',
+    loadComponent: () => import('./pages/versions/versions.page').then((m) => m.VersionsPage),
+  },
+  {
     path: '',
     redirectTo: 'welcome',
     pathMatch: 'full',

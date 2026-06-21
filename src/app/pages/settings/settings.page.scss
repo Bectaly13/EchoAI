@@ -51,3 +51,15 @@ ion-content.settings-content {
   font-size: 15px;
   color: var(--app-text-muted);
 }
+
+.settings-versions-link {
+  margin-top: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--app-surface);
+  color: var(--app-text);
+  cursor: pointer;
+}

@@ -1,0 +1,55 @@
+ion-content.versions-content {
+  --background: var(--app-background);
+  // Sous-page sans navbar : marge basse pour la zone sûre du téléphone.
+  --padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+.versions-list {
+  padding: 16px;
+}
+
+.versions-item {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--app-surface);
+}
+
+.versions-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.versions-version {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.versions-current {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+}
+
+.versions-changes {
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.versions-change {
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--app-text);
+}
+
+.versions-empty {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--app-text-muted);
+}

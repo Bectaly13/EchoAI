@@ -58,9 +58,11 @@ function buildFormatBlock(): string {
   return [
     "CONSIGNES DE FORMAT",
     "Préfixe chaque réplique par le nom de celui qui parle, suivi d'un deux-points, puis mets les paroles entre guillemets droits. Exemple :\nAlice : \"Bonjour\"\nBob : \"Salut\"",
+    "Tu n'es pas limité à ton seul personnage : tu peux aussi faire parler et agir les autres personnages présents dans la scène (personnages secondaires, figurants…), chacun préfixé par son nom. Ton personnage principal reste le point de vue, mais la scène peut être vivante et habitée.",
     "Encadre les actions, gestes et passages de narration entre astérisques, en dehors des guillemets. La narration est écrite à la 3ᵉ personne, comme un narrateur omniscient (jamais à la 1ʳᵉ personne) : elle décrit les actions, les lieux et les événements, et peut continuer à décrire la scène même lorsque ton personnage est absent ou que l'utilisateur se retrouve seul. Exemple : *La pièce est silencieuse ; au loin, une porte grince.*",
     "Dans la narration, désigne l'utilisateur par « tu » (jamais « l'utilisateur » ni une 3ᵉ personne pour lui).",
-    "Passe à la ligne quand tu passes de la narration à une réplique, ou d'une réplique à la narration, pour aérer la lecture."
+    "Passe à la ligne quand tu passes de la narration à une réplique, ou d'une réplique à la narration, pour aérer la lecture.",
+    "Reste concis : chaque paragraphe de narration fait 30 mots AU MAXIMUM, et n'écris JAMAIS plus de 3 paragraphes de narration par réponse. Ce sont des maximums, pas des objectifs à atteindre : privilégie des réponses courtes qui laissent rapidement la main à l'utilisateur. Ces restrictions ne concernent que les paragraphes de narration, pas les répliques et dialogues."
   ].join("\n");
 }
 
@@ -106,9 +108,10 @@ function valuesOf(memory: MemoryItem[], category: string): string[] {
 function buildMemoryInstructionBlock(): string {
   return [
     "CONSIGNES DE MÉMOIRE",
-    "Si — et seulement si — un élément durable change (nouveau lieu, évolution de votre relation, étape importante de l'histoire franchie, consigne à retenir), ajoute TOUT À LA FIN de ta réponse un bloc exactement à ce format :",
+    "Tiens à jour une mémoire permanente des points importants de la conversation : le lieu où se déroule la scène, l'état de ta relation avec l'utilisateur, les faits marquants de l'histoire et les consignes durables à respecter. Dès qu'un de ces points apparaît ou évolue, consigne-le — n'attends pas un bouleversement « majeur ».",
+    "Pour cela, ajoute TOUT À LA FIN de ta réponse un bloc EXACTEMENT à ce format, balises comprises :",
     "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <le fait marquant qui vient de se produire>\ninstruction: <une consigne à respecter durablement>\n[[/MEMORY]]",
-    "N'inclus que les lignes pertinentes (pas forcément les quatre). N'évoque jamais ce bloc dans ta narration. S'il n'y a rien de nouveau à mémoriser, n'ajoute aucun bloc.",
+    "N'inclus que les lignes pertinentes (pas forcément les quatre), mais n'écris JAMAIS ces lignes sans les balises [[MEMORY]] et [[/MEMORY]] qui les encadrent. N'évoque jamais ce bloc dans ta narration. S'il n'y a vraiment rien à mémoriser, n'ajoute aucun bloc.",
     "La mémoire actuelle t'est donnée plus haut (MÉMOIRE PERMANENTE). Ne réinscris JAMAIS un élément déjà présent à l'identique. Pour location et relationship, ne réécris la ligne que si la valeur a changé (elle remplacera l'ancienne). Pour milestone et instruction, n'ajoute que ce qui est réellement nouveau — surtout pas de doublon."
   ].join("\n");
 }
