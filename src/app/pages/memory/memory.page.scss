@@ -57,6 +57,35 @@ ion-content.memory-content {
   color: var(--app-text-muted);
 }
 
+.memory-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.memory-group-toggle .memory-group-title {
+  margin: 0;
+}
+
+.memory-group-caret {
+  font-size: 12px;
+  color: var(--app-text-muted);
+}
+
+.memory-group-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
 .memory-entry {
   display: flex;
   align-items: center;

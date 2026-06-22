@@ -10,7 +10,7 @@ import { UsageService } from './usage-service';
 import { buildGeminiContents } from '../utils/build-gemini-contents';
 import { buildSceneImagePrompt } from '../utils/build-scene-image-prompt';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
-import { MemoryCategory, MemoryUpdate, parseMemory } from '../utils/parse-memory';
+import { MemoryCategory, parseMemory } from '../utils/parse-memory';
 
 // Un message dans une conversation. role suit les valeurs attendues par l'API Gemini.
 export interface ChatMessage {
@@ -30,8 +30,6 @@ export interface MemoryEntry {
   category: MemoryCategory;
   value: string;
   at: number;
-  // Message (du modèle) qui a produit cette entrée → permet le rollback (#3).
-  sourceMessageId: string;
 }
 
 // Résumé d'une conversation, pour la liste des conversations (page dédiée).
@@ -65,16 +63,6 @@ interface Conversation {
   // Mémoire permanente accumulée au fil de la conversation.
   memory?: MemoryEntry[];
 }
-
-// Catégories de mémoire à valeur unique : une nouvelle valeur remplace l'ancienne.
-const SINGLE_VALUED_CATEGORIES: MemoryCategory[] = ["location", "relationship"];
-// Source d'une entrée de mémoire créée/éditée à la main : sentinelle qui ne
-// correspond à aucun message, donc jamais effacée par le rollback (régénération,
-// suppression). Voir applyMemoryUpdates / deleteFrom.
-const MANUAL_SOURCE = "manual";
-// Nombre maximum d'entrées conservées par catégorie à valeurs multiples (jalons,
-// consignes), pour borner la croissance de la mémoire (budget de tokens).
-const MAX_LIST_ENTRIES = 30;
 
 // Tour utilisateur transitoire (non persisté) injecté quand l'utilisateur passe son
 // tour : l'historique se termine alors par un message du modèle, or Gemini attend un
@@ -210,11 +198,9 @@ export class ChatService {
       throw new Error("Personnage introuvable");
     }
 
-    // Retire la dernière réponse (et la mémoire qu'elle avait produite), puis régénère.
-    const removed = messages.pop();
-    if (removed) {
-      this.forgetMemoryFrom(conversation, removed.id);
-    }
+    // Retire la dernière réponse, puis régénère (la nouvelle réponse réémettra la
+    // mémoire à jour, qui remplacera l'actuelle).
+    messages.pop();
     const systemPrompt = await this.buildPrompt(character, conversation);
     // Les messages-images sont filtrés de l'historique transmis ; on regarde donc le
     // dernier tour réellement envoyé au modèle. S'il ne vient pas de l'utilisateur
@@ -251,12 +237,8 @@ export class ChatService {
     while (conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].role === "user") {
       conversation.messages.pop();
     }
-    // Oublie la mémoire produite par les messages supprimés. Les entrées manuelles
-    // (sourceMessageId sentinelle) sont conservées : elles ne dépendent d'aucun message.
-    const remainingIds = new Set(conversation.messages.map(message => message.id));
-    conversation.memory = (conversation.memory ?? []).filter(
-      entry => entry.sourceMessageId === MANUAL_SOURCE || remainingIds.has(entry.sourceMessageId)
-    );
+    // La mémoire n'est pas rembobinée à la suppression (elle évolue par réémission du
+    // modèle) : si besoin, l'utilisateur l'ajuste via l'écran mémoire.
     await this.saveConversation(conversation);
 
     return conversation.messages;
@@ -357,73 +339,21 @@ export class ChatService {
     return buildSystemPrompt({ character: character, persona: persona, memory: conversation.memory });
   }
 
-  // Intègre une réponse brute du modèle : extrait l'éventuel bloc mémoire, ajoute le
-  // message (texte nettoyé) et applique les mises à jour. Renvoie le texte affiché.
+  // Intègre une réponse brute du modèle : ajoute le message (texte nettoyé) et, si la
+  // réponse réémet un bloc mémoire, REMPLACE toute la mémoire par son état complet
+  // consolidé (le modèle fusionne les équivalents et retire l'obsolète lui-même).
   private appendModelReply(conversation: Conversation, raw: string): string {
     const parsed = parseMemory(raw);
-    const messageId = crypto.randomUUID();
-    conversation.messages.push({ id: messageId, role: "model", text: parsed.text, at: Date.now() });
-    this.applyMemoryUpdates(conversation, parsed.updates, messageId);
-    return parsed.text;
-  }
-
-  // Applique les mises à jour de mémoire : remplace pour les catégories à valeur
-  // unique, ajoute (en bornant) pour les catégories à valeurs multiples.
-  private applyMemoryUpdates(conversation: Conversation, updates: MemoryUpdate[], sourceMessageId: string): void {
-    if (updates.length === 0) {
-      return;
-    }
-    let memory = conversation.memory ? [...conversation.memory] : [];
-    for (const update of updates) {
-      if (SINGLE_VALUED_CATEGORIES.includes(update.category)) {
-        memory = memory.filter(entry => entry.category !== update.category);
-      } else if (memory.some(entry => entry.category === update.category && this.sameMemoryValue(entry.value, update.value))) {
-        // Anti-doublon : valeur déjà présente dans cette catégorie → on n'ajoute pas.
-        continue;
-      }
-      memory.push({
+    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: parsed.text, at: Date.now() });
+    if (parsed.hasMemoryBlock) {
+      conversation.memory = parsed.entries.map(entry => ({
         id: crypto.randomUUID(),
-        category: update.category,
-        value: update.value,
-        at: Date.now(),
-        sourceMessageId: sourceMessageId
-      });
+        category: entry.category,
+        value: entry.value,
+        at: Date.now()
+      }));
     }
-    conversation.memory = this.capMemory(memory);
-  }
-
-  // Compare deux valeurs de mémoire en ignorant casse et espaces de bord (anti-doublon).
-  private sameMemoryValue(a: string, b: string): boolean {
-    return a.trim().toLowerCase() === b.trim().toLowerCase();
-  }
-
-  // Retire les entrées de mémoire produites par un message donné (rollback).
-  private forgetMemoryFrom(conversation: Conversation, messageId: string): void {
-    if (!conversation.memory) {
-      return;
-    }
-    conversation.memory = conversation.memory.filter(entry => entry.sourceMessageId !== messageId);
-  }
-
-  // Borne chaque catégorie à valeurs multiples à ses MAX_LIST_ENTRIES plus récentes,
-  // en préservant l'ordre chronologique.
-  private capMemory(memory: MemoryEntry[]): MemoryEntry[] {
-    const counts = new Map<MemoryCategory, number>();
-    const kept: MemoryEntry[] = [];
-    // On parcourt du plus récent au plus ancien pour garder les derniers.
-    for (let i = memory.length - 1; i >= 0; i--) {
-      const entry = memory[i];
-      if (SINGLE_VALUED_CATEGORIES.includes(entry.category)) {
-        kept.push(entry);
-        continue;
-      }
-      const count = counts.get(entry.category) ?? 0;
-      if (count < MAX_LIST_ENTRIES) {
-        counts.set(entry.category, count + 1);
-        kept.push(entry);
-      }
-    }
-    return kept.reverse();
+    return parsed.text;
   }
 
   // Renvoie la mémoire permanente de la conversation (vide si aucune).
@@ -433,8 +363,8 @@ export class ChatService {
   }
 
   // Ajoute manuellement une entrée de mémoire (catégorie + valeur) et renvoie la
-  // mémoire mise à jour. Suit les mêmes règles que la mémoire automatique
-  // (catégorie à valeur unique → remplacement ; à valeurs multiples → ajout borné).
+  // mémoire mise à jour. Le modèle la conservera lors de ses réémissions (sauf
+  // obsolescence) et consolidera au besoin au tour suivant.
   async addMemoryEntry(characterId: string, category: MemoryCategory, value: string): Promise<MemoryEntry[]> {
     const conversation = await this.getConversation(characterId);
     if (!conversation) {
@@ -444,13 +374,15 @@ export class ChatService {
     if (!text) {
       return conversation.memory ?? [];
     }
-    this.applyMemoryUpdates(conversation, [{ category: category, value: text }], MANUAL_SOURCE);
+    conversation.memory = [
+      ...(conversation.memory ?? []),
+      { id: crypto.randomUUID(), category: category, value: text, at: Date.now() }
+    ];
     await this.saveConversation(conversation);
-    return conversation.memory ?? [];
+    return conversation.memory;
   }
 
-  // Modifie la valeur d'une entrée de mémoire existante. L'entrée devient
-  // « manuelle » (protégée du rollback), l'utilisateur en ayant pris possession.
+  // Modifie la valeur d'une entrée de mémoire existante.
   async updateMemoryEntry(characterId: string, entryId: string, value: string): Promise<MemoryEntry[]> {
     const conversation = await this.getConversation(characterId);
     if (!conversation || !conversation.memory) {
@@ -462,7 +394,6 @@ export class ChatService {
       return conversation.memory;
     }
     entry.value = text;
-    entry.sourceMessageId = MANUAL_SOURCE;
     await this.saveConversation(conversation);
     return conversation.memory;
   }

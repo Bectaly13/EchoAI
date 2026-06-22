@@ -70,7 +70,7 @@ function buildFormatBlock(): string {
 function buildMemoryBlock(memory: MemoryItem[]): string {
   const lines = [
     "MÉMOIRE PERMANENTE",
-    "Tiens compte de ces informations établies au fil de l'histoire :"
+    "Voici l'état actuel de la mémoire permanente, que tu dois respecter puis maintenir à jour (cf. CONSIGNES DE MÉMOIRE) :"
   ];
   const location = latestValue(memory, "location");
   if (location) {
@@ -108,11 +108,18 @@ function valuesOf(memory: MemoryItem[], category: string): string[] {
 function buildMemoryInstructionBlock(): string {
   return [
     "CONSIGNES DE MÉMOIRE",
-    "Tiens à jour une mémoire permanente des points importants de la conversation : le lieu où se déroule la scène, l'état de ta relation avec l'utilisateur, les faits marquants de l'histoire et les consignes durables à respecter. Dès qu'un de ces points apparaît ou évolue, consigne-le — n'attends pas un bouleversement « majeur ».",
-    "Pour cela, ajoute TOUT À LA FIN de ta réponse un bloc EXACTEMENT à ce format, balises comprises :",
-    "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <le fait marquant qui vient de se produire>\ninstruction: <une consigne à respecter durablement>\n[[/MEMORY]]",
-    "N'inclus que les lignes pertinentes (pas forcément les quatre), mais n'écris JAMAIS ces lignes sans les balises [[MEMORY]] et [[/MEMORY]] qui les encadrent. N'évoque jamais ce bloc dans ta narration. S'il n'y a vraiment rien à mémoriser, n'ajoute aucun bloc.",
-    "La mémoire actuelle t'est donnée plus haut (MÉMOIRE PERMANENTE). Ne réinscris JAMAIS un élément déjà présent à l'identique. Pour location et relationship, ne réécris la ligne que si la valeur a changé (elle remplacera l'ancienne). Pour milestone et instruction, n'ajoute que ce qui est réellement nouveau — surtout pas de doublon."
+    "Tu maintiens une mémoire permanente de l'histoire. À la fin de CHAQUE réponse, si la mémoire contient quelque chose ou qu'il y a quelque chose à retenir, réémets-la EN ENTIER (son état complet et à jour APRÈS ce tour) dans un bloc EXACTEMENT à ce format, balises comprises :",
+    "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <un fait marquant vécu>\ninstruction: <une consigne durable à respecter>\n[[/MEMORY]]",
+    "Règles pour ce bloc :",
+    "- Réémets TOUTE la mémoire à conserver, pas seulement les nouveautés : ce bloc REMPLACE entièrement la mémoire précédente.",
+    "- location et relationship : une seule ligne chacun (la valeur courante).",
+    "- milestone et instruction : autant de lignes que nécessaire (une par élément) ; tu peux en avoir plusieurs.",
+    "- FUSIONNE les éléments équivalents (même sens, même formulés différemment) : un seul par idée, jamais de doublon.",
+    "- RETIRE ce qui est devenu faux, dépassé ou contredit par la suite de l'histoire.",
+    "- CONSERVE les éléments déjà présents (y compris ceux ajoutés par l'utilisateur) tant qu'ils restent pertinents.",
+    "- Si la liste de jalons s'allonge trop, fusionne ou résume les plus anciens pour rester concis.",
+    "- Écris TOUTES les valeurs en français.",
+    "- N'écris JAMAIS ces lignes hors des balises [[MEMORY]] / [[/MEMORY]], et n'évoque jamais ce bloc dans ta narration."
   ].join("\n");
 }
 

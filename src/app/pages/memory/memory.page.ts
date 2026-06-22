@@ -14,8 +14,12 @@ import { MemoryCategory } from 'src/app/utils/parse-memory';
 
 // Une catégorie de mémoire et son libellé affiché.
 interface MemoryGroup {
+  category: MemoryCategory;
   label: string;
   entries: MemoryEntry[];
+  // Repliable (catégories à valeurs multiples) et état plié/déplié courant.
+  collapsible: boolean;
+  collapsed: boolean;
 }
 
 @Component({
@@ -34,6 +38,9 @@ export class MemoryPage implements ViewWillEnter {
     { category: "milestone", label: "Jalons de l'histoire" },
     { category: "instruction", label: "Consignes à respecter" }
   ];
+
+  // Catégories à valeurs multiples : repliables dans l'affichage (pliées par défaut).
+  private readonly collapsibleCategories: MemoryCategory[] = ["milestone", "instruction"];
 
   character?: Character;
   // Id du personnage (= id de la conversation) ; sert au retour vers le chat.
@@ -75,7 +82,7 @@ export class MemoryPage implements ViewWillEnter {
     this.characterId = id;
     this.character = await this.characterService.get(id);
     const memory = await this.chatService.getMemory(id);
-    this.groups = this.groupByCategory(memory);
+    this.groups = this.groupByCategory(memory, true);
   }
 
   // Vrai s'il n'y a aucune entrée de mémoire à afficher.
@@ -123,7 +130,7 @@ export class MemoryPage implements ViewWillEnter {
     } else {
       return;
     }
-    this.groups = this.groupByCategory(memory);
+    this.groups = this.groupByCategory(memory, false);
   }
 
   // ----- Suppression -----
@@ -141,7 +148,7 @@ export class MemoryPage implements ViewWillEnter {
       return;
     }
     const memory = await this.chatService.deleteMemoryEntry(this.character.id, entry.id);
-    this.groups = this.groupByCategory(memory);
+    this.groups = this.groupByCategory(memory, false);
   }
 
   private async clear() {
@@ -163,10 +170,29 @@ export class MemoryPage implements ViewWillEnter {
     action();
   }
 
+  // Plie/déplie un groupe repliable.
+  toggleGroup(group: MemoryGroup): void {
+    if (group.collapsible) {
+      group.collapsed = !group.collapsed;
+    }
+  }
+
   // Répartit les entrées par catégorie (dans l'ordre défini), en ignorant les vides.
-  private groupByCategory(memory: MemoryEntry[]): MemoryGroup[] {
+  // `collapseAll` (chargement de la page) → tout est replié ; sinon (édition /
+  // suppression d'un souvenir) on conserve l'état plié/déplié courant de chaque groupe.
+  private groupByCategory(memory: MemoryEntry[], collapseAll: boolean): MemoryGroup[] {
     return this.categories
-      .map(item => ({ label: item.label, entries: memory.filter(entry => entry.category === item.category) }))
+      .map(item => {
+        const collapsible = this.collapsibleCategories.includes(item.category);
+        const previous = this.groups.find(group => group.category === item.category);
+        return {
+          category: item.category,
+          label: item.label,
+          entries: memory.filter(entry => entry.category === item.category),
+          collapsible: collapsible,
+          collapsed: collapseAll ? collapsible : (previous ? previous.collapsed : collapsible)
+        };
+      })
       .filter(group => group.entries.length > 0);
   }
 }

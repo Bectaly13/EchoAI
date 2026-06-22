@@ -18,13 +18,23 @@
     <div class="memory-list">
       @for (group of groups; track group.label) {
         <section class="memory-group">
-          <h2 class="memory-group-title">{{ group.label }}</h2>
-          @for (entry of group.entries; track entry.id) {
-            <div class="memory-entry">
-              <p class="memory-entry-value">{{ entry.value }}</p>
-              <button class="memory-entry-edit icon-btn" (click)="promptEditEntry(entry)">✎</button>
-              <button class="memory-entry-delete icon-btn" (click)="confirmDeleteEntry(entry)">🗑</button>
-            </div>
+          @if (group.collapsible) {
+            <button class="memory-group-toggle" type="button" (click)="toggleGroup(group)">
+              <span class="memory-group-caret">{{ group.collapsed ? '▸' : '▾' }}</span>
+              <span class="memory-group-title">{{ group.label }}</span>
+              <span class="memory-group-count">{{ group.entries.length }}</span>
+            </button>
+          } @else {
+            <h2 class="memory-group-title">{{ group.label }}</h2>
+          }
+          @if (!group.collapsible || !group.collapsed) {
+            @for (entry of group.entries; track entry.id) {
+              <div class="memory-entry">
+                <p class="memory-entry-value">{{ entry.value }}</p>
+                <button class="memory-entry-edit icon-btn" (click)="promptEditEntry(entry)">✎</button>
+                <button class="memory-entry-delete icon-btn" (click)="confirmDeleteEntry(entry)">🗑</button>
+              </div>
+            }
           }
         </section>
       }

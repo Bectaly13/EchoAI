@@ -13,6 +13,15 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2",
+    changes: [
+      "Mémoire permanente repensée : le personnage la consolide lui-même à chaque réponse (fusion des doublons, y compris reformulés, et oubli de ce qui est dépassé).",
+      "Fini les souvenirs en double ; la mémoire est toujours en français.",
+      "Écran mémoire : les jalons et consignes sont repliables (repliés par défaut) pour plus de lisibilité.",
+      "La suppression d'un message ne réécrit plus la mémoire (elle évolue avec l'histoire ; ajuste-la depuis l'écran mémoire si besoin)."
+    ]
+  },
+  {
     version: "1.1.1",
     changes: [
       "Réponses de chat encore plus concises (narration limitée à 2 paragraphes courts).",

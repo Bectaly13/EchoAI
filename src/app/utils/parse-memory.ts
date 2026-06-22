@@ -1,34 +1,38 @@
-// Extrait les mises à jour de mémoire permanente émises par l'IA, via la convention
-// balisée suivante, ajoutée TOUT À LA FIN de sa réponse (et seulement si un élément
-// durable change) :
+// Extrait l'état complet de la mémoire permanente émis par l'IA en fin de réponse,
+// via la convention balisée suivante (le modèle réémet TOUTE la mémoire à jour à
+// chaque tour ; elle remplace la précédente) :
 //
 //   [[MEMORY]]
 //   location: <lieu actuel>
 //   relationship: <état de la relation>
-//   milestone: <fait marquant>
+//   milestone: <fait marquant>   (autant de lignes que nécessaire)
 //   instruction: <consigne durable>
 //   [[/MEMORY]]
 //
 // Le bloc est retiré du texte affiché ; chaque ligne « catégorie: valeur » devient
-// une mise à jour. Repli : si le modèle oublie les balises et laisse les lignes
-// « catégorie: valeur » nues en fin de réponse, on les récupère quand même et on les
-// retire de l'affichage (sinon elles fuiteraient dans la conversation).
+// une entrée. Repli : si le modèle oublie les balises et laisse les lignes nues en
+// fin de réponse, on les récupère quand même et on les retire de l'affichage (sinon
+// elles fuiteraient dans la conversation).
 
 // Catégories de mémoire reconnues.
 export type MemoryCategory = "location" | "relationship" | "milestone" | "instruction";
 
 const CATEGORIES: string[] = ["location", "relationship", "milestone", "instruction"];
 
-// Une mise à jour détectée (avant d'être enrichie en entrée de mémoire).
-export interface MemoryUpdate {
+// Une ligne de mémoire détectée (catégorie + valeur).
+export interface MemoryLine {
   category: MemoryCategory;
   value: string;
 }
 
-// Résultat du parsing : le texte sans le bloc mémoire, et les mises à jour détectées.
+// Résultat du parsing : le texte sans le bloc mémoire, un indicateur de présence du
+// bloc, et l'état complet de la mémoire (les lignes détectées).
 export interface ParsedMemory {
   text: string;
-  updates: MemoryUpdate[];
+  // Vrai si un bloc mémoire (balisé ou récupéré) était présent → l'appelant remplace
+  // toute la mémoire par `entries`. Faux → mémoire laissée inchangée.
+  hasMemoryBlock: boolean;
+  entries: MemoryLine[];
 }
 
 export function parseMemory(raw: string): ParsedMemory {
@@ -39,7 +43,7 @@ export function parseMemory(raw: string): ParsedMemory {
       .replace(/\[\[MEMORY\]\][\s\S]*?\[\[\/MEMORY\]\]/gi, "")
       .replace(/\[\[\/?MEMORY\]\]/gi, "")
       .trim();
-    return { text: text, updates: parseMemoryLines(match[1]) };
+    return { text: text, hasMemoryBlock: true, entries: parseMemoryLines(match[1]) };
   }
 
   // Repli : pas de bloc balisé. Le modèle émet parfois les lignes « catégorie: valeur »
@@ -48,9 +52,9 @@ export function parseMemory(raw: string): ParsedMemory {
   return salvageTrailingMemory(raw);
 }
 
-// Interprète un bloc de lignes « catégorie: valeur » en mises à jour de mémoire.
-function parseMemoryLines(block: string): MemoryUpdate[] {
-  const updates: MemoryUpdate[] = [];
+// Interprète un bloc de lignes « catégorie: valeur » en lignes de mémoire.
+function parseMemoryLines(block: string): MemoryLine[] {
+  const entries: MemoryLine[] = [];
   for (const rawLine of block.split("\n")) {
     // Tolère une puce de liste éventuelle en début de ligne.
     const line = rawLine.trim().replace(/^[-*]\s*/, "");
@@ -61,10 +65,10 @@ function parseMemoryLines(block: string): MemoryUpdate[] {
     const category = line.slice(0, separator).trim().toLowerCase();
     const value = line.slice(separator + 1).trim();
     if (value && CATEGORIES.includes(category)) {
-      updates.push({ category: category as MemoryCategory, value: value });
+      entries.push({ category: category as MemoryCategory, value: value });
     }
   }
-  return updates;
+  return entries;
 }
 
 // Indique si une ligne ressemble à une ligne de mémoire « catégorie connue: valeur ».
@@ -102,8 +106,8 @@ function salvageTrailingMemory(raw: string): ParsedMemory {
     }
     break;
   }
-  const updates = parseMemoryLines(trailing.join("\n"));
+  const entries = parseMemoryLines(trailing.join("\n"));
   // Rien reconnu → on ne touche pas au texte (hormis les balises orphelines retirées).
-  const text = (updates.length > 0 ? lines.join("\n") : cleaned).trim();
-  return { text: text, updates: updates };
+  const text = (entries.length > 0 ? lines.join("\n") : cleaned).trim();
+  return { text: text, hasMemoryBlock: entries.length > 0, entries: entries };
 }
