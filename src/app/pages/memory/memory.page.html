@@ -1,6 +1,6 @@
 <ion-header class="memory-header-wrap">
   <app-header class="memory-header" [title]="'Mémoire — ' + (character?.name ?? '')"
-    [showBack]="true" (back)="goBack()"></app-header>
+    [showBack]="true" [backTo]="['chat', characterId]"></app-header>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="memory-content">

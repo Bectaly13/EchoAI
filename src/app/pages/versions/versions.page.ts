@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Location } from '@angular/common';
 import { IonContent, IonHeader } from '@ionic/angular/standalone';
 
 import { VersionHandlerService } from 'src/app/services/version-handler-service';
@@ -21,17 +20,11 @@ export class VersionsPage {
   releases: ReleaseNote[] = RELEASE_NOTES;
 
   constructor(
-    private location: Location,
     private version: VersionHandlerService
   ) { }
 
   // Version commerciale courante, pour marquer la note correspondante « Actuelle ».
   get currentVersion(): string {
     return this.version.appVersionDisplay;
-  }
-
-  // Retour (bouton de l'en-tête) : revient à la page précédente.
-  back() {
-    this.location.back();
   }
 }

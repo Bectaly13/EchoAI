@@ -47,6 +47,14 @@ export interface ConversationSummary {
   at: number;
 }
 
+// Aperçu d'un personnage dont la conversation incarne un persona donné
+// (pour l'écran d'édition de persona : photo/pastille + nom).
+export interface PersonaUsage {
+  characterName: string;
+  avatarColor: string;
+  avatarImage?: string;
+}
+
 // Une conversation rattachée à un personnage.
 interface Conversation {
   id: string;
@@ -132,6 +140,27 @@ export class ChatService {
     return summaries.sort((a, b) => b.at - a.at);
   }
 
+  // Renvoie les personnages (nom + avatar) dont la conversation incarne ce persona
+  // (pour informer, à l'édition d'un persona, où il est actif).
+  async conversationsUsingPersona(personaId: string): Promise<PersonaUsage[]> {
+    const conversations: Conversation[] = (await this.database.getTable("conversations")) || [];
+    const usages: PersonaUsage[] = [];
+    for (const conversation of conversations) {
+      if (conversation.personaId !== personaId) {
+        continue;
+      }
+      const character = await this.characterService.get(conversation.characterId);
+      if (character) {
+        usages.push({
+          characterName: character.name,
+          avatarColor: character.avatarColor,
+          avatarImage: character.avatarImage
+        });
+      }
+    }
+    return usages;
+  }
+
   // Supprime entièrement la conversation d'un personnage (messages + mémoire),
   // sans supprimer le personnage lui-même.
   async deleteConversation(characterId: string): Promise<void> {
@@ -164,7 +193,7 @@ export class ChatService {
 
   // Régénère la dernière réponse du modèle : la retire et en génère une nouvelle à
   // partir de l'historique restant. Ne touche jamais à la salutation « ancrée »
-  // (rien ne se passe s'il n'y a pas de message utilisateur avant la réponse).
+  // (le premier message n'est pas régénérable).
   async regenerate(characterId: string): Promise<ChatMessage[]> {
     const conversation = await this.getConversation(characterId);
     if (!conversation) {
@@ -172,8 +201,7 @@ export class ChatService {
     }
     const messages = conversation.messages;
     const last = messages[messages.length - 1];
-    const hasUserTurn = messages.some(message => message.role === "user");
-    if (!last || last.role !== "model" || !hasUserTurn) {
+    if (!last || last.role !== "model" || last === messages[0]) {
       return messages;
     }
 
@@ -188,7 +216,15 @@ export class ChatService {
       this.forgetMemoryFrom(conversation, removed.id);
     }
     const systemPrompt = await this.buildPrompt(character, conversation);
-    const raw = await this.generateReply(systemPrompt, messages);
+    // Les messages-images sont filtrés de l'historique transmis ; on regarde donc le
+    // dernier tour réellement envoyé au modèle. S'il ne vient pas de l'utilisateur
+    // (ex. régénération d'un message « passer son tour », ou juste après une image),
+    // on amorce comme une continuation — sinon le modèle reçoit un historique se
+    // terminant par un tour « model » et renvoie une réponse vide.
+    const lastSent = [...messages].reverse().find(message => !message.imageData);
+    const raw = lastSent && lastSent.role === "user"
+      ? await this.generateReply(systemPrompt, messages)
+      : await this.generateContinuation(systemPrompt, messages);
     this.appendModelReply(conversation, raw);
     await this.saveConversation(conversation);
 
@@ -263,8 +299,17 @@ export class ChatService {
     const conversation = await this.getOrCreateConversation(characterId);
 
     const prompt = buildSceneImagePrompt(character, conversation.memory ?? [], conversation.messages);
-    const result = await this.image.generate(prompt);
-    await this.usage.recordImage(result.model);
+    let result;
+    try {
+      result = await this.image.generate(prompt);
+    } catch (error) {
+      // Quota de neurons Cloudflare dépassé : on marque le modèle image épuisé.
+      if ((error as { quotaExceeded?: boolean })?.quotaExceeded) {
+        await this.usage.markImageExhausted();
+      }
+      throw error;
+    }
+    await this.usage.recordImage(result.model, result.neurons);
     if (result.image) {
       conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: "", imageData: result.image, at: Date.now() });
       await this.saveConversation(conversation);

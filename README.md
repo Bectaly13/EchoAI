@@ -41,7 +41,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 
 ### Robustesse & suivi
 - **Repli automatique des modèles (texte)** : la génération de texte s'appuie sur une **liste** de modèles Gemini ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant. (La génération d'image utilise Cloudflare Workers AI, un seul modèle.)
-- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les requêtes (sous la forme « X / max par jour ») et les tokens consommés par modèle, et signale les modèles épuisés. Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche). ⚠️ L'API Gemini n'exposant pas le quota restant, ces chiffres — y compris le max par jour, saisi à la main — sont une **estimation locale**, pas une lecture officielle.
+- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les **requêtes** par modèle (texte sous la forme « X / max par jour », image en nombre de requêtes). Un modèle dont le quota est épuisé est signalé par un **contour rouge**, jusqu'à sa réinitialisation quotidienne (minuit Pacifique pour Gemini, 00:00 UTC pour Cloudflare). Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche) ; les **tokens** (texte) et **neurons** (image) sont estimés et stockés mais **non affichés**. ⚠️ Ces chiffres sont une **estimation locale**, pas une lecture officielle du quota.
 
 ---
 

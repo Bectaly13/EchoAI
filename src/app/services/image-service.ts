@@ -3,15 +3,26 @@ import { Capacitor } from '@capacitor/core';
 
 import { environment } from 'src/environments/environment';
 
-// Résultat d'une génération d'image : l'image (data URL) et le modèle utilisé.
+// Résultat d'une génération d'image : l'image (data URL), le modèle utilisé et le
+// coût estimé en neurons Cloudflare.
 export interface ImageResult {
   image: string;
   model: string;
+  neurons: number;
 }
 
 // Longueur maximale du prompt acceptée par Cloudflare FLUX (2048 caractères).
 // On garde une marge de sécurité sous la limite stricte.
 const MAX_PROMPT_LENGTH = 2000;
+
+// Génération en 512×512 (1 tuile) avec 4 steps. Coût estimé en neurons Cloudflare
+// pour flux-1-schnell : 9,60 neurons/step + 4,80 neurons/tuile 512×512.
+const IMAGE_SIZE = 512;
+const IMAGE_STEPS = 4;
+const NEURONS_PER_STEP = 9.6;
+const NEURONS_PER_TILE = 4.8;
+// 1 tuile car 512×512 → 4 × 9,60 + 1 × 4,80 = 43,2 neurons par image.
+const NEURONS_PER_IMAGE = IMAGE_STEPS * NEURONS_PER_STEP + NEURONS_PER_TILE;
 
 @Injectable({
   providedIn: 'root',
@@ -40,19 +51,28 @@ export class ImageService {
         "Authorization": `Bearer ${environment.CLOUDFLARE_API_TOKEN}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ prompt: safePrompt, steps: 4 })
+      body: JSON.stringify({ prompt: safePrompt, steps: IMAGE_STEPS, width: IMAGE_SIZE, height: IMAGE_SIZE })
     });
 
     if (!response.ok) {
-      // 429 = quota de neurons épuisé pour la journée ; autre = erreur d'appel.
+      // Cloudflare signale le dépassement du quota gratuit de neurons par le code
+      // d'erreur 4006 (« daily free neuron limit exceeded »). On marque alors l'erreur
+      // pour que l'appelant signale le modèle comme épuisé (cf. UsageService).
       let detail = "";
+      let quotaExceeded = response.status === 429;
       try {
         const body: any = await response.json();
-        detail = body?.errors?.[0]?.message || "";
+        const apiError = body?.errors?.[0];
+        detail = apiError?.message || "";
+        if (apiError?.code === 4006) {
+          quotaExceeded = true;
+        }
       } catch {
         detail = "";
       }
-      throw new Error(`HTTP ${response.status}${detail ? " — " + detail : ""}`);
+      const error: any = new Error(`HTTP ${response.status}${detail ? " — " + detail : ""}`);
+      error.quotaExceeded = quotaExceeded;
+      throw error;
     }
 
     // flux-1-schnell renvoie { result: { image: "<base64 jpeg>" }, success: true }.
@@ -60,7 +80,8 @@ export class ImageService {
     const base64 = data?.result?.image;
     return {
       image: base64 ? `data:image/jpeg;base64,${base64}` : "",
-      model: model
+      model: model,
+      neurons: NEURONS_PER_IMAGE
     };
   }
 

@@ -31,12 +31,12 @@ export class TokensPage implements ViewWillEnter {
   hasApiKey = false;
   // Utilisation du jour, par modèle de texte (Gemini).
   textModels: ModelUsage[] = [];
-  // Total de tokens consommés aujourd'hui (texte).
-  totalTokens = 0;
-  // Génération d'image (Cloudflare) : disponible, modèle, et requêtes du jour.
+  // Génération d'image (Cloudflare) : disponible, modèle, requêtes du jour, épuisement.
+  // (Les neurons sont estimés et stockés côté UsageService, mais pas affichés.)
   imageEnabled = false;
   imageModel = "";
   imageRequests = 0;
+  imageExhausted = false;
 
   async ionViewWillEnter() {
     await this.load();
@@ -51,11 +51,17 @@ export class TokensPage implements ViewWillEnter {
     this.hasApiKey = !!environment.GEMINI_API_KEY;
     const rows = await this.usageService.getToday();
     this.textModels = environment.GEMINI_MODELS.map(model => this.viewFor(rows, model, "text"));
-    this.totalTokens = rows.reduce((sum, row) => sum + row.totalTokens, 0);
     // Image (Cloudflare) : suivi par nombre de requêtes (quota en neurons, pas en requêtes).
     this.imageEnabled = !!environment.CLOUDFLARE_ACCOUNT_ID && !!environment.CLOUDFLARE_API_TOKEN;
     this.imageModel = environment.CLOUDFLARE_IMAGE_MODEL;
-    this.imageRequests = rows.find(row => row.model === this.imageModel && row.kind === "image")?.requests ?? 0;
+    const imageRow = rows.find(row => row.model === this.imageModel && row.kind === "image");
+    this.imageRequests = imageRow?.requests ?? 0;
+    this.imageExhausted = imageRow?.exhausted ?? false;
+  }
+
+  // Accorde « requête » en nombre (0 et 1 → singulier, ≥ 2 → pluriel).
+  requestLabel(count: number): string {
+    return count >= 2 ? "requêtes" : "requête";
   }
 
   // Construit la vue d'un modèle (compteurs à zéro si aucune ligne pour aujourd'hui).

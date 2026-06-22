@@ -1,5 +1,5 @@
 <ion-header class="chat-header-wrap">
-  <app-header class="chat-header" [title]="character?.name ?? ''" [showBack]="true" (back)="goBack()"></app-header>
+  <app-header class="chat-header" [title]="character?.name ?? ''" [showBack]="true" [backTo]="['conversations']"></app-header>
 </ion-header>
 
 <div class="chat-actions">
@@ -16,11 +16,12 @@
         [message]="message"
         [canRegenerate]="canRegenerate(message)"
         [canDelete]="canDelete(message)"
+        [disabled]="sending"
         (regenerate)="regenerate()"
         (remove)="confirmDelete(message)">
       </app-message-bubble>
     }
-    @if (sending) {
+    @if (sending && !regenerating) {
       <p class="chat-typing">…</p>
     }
   </div>

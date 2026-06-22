@@ -104,6 +104,12 @@ export class PersonaService {
       return;
     }
     await this.database.removeEntriesWith("personas", "id", id);
+    // Les conversations qui incarnaient ce persona basculent sur le persona par
+    // défaut, pour ne pas rester avec un personaId pointant dans le vide.
+    const fallback = await this.getDefault();
+    if (fallback) {
+      await this.database.updateEntriesWith("conversations", "personaId", id, { personaId: fallback.id });
+    }
   }
 
   // Génère un identifiant unique.

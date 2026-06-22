@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,7 +46,6 @@ export class CharacterFormPage implements ViewWillEnter {
 
   constructor(
     private characterService: CharacterService,
-    private location: Location,
     private message: MessageService,
     private route: ActivatedRoute,
     private router: Router
@@ -167,10 +165,5 @@ export class CharacterFormPage implements ViewWillEnter {
       await this.characterService.create(draft);
     }
     this.router.navigate(["characters"]);
-  }
-
-  // Retour (bouton de l'en-tête) : revient à la page précédente.
-  cancel() {
-    this.location.back();
   }
 }

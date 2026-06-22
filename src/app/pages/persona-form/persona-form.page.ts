@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { ChatService, PersonaUsage } from 'src/app/services/chat-service';
 import { MessageService } from 'src/app/services/message-service';
 import { PersonaService } from 'src/app/services/persona-service';
 
@@ -24,13 +24,15 @@ export class PersonaFormPage implements ViewWillEnter {
   description = "";
   // Vrai si on édite le persona par défaut (« Moi ») : il n'a pas de description.
   isDefault = false;
+  // Personnages (nom + avatar) dont la conversation incarne ce persona (mode édition).
+  activeInConversations: PersonaUsage[] = [];
 
   async ionViewWillEnter() {
     await this.loadIfEditing();
   }
 
   constructor(
-    private location: Location,
+    private chatService: ChatService,
     private messageService: MessageService,
     private personaService: PersonaService,
     private route: ActivatedRoute,
@@ -51,6 +53,7 @@ export class PersonaFormPage implements ViewWillEnter {
     this.name = persona.name;
     this.description = persona.description;
     this.isDefault = persona.isDefault ?? false;
+    this.activeInConversations = await this.chatService.conversationsUsingPersona(persona.id);
   }
 
   isEditing(): boolean {
@@ -70,10 +73,5 @@ export class PersonaFormPage implements ViewWillEnter {
       await this.personaService.create(changes.name, changes.description);
     }
     this.router.navigate(["personas"]);
-  }
-
-  // Retour (bouton de l'en-tête) : revient à la page précédente.
-  cancel() {
-    this.location.back();
   }
 }

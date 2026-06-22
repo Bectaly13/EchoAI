@@ -13,6 +13,19 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.1.1",
+    changes: [
+      "Réponses de chat encore plus concises (narration limitée à 2 paragraphes courts).",
+      "Correction : régénérer juste après une illustration ne renvoie plus de réponse vide.",
+      "Correction : supprimer un persona bascule ses conversations sur le persona par défaut.",
+      "L'édition d'un persona liste les conversations qui l'utilisent.",
+      "Pendant une génération, toutes les actions du chat sont bloquées (boutons grisés) ; plus d'indicateur « … » à la régénération.",
+      "Bouton retour plus fiable et titres tronqués proprement quand ils sont trop longs.",
+      "Page Tokens simplifiée : suivi par requêtes, et contour rouge quand un modèle est épuisé.",
+      "Noms des personnages sur une seule ligne dans les listes."
+    ]
+  },
+  {
     version: "1.1",
     changes: [
       "Réponses du chat plus courtes (narration bornée), pour des échanges plus vivants.",

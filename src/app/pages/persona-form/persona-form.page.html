@@ -1,7 +1,7 @@
 <ion-header class="persona-form-header-wrap">
   <app-header class="persona-form-header"
     [title]="isEditing() ? 'Modifier le persona' : 'Nouveau persona'"
-    [showBack]="true" (back)="cancel()"></app-header>
+    [showBack]="true" [backTo]="['personas']"></app-header>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="persona-form-content">
@@ -22,5 +22,29 @@
     <button class="persona-form-save" type="submit">Enregistrer</button>
 
   </form>
+
+  @if (isEditing()) {
+    <section class="persona-form-usage">
+      <h2 class="persona-form-usage-title">Conversations utilisant ce persona</h2>
+      @if (activeInConversations.length === 0) {
+        <p class="persona-form-usage-empty">Aucune conversation n'incarne ce persona pour l'instant.</p>
+      } @else {
+        <div class="persona-form-usage-list">
+          @for (usage of activeInConversations; track $index) {
+            <div class="persona-form-usage-card">
+              @if (usage.avatarImage) {
+                <img class="persona-form-usage-photo" [src]="usage.avatarImage" [alt]="usage.characterName" />
+              } @else {
+                <div class="persona-form-usage-avatar" [style.background]="usage.avatarColor">
+                  <span class="persona-form-usage-initial">{{ usage.characterName.charAt(0).toUpperCase() }}</span>
+                </div>
+              }
+              <span class="persona-form-usage-name">{{ usage.characterName }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
 
 </ion-content>

@@ -7,10 +7,10 @@
   }
   <div class="message-bubble-actions">
     @if (canRegenerate()) {
-      <button class="message-bubble-regenerate" type="button" title="Régénérer" (click)="regenerate.emit()">↻</button>
+      <button class="message-bubble-regenerate" type="button" title="Régénérer" [disabled]="disabled()" (click)="regenerate.emit()">↻</button>
     }
     @if (canDelete()) {
-      <button class="message-bubble-delete" type="button" title="Supprimer" (click)="remove.emit()">🗑</button>
+      <button class="message-bubble-delete" type="button" title="Supprimer" [disabled]="disabled()" (click)="remove.emit()">🗑</button>
     }
   </div>
 </div>

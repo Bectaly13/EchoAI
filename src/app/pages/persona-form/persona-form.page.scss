@@ -40,3 +40,72 @@ ion-content.persona-form-content {
   color: var(--app-on-accent);
   cursor: pointer;
 }
+
+.persona-form-usage {
+  padding: 0 16px 24px;
+}
+
+.persona-form-usage-title {
+  margin: 8px 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--app-text-muted);
+}
+
+.persona-form-usage-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--app-text-muted);
+}
+
+.persona-form-usage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.persona-form-usage-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--app-surface);
+}
+
+.persona-form-usage-photo,
+.persona-form-usage-avatar {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.persona-form-usage-photo {
+  object-fit: cover;
+}
+
+.persona-form-usage-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.persona-form-usage-initial {
+  color: var(--app-on-accent);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.persona-form-usage-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

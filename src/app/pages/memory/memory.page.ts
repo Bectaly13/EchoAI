@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatService, MemoryEntry } from 'src/app/services/chat-service';
@@ -37,6 +36,8 @@ export class MemoryPage implements ViewWillEnter {
   ];
 
   character?: Character;
+  // Id du personnage (= id de la conversation) ; sert au retour vers le chat.
+  characterId = "";
   groups: MemoryGroup[] = [];
 
   // Modale de choix de catégorie (ajout d'un souvenir).
@@ -61,8 +62,8 @@ export class MemoryPage implements ViewWillEnter {
   constructor(
     private characterService: CharacterService,
     private chatService: ChatService,
-    private location: Location,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   async loadMemory() {
@@ -71,6 +72,7 @@ export class MemoryPage implements ViewWillEnter {
       this.goBack();
       return;
     }
+    this.characterId = id;
     this.character = await this.characterService.get(id);
     const memory = await this.chatService.getMemory(id);
     this.groups = this.groupByCategory(memory);
@@ -81,9 +83,9 @@ export class MemoryPage implements ViewWillEnter {
     return this.groups.length === 0;
   }
 
-  // Retour à la page précédente (le chat d'où l'on vient).
+  // Repli si la page est ouverte sans id valide : retour à la liste des conversations.
   goBack() {
-    this.location.back();
+    this.router.navigate(["conversations"]);
   }
 
   // ----- Ajout / édition d'un souvenir -----

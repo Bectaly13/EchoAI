@@ -81,3 +81,10 @@
   border-color: var(--app-on-accent);
   color: var(--app-on-accent);
 }
+
+// Action en cours : boutons grisés (comme « passer son tour » / « illustrer »).
+.message-bubble-regenerate:disabled,
+.message-bubble-delete:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

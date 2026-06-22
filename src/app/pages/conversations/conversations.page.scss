@@ -64,6 +64,9 @@ ion-content.conversations-content {
   font-size: 16px;
   font-weight: 600;
   color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .conversation-preview {

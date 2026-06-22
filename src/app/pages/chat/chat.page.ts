@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -33,6 +32,9 @@ export class ChatPage implements ViewWillEnter {
   draft = "";
   // Vrai pendant l'attente de la réponse de l'IA (désactive l'envoi).
   sending = false;
+  // Vrai pendant une régénération : on n'affiche alors PAS l'indicateur de saisie
+  // (on remplace un message existant, pas d'attente d'un nouveau message).
+  regenerating = false;
   // Personas disponibles et id de celui incarné dans cette conversation.
   personas: Persona[] = [];
   activePersonaId?: string;
@@ -50,7 +52,6 @@ export class ChatPage implements ViewWillEnter {
   constructor(
     private characterService: CharacterService,
     private chatService: ChatService,
-    private location: Location,
     private message: MessageService,
     private personaService: PersonaService,
     private route: ActivatedRoute,
@@ -168,10 +169,10 @@ export class ChatPage implements ViewWillEnter {
 
   // Vrai pour le dernier message s'il vient de l'IA : on régénère uniquement la
   // dernière réponse, hors salutation « ancrée » (premier message) et hors image.
+  // (Le blocage pendant une action en cours se fait via [disabled], pas ici.)
   canRegenerate(message: ChatMessage): boolean {
     const last = this.messages[this.messages.length - 1];
-    return !this.sending
-      && message === last
+    return message === last
       && message.role === "model"
       && !message.imageData
       && message !== this.messages[0];
@@ -183,6 +184,7 @@ export class ChatPage implements ViewWillEnter {
       return;
     }
     this.sending = true;
+    this.regenerating = true;
     try {
       await this.chatService.regenerate(this.character.id);
       this.messages = await this.chatService.getMessages(this.character.id);
@@ -190,12 +192,14 @@ export class ChatPage implements ViewWillEnter {
       await this.message.error("Échec de la régénération.");
     } finally {
       this.sending = false;
+      this.regenerating = false;
       this.scrollToBottom();
     }
   }
 
   // Le premier message (la salutation) n'est pas supprimable : pour repartir de
-  // zéro, on passe par « Réinitialiser la conversation ».
+  // zéro, on passe par « Réinitialiser la conversation ». (Le blocage pendant une
+  // action en cours se fait via [disabled], pas ici.)
   canDelete(message: ChatMessage): boolean {
     return message !== this.messages[0];
   }
@@ -252,9 +256,9 @@ export class ChatPage implements ViewWillEnter {
     action();
   }
 
-  // Retour à la page d'origine (Personnages ou Conversations selon d'où l'on vient).
+  // Retour à la liste des conversations (destination fixe, pas de Location.back).
   goBack() {
-    this.location.back();
+    this.router.navigate(["conversations"]);
   }
 
   // Fait défiler la conversation jusqu'au dernier message (après rendu).

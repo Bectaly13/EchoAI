@@ -17,6 +17,8 @@ export class MessageBubbleComponent {
   canRegenerate = input<boolean>(false);
   // Affiche le bouton de suppression (masqué sur le premier message / salutation).
   canDelete = input<boolean>(true);
+  // Grise (désactive) les boutons d'action pendant qu'une action est en cours.
+  disabled = input<boolean>(false);
 
   // Segments du message : alterne paroles (texte normal) et narration (astérisques).
   segments = computed<TextSegment[]>(() => formatNarration(this.message().text));

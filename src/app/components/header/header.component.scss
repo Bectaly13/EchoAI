@@ -32,6 +32,11 @@
 .header-title {
   // Pousse le logo tout à droite.
   flex: 1;
+  // Sur une seule ligne, tronqué par des points de suspension s'il dépasse.
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin: 0;
   font-size: 20px;
   font-weight: 700;

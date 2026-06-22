@@ -1,7 +1,7 @@
 <ion-header class="character-form-header-wrap">
   <app-header class="character-form-header"
     [title]="isEditing() ? 'Modifier le personnage' : 'Nouveau personnage'"
-    [showBack]="true" (back)="cancel()"></app-header>
+    [showBack]="true" [backTo]="['characters']"></app-header>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="character-form-content">

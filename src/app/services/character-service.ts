@@ -127,9 +127,17 @@ export class CharacterService {
     if (!this.image.enabled()) {
       throw new Error("image-disabled");
     }
-    const result = await this.image.generate(buildImagePrompt(fields));
-    await this.usage.recordImage(result.model);
-    return result.image;
+    try {
+      const result = await this.image.generate(buildImagePrompt(fields));
+      await this.usage.recordImage(result.model, result.neurons);
+      return result.image;
+    } catch (error) {
+      // Quota de neurons Cloudflare dépassé : on marque le modèle image épuisé.
+      if ((error as { quotaExceeded?: boolean })?.quotaExceeded) {
+        await this.usage.markImageExhausted();
+      }
+      throw error;
+    }
   }
 
   // Met à jour le nom et la personnalité d'un personnage existant.

@@ -62,7 +62,7 @@ function buildFormatBlock(): string {
     "Encadre les actions, gestes et passages de narration entre astérisques, en dehors des guillemets. La narration est écrite à la 3ᵉ personne, comme un narrateur omniscient (jamais à la 1ʳᵉ personne) : elle décrit les actions, les lieux et les événements, et peut continuer à décrire la scène même lorsque ton personnage est absent ou que l'utilisateur se retrouve seul. Exemple : *La pièce est silencieuse ; au loin, une porte grince.*",
     "Dans la narration, désigne l'utilisateur par « tu » (jamais « l'utilisateur » ni une 3ᵉ personne pour lui).",
     "Passe à la ligne quand tu passes de la narration à une réplique, ou d'une réplique à la narration, pour aérer la lecture.",
-    "Reste concis : chaque paragraphe de narration fait 30 mots AU MAXIMUM, et n'écris JAMAIS plus de 3 paragraphes de narration par réponse. Ce sont des maximums, pas des objectifs à atteindre : privilégie des réponses courtes qui laissent rapidement la main à l'utilisateur. Ces restrictions ne concernent que les paragraphes de narration, pas les répliques et dialogues."
+    "Reste concis : chaque paragraphe de narration fait 1 à 2 phrases courtes AU MAXIMUM, et n'écris JAMAIS plus de 2 paragraphes de narration par réponse. Ce sont des maximums, pas des objectifs à atteindre : privilégie des réponses courtes qui laissent rapidement la main à l'utilisateur. Ces restrictions ne concernent que les paragraphes de narration, pas les répliques et dialogues."
   ].join("\n");
 }
 

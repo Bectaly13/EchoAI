@@ -3,18 +3,8 @@ ion-content.tokens-content {
   --padding-bottom: calc(72px + var(--safe-bottom));
 }
 
-.tokens-disclaimer {
-  margin: 16px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--app-surface);
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--app-text-muted);
-}
-
 .tokens-demo {
-  margin: 0 16px;
+  margin: 16px;
   font-size: 13px;
   color: var(--app-text-muted);
 }
@@ -37,36 +27,25 @@ ion-content.tokens-content {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px;
   margin-bottom: 8px;
-  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
   background: var(--app-surface);
 }
 
+// Quota épuisé (429 / dépassement de neurons) : contour rouge jusqu'au reset quotidien.
+.tokens-row-exhausted {
+  border-color: var(--app-danger);
+}
+
 .tokens-model {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   min-width: 0;
   font-size: 14px;
   color: var(--app-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.tokens-tag {
-  flex: 0 0 auto;
-  padding: 1px 6px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--app-background);
-  color: var(--app-accent);
-}
-
-.tokens-tag-exhausted {
-  color: var(--app-danger);
 }
 
 .tokens-stats {
