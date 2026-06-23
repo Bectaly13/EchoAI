@@ -34,6 +34,7 @@ export class MemoryPage implements ViewWillEnter {
   // Catégories affichées, dans l'ordre, avec leur libellé.
   readonly categories: { category: MemoryCategory; label: string }[] = [
     { category: "location", label: "Lieu actuel" },
+    { category: "situation", label: "Situation actuelle" },
     { category: "relationship", label: "Relation avec l'utilisateur" },
     { category: "milestone", label: "Jalons de l'histoire" },
     { category: "instruction", label: "Consignes à respecter" }

@@ -76,6 +76,10 @@ function buildMemoryBlock(memory: MemoryItem[]): string {
   if (location) {
     lines.push(`Lieu actuel : ${location}`);
   }
+  const situation = latestValue(memory, "situation");
+  if (situation) {
+    lines.push(`Situation actuelle : ${situation}`);
+  }
   const relationship = latestValue(memory, "relationship");
   if (relationship) {
     lines.push(`Relation avec l'utilisateur : ${relationship}`);
@@ -109,17 +113,13 @@ function buildMemoryInstructionBlock(): string {
   return [
     "CONSIGNES DE MÉMOIRE",
     "Tu maintiens une mémoire permanente de l'histoire. À la fin de CHAQUE réponse, si la mémoire contient quelque chose ou qu'il y a quelque chose à retenir, réémets-la EN ENTIER (son état complet et à jour APRÈS ce tour) dans un bloc EXACTEMENT à ce format, balises comprises :",
-    "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <un fait marquant vécu>\ninstruction: <une consigne durable à respecter>\n[[/MEMORY]]",
-    "Règles pour ce bloc :",
-    "- Réémets TOUTE la mémoire à conserver, pas seulement les nouveautés : ce bloc REMPLACE entièrement la mémoire précédente.",
-    "- location et relationship : une seule ligne chacun (la valeur courante).",
-    "- milestone et instruction : autant de lignes que nécessaire (une par élément) ; tu peux en avoir plusieurs.",
-    "- FUSIONNE les éléments équivalents (même sens, même formulés différemment) : un seul par idée, jamais de doublon.",
-    "- RETIRE ce qui est devenu faux, dépassé ou contredit par la suite de l'histoire.",
-    "- CONSERVE les éléments déjà présents (y compris ceux ajoutés par l'utilisateur) tant qu'ils restent pertinents.",
-    "- Si la liste de jalons s'allonge trop, fusionne ou résume les plus anciens pour rester concis.",
-    "- Écris TOUTES les valeurs en français.",
-    "- N'écris JAMAIS ces lignes hors des balises [[MEMORY]] / [[/MEMORY]], et n'évoque jamais ce bloc dans ta narration."
+    "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nsituation: <où en est l'histoire en ce moment>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <un fait marquant vécu>\ninstruction: <une consigne durable à respecter>\n[[/MEMORY]]",
+    "Règles générales : réémets TOUTE la mémoire à conserver (ce bloc REMPLACE entièrement la précédente) ; n'écris JAMAIS ces lignes hors des balises [[MEMORY]] / [[/MEMORY]] ; n'évoque jamais ce bloc dans ta narration ; écris TOUTES les valeurs en français.",
+    "ÉTAT COURANT — location, situation, relationship : une seule ligne chacun, la valeur actuelle. Mets-la à jour quand elle évolue (l'ancienne valeur est remplacée). « situation » résume où en est l'histoire maintenant (différent d'un événement).",
+    "JOURNAL — milestone : la liste CUMULATIVE des faits marquants vécus (une ligne par fait). Un jalon est un événement passé : il n'est JAMAIS obsolète, ne le supprime donc jamais. Conserve tous les jalons existants et AJOUTE les nouveaux.",
+    "N'enregistre comme jalon que les faits VRAIMENT MARQUANTS (décision importante, rencontre, révélation, bascule de la relation, objectif ou lieu atteint…) — surtout PAS un jalon par message ni pour des détails anodins.",
+    "Fusionne uniquement les vrais doublons (même fait formulé différemment). Si — et seulement si — il y a plus de 30 jalons, regroupe les PLUS ANCIENS en jalons de synthèse fidèles (sans perdre d'information), jamais par simple suppression.",
+    "instruction : consignes durables à respecter ; ne les retire que si elles sont explicitement révoquées ou contredites. Conserve les éléments ajoutés par l'utilisateur tant qu'ils restent pertinents."
   ].join("\n");
 }
 

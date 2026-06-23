@@ -15,9 +15,9 @@
 // elles fuiteraient dans la conversation).
 
 // Catégories de mémoire reconnues.
-export type MemoryCategory = "location" | "relationship" | "milestone" | "instruction";
+export type MemoryCategory = "location" | "relationship" | "situation" | "milestone" | "instruction";
 
-const CATEGORIES: string[] = ["location", "relationship", "milestone", "instruction"];
+const CATEGORIES: string[] = ["location", "relationship", "situation", "milestone", "instruction"];
 
 // Une ligne de mémoire détectée (catégorie + valeur).
 export interface MemoryLine {

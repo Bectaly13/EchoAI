@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2.1",
+    changes: [
+      "Les jalons de l'histoire s'accumulent désormais correctement (un vrai journal des événements vécus), au lieu de se réduire à une seule entrée.",
+      "Seuls les faits vraiment marquants deviennent des jalons.",
+      "Nouvelle entrée de mémoire « Situation actuelle » : où en est l'histoire à l'instant, distincte des événements passés."
+    ]
+  },
+  {
     version: "1.2",
     changes: [
       "Mémoire permanente repensée : le personnage la consolide lui-même à chaque réponse (fusion des doublons, y compris reformulés, et oubli de ce qui est dépassé).",
