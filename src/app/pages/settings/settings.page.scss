@@ -4,11 +4,11 @@ ion-content.settings-content {
 }
 
 .settings-container {
-  padding: 16px;
-}
-
-.settings-section {
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
+  padding: 16px 16px 0;
 }
 
 .settings-section-title {

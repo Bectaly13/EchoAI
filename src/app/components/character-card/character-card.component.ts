@@ -12,10 +12,8 @@ export class CharacterCardComponent {
   // Le personnage à afficher.
   character = input.required<Character>();
 
-  // Ouvrir la conversation avec ce personnage.
+  // Clic sur la carte (ouvre l'édition du personnage côté page).
   open = output<void>();
-  // Éditer ce personnage.
-  edit = output<void>();
   // Supprimer ce personnage.
   remove = output<void>();
 
@@ -24,13 +22,7 @@ export class CharacterCardComponent {
     return this.character().name.charAt(0).toUpperCase();
   }
 
-  // Émet l'édition sans déclencher l'ouverture de la conversation.
-  onEdit(event: Event) {
-    event.stopPropagation();
-    this.edit.emit();
-  }
-
-  // Émet la suppression sans déclencher l'ouverture de la conversation.
+  // Émet la suppression sans déclencher le clic sur la carte.
   onRemove(event: Event) {
     event.stopPropagation();
     this.remove.emit();

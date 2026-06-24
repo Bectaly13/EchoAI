@@ -30,9 +30,13 @@ export class WelcomePage implements ViewWillEnter {
   // défaut, puis redirige vers la liste des personnages après un court splash.
   async initialize() {
     await this.theme.initTheme();
+    // Écran sans header : on accorde la barre d'état au fond de la page welcome.
+    await this.theme.useBackgroundStatusBar();
     await this.version.init();
     await this.personaService.ensureDefault();
     await this.delay(1500);
+    // On rétablit la barre d'état « header » avant de rejoindre les pages à header.
+    await this.theme.useHeaderStatusBar();
     this.goToCharacters();
   }
 

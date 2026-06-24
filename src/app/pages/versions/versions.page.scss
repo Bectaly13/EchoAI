@@ -5,11 +5,14 @@ ion-content.versions-content {
 }
 
 .versions-list {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
+  padding: 16px 16px 0;
 }
 
 .versions-item {
-  margin-bottom: 16px;
   padding: 14px;
   border-radius: 14px;
   background: var(--app-surface);

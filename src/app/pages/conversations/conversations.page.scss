@@ -4,6 +4,23 @@ ion-content.conversations-content {
   --padding-bottom: calc(72px + var(--safe-bottom));
 }
 
+.conversations-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 12px 0;
+}
+
+.conversations-add {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  cursor: pointer;
+}
+
 .conversations-empty {
   padding: 48px 24px;
   text-align: center;
@@ -16,7 +33,11 @@ ion-content.conversations-content {
 }
 
 .conversations-list {
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
+  padding: 12px 12px 0;
 }
 
 .conversation-item {
@@ -24,7 +45,6 @@ ion-content.conversations-content {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  margin-bottom: 10px;
   border-radius: 14px;
   background: var(--app-surface);
   cursor: pointer;
@@ -76,5 +96,70 @@ ion-content.conversations-content {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.conversations-modal-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--app-text-muted);
+}
+
+.conversations-character-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conversations-character-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--app-background);
+  cursor: pointer;
+}
+
+.conversations-character-photo,
+.conversations-character-avatar {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.conversations-character-photo {
+  object-fit: cover;
+}
+
+.conversations-character-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversations-character-initial {
+  color: var(--app-on-accent);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.conversations-character-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversations-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 

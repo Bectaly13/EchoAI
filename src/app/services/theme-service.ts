@@ -44,22 +44,33 @@ export class ThemeService {
     await this.storage.set("theme", theme);
     document.body.classList.remove(...Object.values(this.themeClasses));
     document.body.classList.add(this.themeClasses[theme]);
-    await this.updateStatusBar(theme);
+    await this.applyStatusBar(theme, "--header-background");
+  }
+
+  // Accorde la barre d'état (Android) au **fond de page** (`--app-background`), pour
+  // un écran sans header (ex. welcome) où la couleur header trancherait avec le fond.
+  async useBackgroundStatusBar(): Promise<void> {
+    await this.applyStatusBar(await this.getTheme(), "--app-background");
+  }
+
+  // Rétablit la barre d'état accordée au **header** (comportement normal des pages).
+  async useHeaderStatusBar(): Promise<void> {
+    await this.applyStatusBar(await this.getTheme(), "--header-background");
   }
 
   // Accorde la barre d'état (Android) au thème : style des icônes + couleur de fond
-  // reprise du header. Sans effet hors plateforme native (web/tests) ; toute erreur
-  // de l'API est ignorée pour ne jamais bloquer l'application du thème.
-  private async updateStatusBar(theme: Theme): Promise<void> {
+  // lue dans la variable CSS donnée. Sans effet hors plateforme native (web/tests) ;
+  // toute erreur de l'API est ignorée pour ne jamais bloquer l'application du thème.
+  private async applyStatusBar(theme: Theme, backgroundVar: string): Promise<void> {
     if (!Capacitor.isNativePlatform()) {
       return;
     }
     try {
       await StatusBar.setStyle({ style: this.statusBarStyles[theme] });
-      // setBackgroundColor n'existe que sur Android : on lit la couleur du header
-      // du thème courant (pas de couleur en dur → suit variables.scss).
+      // setBackgroundColor n'existe que sur Android : on lit la couleur dans la
+      // variable CSS du thème courant (pas de couleur en dur → suit variables.scss).
       if (Capacitor.getPlatform() === "android") {
-        const color = getComputedStyle(document.body).getPropertyValue("--header-background").trim();
+        const color = getComputedStyle(document.body).getPropertyValue(backgroundVar).trim();
         if (color) {
           await StatusBar.setBackgroundColor({ color: color });
         }

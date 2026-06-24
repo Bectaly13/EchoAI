@@ -15,7 +15,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
 - **Photo de profil générée** : l'IA peut générer une photo de profil du personnage via **Cloudflare Workers AI** (modèle FLUX, palier gratuit). Activée dès que les identifiants Cloudflare sont renseignés ; sinon une pastille colorée sert d'avatar.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
-- **Modifier un personnage** : le nom et la personnalité sont éditables à tout moment.
+- **Modifier un personnage** : toucher une carte dans la liste ouvre sa fiche (tous les champs éditables à tout moment).
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
 ### Personas
@@ -23,7 +23,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Incarner un persona** : chaque conversation a **toujours** un persona actif (le persona par défaut au départ) ; on peut en changer via une liste qui affiche nom **et** description. Ces infos sont transmises au personnage IA.
 
 ### Conversation
-- **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement.
+- **Discuter avec un personnage** : chaque personnage a sa propre conversation, persistée localement. On démarre une discussion via **« + Nouvelle conversation »** dans l'onglet Conversations (sélection du personnage), ou en rouvrant une conversation existante.
 - **Message d'accueil** : premier message affiché (côté IA) à l'ouverture de la conversation, pour planter le décor. Obligatoire à la création ; suit le format des messages (narration, dialogue) — y compris quand il est généré par l'IA.
 - **Réponses de l'IA** : les messages sont envoyés à Gemini avec la personnalité du personnage et l'historique de la conversation comme contexte. Les réponses sont volontairement **concises** (longueur de narration bornée) pour garder des échanges vivants.
 - **Narration** : les passages encadrés d'astérisques (`*la porte grince*`) sont mis en forme (italique, grisé) pour distinguer la narration des paroles. La narration est une voix de narrateur (3ᵉ personne) : l'histoire peut continuer à décrire la scène même quand le personnage n'est pas là.

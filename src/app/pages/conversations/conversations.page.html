@@ -4,9 +4,13 @@
 
 <ion-content [fullscreen]="true" class="conversations-content">
 
+  <div class="conversations-toolbar">
+    <button class="conversations-add" (click)="openNewConversation()">+ Nouvelle conversation</button>
+  </div>
+
   @if (conversations.length === 0) {
     <div class="conversations-empty">
-      <p class="conversations-empty-text">Aucune conversation pour l'instant. Ouvre un personnage pour commencer à discuter.</p>
+      <p class="conversations-empty-text">Aucune conversation pour l'instant. Touche « + Nouvelle conversation » pour commencer à discuter.</p>
     </div>
   } @else {
     <div class="conversations-list">
@@ -32,6 +36,30 @@
 </ion-content>
 
 <app-navbar class="conversations-navbar"></app-navbar>
+
+<app-modal [open]="newConversationModal.open" title="Avec quel personnage ?" (dismiss)="newConversationModal.open = false">
+  @if (characters.length === 0) {
+    <p class="conversations-modal-empty">Aucun personnage. Crée d'abord un personnage dans l'onglet Personnages.</p>
+  } @else {
+    <div class="conversations-character-list">
+      @for (character of characters; track character.id) {
+        <button class="conversations-character-option" type="button" (click)="startConversation(character)">
+          @if (character.avatarImage) {
+            <img class="conversations-character-photo" [src]="character.avatarImage" [alt]="character.name" />
+          } @else {
+            <div class="conversations-character-avatar" [style.background]="character.avatarColor">
+              <span class="conversations-character-initial">{{ character.name.charAt(0).toUpperCase() }}</span>
+            </div>
+          }
+          <span class="conversations-character-name">{{ character.name }}</span>
+        </button>
+      }
+    </div>
+  }
+  <div class="conversations-modal-actions">
+    <button class="modal-btn" type="button" (click)="newConversationModal.open = false">Fermer</button>
+  </div>
+</app-modal>
 
 <app-confirm-modal
   [open]="confirmModal.open"

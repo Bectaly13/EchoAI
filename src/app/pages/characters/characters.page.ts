@@ -73,10 +73,6 @@ export class CharactersPage implements ViewWillEnter {
     this.router.navigate(["character-form", character.id]);
   }
 
-  goToChat(character: Character) {
-    this.router.navigate(["chat", character.id]);
-  }
-
   // Demande confirmation avant de supprimer un personnage.
   confirmRemove(character: Character) {
     this.askConfirm(

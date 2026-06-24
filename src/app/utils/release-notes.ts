@@ -13,6 +13,15 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2.2",
+    changes: [
+      "Salutations générées par l'IA mieux mises en page (sauts de ligne entre narration et dialogues).",
+      "Toucher un personnage ouvre sa fiche (édition) ; on démarre une discussion via « + Nouvelle conversation » dans l'onglet Conversations.",
+      "Espacements revus (moins de vide en bas des écrans, listes plus régulières).",
+      "Écran d'accueil : barre d'état accordée au fond de l'écran."
+    ]
+  },
+  {
     version: "1.2.1",
     changes: [
       "Les jalons de l'histoire s'accumulent désormais correctement (un vrai journal des événements vécus), au lieu de se réduire à une seule entrée.",

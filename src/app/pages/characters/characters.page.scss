@@ -36,7 +36,11 @@ ion-content.characters-content {
 }
 
 .characters-list {
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
+  padding: 12px 12px 0;
 }
 
 .characters-modal-text {
