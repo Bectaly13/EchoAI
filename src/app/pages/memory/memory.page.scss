@@ -108,7 +108,8 @@ ion-content.memory-content {
 .memory-clear {
   display: block;
   width: calc(100% - 32px);
-  margin: 8px 16px 24px;
+  // Pas de marge basse : l'espace vient du --padding-bottom de l'ion-content.
+  margin: 8px 16px 0;
   border: 1px solid var(--app-border);
   border-radius: 12px;
   padding: 12px;

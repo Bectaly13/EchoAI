@@ -132,9 +132,10 @@ function buildMemoryInstructionBlock(): string {
     "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nsituation: <où en est l'histoire en ce moment>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <un fait marquant vécu>\ninstruction: <une consigne durable à respecter>\n[[/MEMORY]]",
     "Règles générales : réémets TOUTE la mémoire à conserver (ce bloc REMPLACE entièrement la précédente) ; n'écris JAMAIS ces lignes hors des balises [[MEMORY]] / [[/MEMORY]] ; n'évoque jamais ce bloc dans ta narration ; écris TOUTES les valeurs en français.",
     "ÉTAT COURANT — location, situation, relationship : une seule ligne chacun, la valeur actuelle. Mets-la à jour quand elle évolue (l'ancienne valeur est remplacée). « situation » résume où en est l'histoire maintenant (différent d'un événement).",
-    "JOURNAL — milestone : la liste CUMULATIVE des faits marquants vécus (une ligne par fait). Un jalon est un événement passé : il n'est JAMAIS obsolète, ne le supprime donc jamais. Conserve tous les jalons existants et AJOUTE les nouveaux.",
-    "N'enregistre comme jalon que les faits VRAIMENT MARQUANTS (décision importante, rencontre, révélation, bascule de la relation, objectif ou lieu atteint…) — surtout PAS un jalon par message ni pour des détails anodins.",
-    "Fusionne uniquement les vrais doublons (même fait formulé différemment). Si — et seulement si — il y a plus de 30 jalons, regroupe les PLUS ANCIENS en jalons de synthèse fidèles (sans perdre d'information), jamais par simple suppression.",
+    "JOURNAL — milestone : la liste CUMULATIVE des faits marquants. UNE ligne = UN seul événement. Recopie À L'IDENTIQUE (mot pour mot) TOUS les jalons déjà présents, puis AJOUTE les nouveaux faits en NOUVELLES lignes en dessous.",
+    "INTERDIT pour les jalons : mettre plusieurs événements sur une même ligne (jamais « A ; B ; C »), reformuler ou résumer un jalon existant, ou en supprimer un. Un jalon est un événement passé : il n'est jamais obsolète.",
+    "N'enregistre comme jalon que les faits VRAIMENT MARQUANTS (décision importante, rencontre, révélation, bascule de la relation, objectif ou lieu atteint…) — surtout PAS un jalon par message ni pour des détails anodins. N'ajoute pas un événement déjà consigné (pas de doublon).",
+    "SEULE exception au fait de ne jamais modifier les jalons existants : si la liste dépasse 30 jalons, regroupe les PLUS ANCIENS en quelques jalons de synthèse fidèles (sans perdre d'information).",
     "instruction : consignes durables à respecter ; ne les retire que si elles sont explicitement révoquées ou contredites. Conserve les éléments ajoutés par l'utilisateur tant qu'ils restent pertinents."
   ].join("\n");
 }

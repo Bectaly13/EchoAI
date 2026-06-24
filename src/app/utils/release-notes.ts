@@ -13,6 +13,13 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2.4",
+    changes: [
+      "Jalons de l'histoire empilés correctement (un par événement), au lieu d'être fusionnés en une seule entrée.",
+      "Petit ajustement d'espacement sur l'écran mémoire."
+    ]
+  },
+  {
     version: "1.2.3",
     changes: [
       "Fenêtres de sélection : le titre et les boutons restent visibles même quand la liste est longue.",
