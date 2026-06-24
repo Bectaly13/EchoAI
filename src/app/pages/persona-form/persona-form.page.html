@@ -12,6 +12,16 @@
     <input class="persona-form-input" id="name" name="name" type="text"
       [(ngModel)]="name" placeholder="Ex. : Capitaine Léa Marchand" />
 
+    <label class="persona-form-label">Genre</label>
+    <div class="persona-form-genders">
+      @for (option of genderOptions; track option.value) {
+        <button class="persona-form-gender" type="button"
+          [class.active]="gender === option.value" (click)="gender = option.value">
+          {{ option.label }}
+        </button>
+      }
+    </div>
+
     @if (!isDefault) {
       <label class="persona-form-label" for="description">Description</label>
       <textarea class="persona-form-textarea" id="description" name="description" rows="8"

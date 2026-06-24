@@ -52,7 +52,7 @@
       <button class="memory-category-option" type="button" (click)="selectCategory(item.category)">{{ item.label }}</button>
     }
   </div>
-  <div class="memory-modal-actions">
+  <div class="memory-modal-actions" modalFooter>
     <button class="modal-btn" type="button" (click)="addCategoryModal.open = false">Annuler</button>
   </div>
 </app-modal>
@@ -63,7 +63,7 @@
   }
   <textarea class="memory-modal-input" name="memValue" rows="3"
     [(ngModel)]="valueModal.value" placeholder="Ce dont le personnage doit se souvenir."></textarea>
-  <div class="memory-modal-actions">
+  <div class="memory-modal-actions" modalFooter>
     <button class="modal-btn" type="button" (click)="valueModal.open = false">Annuler</button>
     <button class="modal-btn modal-btn-primary" type="button" (click)="submitValue()">{{ valueModal.mode === 'add' ? 'Ajouter' : 'Enregistrer' }}</button>
   </div>

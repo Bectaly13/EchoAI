@@ -62,6 +62,31 @@ ion-content.characters-content {
   color: var(--app-text);
 }
 
+.characters-genders {
+  display: flex;
+  gap: 10px;
+}
+
+.characters-gender {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  background: var(--app-surface);
+  color: var(--app-text);
+  cursor: pointer;
+}
+
+.characters-gender.active {
+  border-color: var(--app-accent);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+}
+
 .characters-modal-actions {
   display: flex;
   justify-content: flex-end;

@@ -3,6 +3,9 @@ import { Injectable } from '@angular/core';
 import { DatabaseService } from './database-service';
 import { StorageService } from './storage-service';
 
+// Genre du persona, transmis à l'IA pour des réponses plus fidèles.
+export type PersonaGender = "male" | "female" | "other";
+
 // Un persona que l'utilisateur peut incarner dans une conversation : il indique au
 // personnage IA qui est l'utilisateur (nom/surnoms, histoire, pouvoirs…).
 export interface Persona {
@@ -10,6 +13,8 @@ export interface Persona {
   name: string;
   // Description libre : qui est l'utilisateur, son histoire, ses particularités…
   description: string;
+  // Genre (facultatif sur les anciens personas : traité comme non précisé).
+  gender?: PersonaGender;
   // Couleur de la pastille affichée dans la liste.
   avatarColor: string;
   createdAt: number;
@@ -63,6 +68,7 @@ export class PersonaService {
       id: this.generateId(),
       name: DEFAULT_PERSONA_NAME,
       description: "",
+      gender: "male",
       avatarColor: this.pickColor(),
       createdAt: Date.now(),
       isDefault: true
@@ -81,11 +87,12 @@ export class PersonaService {
   }
 
   // Crée un persona et le renvoie.
-  async create(name: string, description: string): Promise<Persona> {
+  async create(name: string, description: string, gender: PersonaGender): Promise<Persona> {
     const persona: Persona = {
       id: this.generateId(),
       name: name,
       description: description,
+      gender: gender,
       avatarColor: this.pickColor(),
       createdAt: Date.now()
     };

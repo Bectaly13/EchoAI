@@ -4,7 +4,7 @@ import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone'
 import { Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
-import { PersonaService } from 'src/app/services/persona-service';
+import { PersonaGender, PersonaService } from 'src/app/services/persona-service';
 
 import { CharacterCardComponent } from 'src/app/components/character-card/character-card.component';
 import { ConfirmModalComponent } from 'src/app/components/confirm-modal/confirm-modal.component';
@@ -22,8 +22,14 @@ import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 export class CharactersPage implements ViewWillEnter {
 
   characters: Character[] = [];
-  // Modale de saisie du nom (persona par défaut) au premier lancement.
-  namePrompt = { open: false, personaId: "", value: "" };
+  // Modale de saisie du nom + genre (persona par défaut) au premier lancement.
+  namePrompt = { open: false, personaId: "", value: "", gender: "male" as PersonaGender };
+  // Options du sélecteur de genre.
+  readonly genderOptions: { value: PersonaGender; label: string }[] = [
+    { value: "male", label: "Homme" },
+    { value: "female", label: "Femme" },
+    { value: "other", label: "Autre" }
+  ];
   // Modale de confirmation (réutilisée).
   confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
 
@@ -54,13 +60,13 @@ export class CharactersPage implements ViewWillEnter {
     if (!persona) {
       return;
     }
-    this.namePrompt = { open: true, personaId: persona.id, value: persona.name };
+    this.namePrompt = { open: true, personaId: persona.id, value: persona.name, gender: persona.gender ?? "male" };
   }
 
   async saveUserName() {
     const trimmed = this.namePrompt.value.trim();
     if (trimmed) {
-      await this.personaService.update(this.namePrompt.personaId, { name: trimmed });
+      await this.personaService.update(this.namePrompt.personaId, { name: trimmed, gender: this.namePrompt.gender });
     }
     this.namePrompt.open = false;
   }

@@ -19,7 +19,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 - **Supprimer un personnage** : avec confirmation ; la conversation associée est supprimée en même temps.
 
 ### Personas
-- **Définir des personas** : l'utilisateur crée des personas (nom + description : qui il est, son histoire, ses pouvoirs…) qu'il peut incarner. Un persona **par défaut** (« Moi ») existe toujours : au premier lancement, l'application propose de le nommer. Il est non supprimable mais reste modifiable.
+- **Définir des personas** : l'utilisateur crée des personas (nom + **genre** + description : qui il est, son histoire, ses pouvoirs…) qu'il peut incarner. Le genre est transmis à l'IA pour des réponses plus fidèles. Un persona **par défaut** (« Moi ») existe toujours : au premier lancement, l'application propose de le nommer. Il est non supprimable mais reste modifiable.
 - **Incarner un persona** : chaque conversation a **toujours** un persona actif (le persona par défaut au départ) ; on peut en changer via une liste qui affiche nom **et** description. Ces infos sont transmises au personnage IA.
 
 ### Conversation
@@ -41,7 +41,7 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 
 ### Robustesse & suivi
 - **Repli automatique des modèles (texte)** : la génération de texte s'appuie sur une **liste** de modèles Gemini ; si le quota d'un modèle est épuisé (`429`), l'application bascule automatiquement sur le suivant. (La génération d'image utilise Cloudflare Workers AI, un seul modèle.)
-- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les **requêtes** par modèle (texte sous la forme « X / max par jour », image en nombre de requêtes). Un modèle dont le quota est épuisé est signalé par un **contour rouge**, jusqu'à sa réinitialisation quotidienne (minuit Pacifique pour Gemini, 00:00 UTC pour Cloudflare). Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche) ; les **tokens** (texte) et **neurons** (image) sont estimés et stockés mais **non affichés**. ⚠️ Ces chiffres sont une **estimation locale**, pas une lecture officielle du quota.
+- **Suivi d'utilisation** : une page debug (bouton 📊) affiche, pour la journée, les **requêtes** par modèle (texte sous la forme « X / max par jour », image en nombre de requêtes). Un modèle dont le quota est épuisé est signalé par un **contour rouge**, jusqu'à sa réinitialisation quotidienne (minuit Pacifique pour Gemini, 00:00 UTC pour Cloudflare) — dont l'heure est affichée **convertie dans le fuseau local**. Tous les appels à l'IA sont comptés (réponses, tour passé, illustration, création de fiche) ; les **tokens** (texte) et **neurons** (image) sont estimés et stockés mais **non affichés**. ⚠️ Ces chiffres sont une **estimation locale**, pas une lecture officielle du quota.
 
 ---
 

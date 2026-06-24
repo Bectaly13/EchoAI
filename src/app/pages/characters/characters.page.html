@@ -32,7 +32,15 @@
 <app-modal [open]="namePrompt.open" title="Comment t'appelles-tu ?" (dismiss)="namePrompt.open = false">
   <p class="characters-modal-text">Ce nom est ton persona par défaut, transmis aux personnages. Tu pourras le modifier dans « Personas ».</p>
   <input class="characters-modal-input" type="text" name="userName" [(ngModel)]="namePrompt.value" placeholder="Ton nom" />
-  <div class="characters-modal-actions">
+  <div class="characters-genders">
+    @for (option of genderOptions; track option.value) {
+      <button class="characters-gender" type="button"
+        [class.active]="namePrompt.gender === option.value" (click)="namePrompt.gender = option.value">
+        {{ option.label }}
+      </button>
+    }
+  </div>
+  <div class="characters-modal-actions" modalFooter>
     <button class="modal-btn" type="button" (click)="namePrompt.open = false">Plus tard</button>
     <button class="modal-btn modal-btn-primary" type="button" (click)="saveUserName()">Valider</button>
   </div>

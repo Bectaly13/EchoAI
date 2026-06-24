@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { ChatService, PersonaUsage } from 'src/app/services/chat-service';
 import { MessageService } from 'src/app/services/message-service';
-import { PersonaService } from 'src/app/services/persona-service';
+import { PersonaGender, PersonaService } from 'src/app/services/persona-service';
 
 import { HeaderComponent } from 'src/app/components/header/header.component';
 
@@ -22,6 +22,14 @@ export class PersonaFormPage implements ViewWillEnter {
   personaId = "";
   name = "";
   description = "";
+  // Genre du persona (« Homme » par défaut en création).
+  gender: PersonaGender = "male";
+  // Options du sélecteur de genre.
+  readonly genderOptions: { value: PersonaGender; label: string }[] = [
+    { value: "male", label: "Homme" },
+    { value: "female", label: "Femme" },
+    { value: "other", label: "Autre" }
+  ];
   // Vrai si on édite le persona par défaut (« Moi ») : il n'a pas de description.
   isDefault = false;
   // Personnages (nom + avatar) dont la conversation incarne ce persona (mode édition).
@@ -52,6 +60,7 @@ export class PersonaFormPage implements ViewWillEnter {
     this.personaId = persona.id;
     this.name = persona.name;
     this.description = persona.description;
+    this.gender = persona.gender ?? "male";
     this.isDefault = persona.isDefault ?? false;
     this.activeInConversations = await this.chatService.conversationsUsingPersona(persona.id);
   }
@@ -66,11 +75,11 @@ export class PersonaFormPage implements ViewWillEnter {
       await this.messageService.error("Donne un nom au persona.");
       return;
     }
-    const changes = { name: name, description: this.description.trim() };
+    const changes = { name: name, description: this.description.trim(), gender: this.gender };
     if (this.isEditing()) {
       await this.personaService.update(this.personaId, changes);
     } else {
-      await this.personaService.create(changes.name, changes.description);
+      await this.personaService.create(changes.name, changes.description, changes.gender);
     }
     this.router.navigate(["personas"]);
   }

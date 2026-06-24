@@ -4,8 +4,11 @@
       @if (title()) {
         <h2 class="modal-title">{{ title() }}</h2>
       }
-      <div class="modal-content">
+      <div class="modal-body">
         <ng-content></ng-content>
+      </div>
+      <div class="modal-footer">
+        <ng-content select="[modalFooter]"></ng-content>
       </div>
     </div>
   </div>

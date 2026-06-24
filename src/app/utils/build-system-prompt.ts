@@ -46,11 +46,27 @@ function buildPersonaBlock(persona: Persona): string {
     "UTILISATEUR (PERSONA)",
     `L'utilisateur incarne « ${persona.name} ». Tiens-en compte dans tes réponses et adresse-toi à lui en conséquence.`
   ];
+  const gender = personaGenderPhrase(persona.gender);
+  if (gender) {
+    lines.push(`L'utilisateur est ${gender}.`);
+  }
   const description = persona.description.trim();
   if (description) {
-    lines.push(description);
+    // Cadré : la description est rédigée par l'utilisateur (« je »/« il »/« elle »…). Ce
+    // préfixe évite que le modèle l'attribue au personnage qu'il incarne.
+    lines.push(`L'utilisateur se décrit ainsi : « ${description} »`);
   }
   return lines.join("\n");
+}
+
+// Formulation française du genre (vide si non précisé).
+function personaGenderPhrase(gender: string | undefined): string {
+  switch (gender) {
+    case "male": return "un homme";
+    case "female": return "une femme";
+    case "other": return "une personne non binaire";
+    default: return "";
+  }
 }
 
 // Bloc de consignes de mise en forme attendues dans les réponses.

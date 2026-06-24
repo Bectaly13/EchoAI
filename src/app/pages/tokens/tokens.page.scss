@@ -39,6 +39,13 @@ ion-content.tokens-content {
   border-color: var(--app-danger);
 }
 
+.tokens-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .tokens-model {
   min-width: 0;
   font-size: 14px;
@@ -46,6 +53,11 @@ ion-content.tokens-content {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.tokens-reset {
+  font-size: 12px;
+  color: var(--app-text-muted);
 }
 
 .tokens-stats {

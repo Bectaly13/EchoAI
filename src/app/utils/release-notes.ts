@@ -13,6 +13,15 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2.3",
+    changes: [
+      "Fenêtres de sélection : le titre et les boutons restent visibles même quand la liste est longue.",
+      "Les personas ont un genre (homme / femme / autre), pris en compte dans les réponses de l'IA.",
+      "Description de persona mieux interprétée par l'IA (attribuée à toi, pas au personnage).",
+      "Page Tokens : heure de réinitialisation du quota affichée pour chaque modèle (dans ton fuseau horaire)."
+    ]
+  },
+  {
     version: "1.2.2",
     changes: [
       "Salutations générées par l'IA mieux mises en page (sauts de ligne entre narration et dialogues).",
