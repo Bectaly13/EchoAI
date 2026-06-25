@@ -67,7 +67,8 @@ ion-content.persona-form-content {
 }
 
 .persona-form-usage {
-  padding: 0 16px 24px;
+  // Pas de marge basse : l'espace vient du --padding-bottom de l'ion-content.
+  padding: 0 16px;
 }
 
 .persona-form-usage-title {

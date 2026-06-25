@@ -13,6 +13,12 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.3",
+    changes: [
+      "Ajustements mineurs du formulaire de persona (espacement de la liste des conversations, mention « facultatif » sur la description)."
+    ]
+  },
+  {
     version: "1.4.2",
     changes: [
       "Aperçu des personnages : les balises {char} et {user} y affichent maintenant les vrais noms (personnage et persona de la conversation).",

@@ -18,7 +18,7 @@
         <app-character-card
           class="characters-card"
           [character]="character"
-          [userName]="userNames[character.id] ?? ''"
+          [userName]="userNames[character.id]"
           (open)="goToEdit(character)"
           (remove)="confirmRemove(character)">
         </app-character-card>
