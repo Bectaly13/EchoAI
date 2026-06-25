@@ -56,6 +56,11 @@ function buildPersonaBlock(persona: Persona): string {
     // préfixe évite que le modèle l'attribue au personnage qu'il incarne.
     lines.push(`L'utilisateur se décrit ainsi : « ${description} »`);
   }
+  const appearance = persona.appearance?.trim();
+  if (appearance) {
+    // Apparence physique de l'utilisateur, à garder cohérente sur la durée.
+    lines.push(`L'utilisateur a l'apparence physique suivante : « ${appearance} »`);
+  }
   return lines.join("\n");
 }
 
@@ -132,10 +137,8 @@ function buildMemoryInstructionBlock(): string {
     "[[MEMORY]]\nlocation: <le lieu actuel de la scène>\nsituation: <où en est l'histoire en ce moment>\nrelationship: <l'état actuel de ta relation avec l'utilisateur>\nmilestone: <un fait marquant vécu>\ninstruction: <une consigne durable à respecter>\n[[/MEMORY]]",
     "Règles générales : réémets TOUTE la mémoire à conserver (ce bloc REMPLACE entièrement la précédente) ; n'écris JAMAIS ces lignes hors des balises [[MEMORY]] / [[/MEMORY]] ; n'évoque jamais ce bloc dans ta narration ; écris TOUTES les valeurs en français.",
     "ÉTAT COURANT — location, situation, relationship : une seule ligne chacun, la valeur actuelle. Mets-la à jour quand elle évolue (l'ancienne valeur est remplacée). « situation » résume où en est l'histoire maintenant (différent d'un événement).",
-    "JOURNAL — milestone : la liste CUMULATIVE des faits marquants. UNE ligne = UN seul événement. Recopie À L'IDENTIQUE (mot pour mot) TOUS les jalons déjà présents, puis AJOUTE les nouveaux faits en NOUVELLES lignes en dessous.",
-    "INTERDIT pour les jalons : mettre plusieurs événements sur une même ligne (jamais « A ; B ; C »), reformuler ou résumer un jalon existant, ou en supprimer un. Un jalon est un événement passé : il n'est jamais obsolète.",
-    "N'enregistre comme jalon que les faits VRAIMENT MARQUANTS (décision importante, rencontre, révélation, bascule de la relation, objectif ou lieu atteint…) — surtout PAS un jalon par message ni pour des détails anodins. N'ajoute pas un événement déjà consigné (pas de doublon).",
-    "SEULE exception au fait de ne jamais modifier les jalons existants : si la liste dépasse 30 jalons, regroupe les PLUS ANCIENS en quelques jalons de synthèse fidèles (sans perdre d'information).",
+    "JOURNAL — milestone : n'émets QUE le(s) NOUVEAU(X) jalon(s) ATTEINT(S) durant CE tour, un seul événement par ligne. Ne réémets PAS les jalons déjà présents dans le journal ci-dessus (rubrique « Jalons de l'histoire ») : l'application les conserve automatiquement. Si aucun fait vraiment marquant n'a eu lieu ce tour, n'émets AUCUNE ligne milestone.",
+    "N'enregistre comme jalon que les faits VRAIMENT MARQUANTS (décision importante, rencontre, révélation, bascule de la relation, objectif ou lieu atteint…) — surtout PAS un jalon par message ni pour des détails anodins. Ne réémets pas un événement déjà consigné (pas de doublon), et ne mets jamais plusieurs événements sur une même ligne (jamais « A ; B ; C »).",
     "instruction : consignes durables à respecter ; ne les retire que si elles sont explicitement révoquées ou contredites. Conserve les éléments ajoutés par l'utilisateur tant qu'ils restent pertinents."
   ].join("\n");
 }

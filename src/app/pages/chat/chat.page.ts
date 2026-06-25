@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,6 +26,8 @@ export class ChatPage implements ViewWillEnter {
 
   // Référence à l'ion-content pour pouvoir scroller en bas automatiquement.
   @ViewChild(IonContent) content!: IonContent;
+  // Référence au champ de saisie (textarea) pour ajuster sa hauteur au contenu.
+  @ViewChild("draftInput") draftInput?: ElementRef<HTMLTextAreaElement>;
 
   character?: Character;
   messages: ChatMessage[] = [];
@@ -112,6 +114,7 @@ export class ChatPage implements ViewWillEnter {
       return;
     }
     this.draft = "";
+    this.resetDraftHeight();
     this.sending = true;
     // Affiche immédiatement le message de l'utilisateur (réponse optimiste).
     this.messages.push({ id: crypto.randomUUID(), role: "user", text: text, at: Date.now() });
@@ -125,6 +128,33 @@ export class ChatPage implements ViewWillEnter {
     } finally {
       this.sending = false;
       this.scrollToBottom();
+    }
+  }
+
+  // La touche Entrée envoie le message (le clavier Android n'a pas de bouton dédié) :
+  // on empêche l'insertion du saut de ligne. Maj+Entrée ne passe pas par ici (Angular
+  // ne déclenche pas keydown.enter avec un modificateur) et insère donc un retour ligne.
+  sendFromKeyboard(event: Event) {
+    event.preventDefault();
+    this.send();
+  }
+
+  // Ajuste la hauteur du champ de saisie à son contenu (jusqu'au plafond fixé en CSS,
+  // au-delà le champ devient défilable).
+  autoGrowDraft() {
+    const textarea = this.draftInput?.nativeElement;
+    if (!textarea) {
+      return;
+    }
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }
+
+  // Ramène le champ de saisie à sa hauteur d'une ligne (après envoi, draft vidé).
+  private resetDraftHeight() {
+    const textarea = this.draftInput?.nativeElement;
+    if (textarea) {
+      textarea.style.height = "auto";
     }
   }
 

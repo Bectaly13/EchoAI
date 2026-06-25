@@ -34,9 +34,9 @@
       <button class="chat-illustrate" type="button" title="Illustrer la scène" (click)="illustrate()" [disabled]="sending">🖼</button>
     }
   </div>
-  <input class="chat-input" type="text" name="draft"
-    [(ngModel)]="draft" (keyup.enter)="send()" placeholder="Écris un message…" />
-  <button class="chat-send" (click)="send()" [disabled]="sending">Envoyer</button>
+  <textarea #draftInput class="chat-input" name="draft" rows="1"
+    [(ngModel)]="draft" (input)="autoGrowDraft()" (keydown.enter)="sendFromKeyboard($event)"
+    placeholder="Écris un message…"></textarea>
 </footer>
 
 <app-modal [open]="personaModal.open" title="Quel persona incarnes-tu ?" (dismiss)="personaModal.open = false">

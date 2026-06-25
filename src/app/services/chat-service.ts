@@ -198,8 +198,9 @@ export class ChatService {
       throw new Error("Personnage introuvable");
     }
 
-    // Retire la dernière réponse, puis régénère (la nouvelle réponse réémettra la
-    // mémoire à jour, qui remplacera l'actuelle).
+    // Retire la dernière réponse, puis régénère : l'état courant (lieu/situation/
+    // relation/consignes) sera remplacé par la nouvelle réponse. Les jalons étant en
+    // delta (ajoutés, non rembobinés), un jalon issu de la réponse écartée peut subsister.
     messages.pop();
     const systemPrompt = await this.buildPrompt(character, conversation);
     // Les messages-images sont filtrés de l'historique transmis ; on regarde donc le
@@ -340,20 +341,32 @@ export class ChatService {
   }
 
   // Intègre une réponse brute du modèle : ajoute le message (texte nettoyé) et, si la
-  // réponse réémet un bloc mémoire, REMPLACE toute la mémoire par son état complet
-  // consolidé (le modèle fusionne les équivalents et retire l'obsolète lui-même).
+  // réponse réémet un bloc mémoire, met la mémoire à jour. Deux régimes coexistent :
+  // - location/situation/relationship/instruction : REMPLACÉS par l'état complet
+  //   réémis par le modèle (le modèle fusionne et retire l'obsolète lui-même) ;
+  // - milestone : régime DELTA — le modèle n'émet que les nouveaux jalons du tour ;
+  //   on CONSERVE les jalons existants et on AJOUTE les nouveaux (anti-doublon exact),
+  //   sans jamais demander au modèle de recopier le journal (qu'il finissait par fusionner).
   private appendModelReply(conversation: Conversation, raw: string): string {
     const parsed = parseMemory(raw);
     conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: parsed.text, at: Date.now() });
     if (parsed.hasMemoryBlock) {
-      conversation.memory = parsed.entries.map(entry => ({
-        id: crypto.randomUUID(),
-        category: entry.category,
-        value: entry.value,
-        at: Date.now()
-      }));
+      const existingMilestones = (conversation.memory ?? []).filter(entry => entry.category === "milestone");
+      const replaced = parsed.entries
+        .filter(line => line.category !== "milestone")
+        .map(line => this.toMemoryEntry(line.category, line.value));
+      const knownValues = new Set(existingMilestones.map(entry => entry.value));
+      const newMilestones = parsed.entries
+        .filter(line => line.category === "milestone" && !knownValues.has(line.value))
+        .map(line => this.toMemoryEntry(line.category, line.value));
+      conversation.memory = [...replaced, ...existingMilestones, ...newMilestones];
     }
     return parsed.text;
+  }
+
+  // Fabrique une entrée de mémoire datée à partir d'une catégorie et d'une valeur.
+  private toMemoryEntry(category: MemoryCategory, value: string): MemoryEntry {
+    return { id: crypto.randomUUID(), category: category, value: value, at: Date.now() };
   }
 
   // Renvoie la mémoire permanente de la conversation (vide si aucune).

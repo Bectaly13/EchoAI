@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.2.5",
+    changes: [
+      "Jalons de l'histoire fiabilisés : ils s'ajoutent un par un au fil des événements marquants, sans jamais fusionner ni se réécrire.",
+      "Les personas ont un champ « apparence » (facultatif) pour décrire ton physique et gagner en cohérence et en immersion.",
+      "Zone de saisie repensée : les messages longs reviennent à la ligne et le champ s'étire jusqu'à trois lignes ; l'envoi se fait avec la touche Entrée du clavier (plus de bouton « Envoyer »)."
+    ]
+  },
+  {
     version: "1.2.4",
     changes: [
       "Jalons de l'histoire empilés correctement (un par événement), au lieu d'être fusionnés en une seule entrée.",

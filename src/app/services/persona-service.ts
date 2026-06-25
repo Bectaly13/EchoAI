@@ -13,6 +13,8 @@ export interface Persona {
   name: string;
   // Description libre : qui est l'utilisateur, son histoire, ses particularités…
   description: string;
+  // Apparence physique (facultative) : pour la cohérence long terme et l'immersion.
+  appearance?: string;
   // Genre (facultatif sur les anciens personas : traité comme non précisé).
   gender?: PersonaGender;
   // Couleur de la pastille affichée dans la liste.
@@ -87,11 +89,12 @@ export class PersonaService {
   }
 
   // Crée un persona et le renvoie.
-  async create(name: string, description: string, gender: PersonaGender): Promise<Persona> {
+  async create(name: string, description: string, gender: PersonaGender, appearance: string): Promise<Persona> {
     const persona: Persona = {
       id: this.generateId(),
       name: name,
       description: description,
+      appearance: appearance,
       gender: gender,
       avatarColor: this.pickColor(),
       createdAt: Date.now()
