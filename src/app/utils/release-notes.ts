@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.2",
+    changes: [
+      "Aperçu des personnages : les balises {char} et {user} y affichent maintenant les vrais noms (personnage et persona de la conversation).",
+      "Boutons « Nouveau personnage », « Nouvelle conversation » et « Enregistrer » toujours accessibles, plaqués en bas de l'écran.",
+      "Persona par défaut (« Moi ») : tu peux désormais lui donner une description et une apparence, proposées (facultatives) dès la première connexion."
+    ]
+  },
+  {
     version: "1.4.1",
     changes: [
       "Champs « Ce qu'il aime » et « Ce qu'il n'aime pas » fusionnés en un seul « Goûts et préférences » (mise à jour automatique des personnages existants).",

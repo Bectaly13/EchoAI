@@ -135,10 +135,9 @@ ion-content.character-form-content {
 }
 
 .character-form-save {
-  // Collé en bas de la zone défilable : toujours accessible sur un formulaire long.
-  // L'ion-content portant --padding-bottom (16px + zone sûre), la position « collée »
-  // coïncide avec la position naturelle en fin de scroll (le bouton atterrit au même
-  // endroit qu'avant une fois tout en bas). Fond opaque → masque le contenu derrière.
+  // Collé en bas de la zone défilable (le formulaire dépasse toujours d'un écran) : sticky
+  // le maintient visible, l'écart au dernier champ vient de margin-top. Fond opaque → masque
+  // le contenu qui défile derrière.
   position: sticky;
   bottom: 0;
   z-index: 1;

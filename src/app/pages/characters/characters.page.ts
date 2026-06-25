@@ -4,6 +4,7 @@ import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone'
 import { Router } from '@angular/router';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
+import { ChatService } from 'src/app/services/chat-service';
 import { PersonaGender, PersonaService } from 'src/app/services/persona-service';
 
 import { CharacterCardComponent } from 'src/app/components/character-card/character-card.component';
@@ -22,8 +23,16 @@ import { NavbarComponent } from 'src/app/components/navbar/navbar.component';
 export class CharactersPage implements ViewWillEnter {
 
   characters: Character[] = [];
-  // Modale de saisie du nom + genre (persona par défaut) au premier lancement.
-  namePrompt = { open: false, personaId: "", value: "", gender: "male" as PersonaGender };
+  // Faux tant que le premier chargement n'est pas terminé : évite d'afficher « Aucun
+  // personnage » alors que la liste est encore en cours de résolution. Reste vrai
+  // ensuite (pas de « Chargement… » qui clignote à chaque retour sur la page).
+  loaded = false;
+  // Nom de l'utilisateur par personnage (clé = id du personnage), pour interpoler {user}
+  // dans les aperçus : persona de la conversation existante, sinon persona par défaut.
+  userNames: Record<string, string> = {};
+  // Modale de saisie du persona par défaut au premier lancement (nom + genre +
+  // description + apparence ; ces deux derniers facultatifs).
+  namePrompt = { open: false, personaId: "", value: "", gender: "male" as PersonaGender, description: "", appearance: "" };
   // Options du sélecteur de genre.
   readonly genderOptions: { value: PersonaGender; label: string }[] = [
     { value: "male", label: "Homme" },
@@ -40,12 +49,31 @@ export class CharactersPage implements ViewWillEnter {
 
   constructor(
     private characterService: CharacterService,
+    private chatService: ChatService,
     private personaService: PersonaService,
     private router: Router
   ) { }
 
   async loadCharacters() {
-    this.characters = await this.characterService.list();
+    const characters = await this.characterService.list();
+    // On résout les noms AVANT d'exposer la liste : au premier rendu, userNames est déjà
+    // prêt → pas de flash du fallback le temps que la résolution asynchrone se termine.
+    this.userNames = await this.resolveUserNames(characters);
+    this.characters = characters;
+    this.loaded = true;
+  }
+
+  // Résout, pour chaque personnage, le nom de l'utilisateur à afficher dans l'aperçu :
+  // le persona de sa conversation s'il en existe une, sinon le persona par défaut
+  // (getActivePersonaId assure déjà ce repli).
+  private async resolveUserNames(characters: Character[]): Promise<Record<string, string>> {
+    const names: Record<string, string> = {};
+    for (const character of characters) {
+      const personaId = await this.chatService.getActivePersonaId(character.id);
+      const persona = personaId ? await this.personaService.get(personaId) : undefined;
+      names[character.id] = persona?.name ?? "";
+    }
+    return names;
   }
 
   // Au premier lancement, invite l'utilisateur à nommer son persona par défaut.
@@ -60,13 +88,25 @@ export class CharactersPage implements ViewWillEnter {
     if (!persona) {
       return;
     }
-    this.namePrompt = { open: true, personaId: persona.id, value: persona.name, gender: persona.gender ?? "male" };
+    this.namePrompt = {
+      open: true,
+      personaId: persona.id,
+      value: persona.name,
+      gender: persona.gender ?? "male",
+      description: persona.description ?? "",
+      appearance: persona.appearance ?? ""
+    };
   }
 
   async saveUserName() {
     const trimmed = this.namePrompt.value.trim();
     if (trimmed) {
-      await this.personaService.update(this.namePrompt.personaId, { name: trimmed, gender: this.namePrompt.gender });
+      await this.personaService.update(this.namePrompt.personaId, {
+        name: trimmed,
+        gender: this.namePrompt.gender,
+        description: this.namePrompt.description.trim(),
+        appearance: this.namePrompt.appearance.trim()
+      });
     }
     this.namePrompt.open = false;
   }

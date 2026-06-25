@@ -32,8 +32,6 @@ export class PersonaFormPage implements ViewWillEnter {
     { value: "female", label: "Femme" },
     { value: "other", label: "Autre" }
   ];
-  // Vrai si on édite le persona par défaut (« Moi ») : il n'a pas de description.
-  isDefault = false;
   // Personnages (nom + avatar) dont la conversation incarne ce persona (mode édition).
   activeInConversations: PersonaUsage[] = [];
 
@@ -64,7 +62,6 @@ export class PersonaFormPage implements ViewWillEnter {
     this.description = persona.description;
     this.appearance = persona.appearance ?? "";
     this.gender = persona.gender ?? "male";
-    this.isDefault = persona.isDefault ?? false;
     this.activeInConversations = await this.chatService.conversationsUsingPersona(persona.id);
   }
 

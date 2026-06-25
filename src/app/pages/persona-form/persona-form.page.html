@@ -22,17 +22,15 @@
       }
     </div>
 
-    @if (!isDefault) {
-      <label class="persona-form-label" for="description">Description</label>
-      <textarea class="persona-form-textarea" id="description" name="description" rows="8"
-        [(ngModel)]="description"
-        placeholder="Qui tu es : comment on t'appelle, ton histoire, tes pouvoirs, ton rôle…"></textarea>
+    <label class="persona-form-label" for="description">Description</label>
+    <textarea class="persona-form-textarea" id="description" name="description" rows="8"
+      [(ngModel)]="description"
+      placeholder="Qui tu es : comment on t'appelle, ton histoire, tes pouvoirs, ton rôle…"></textarea>
 
-      <label class="persona-form-label" for="appearance">Apparence (facultatif)</label>
-      <textarea class="persona-form-textarea" id="appearance" name="appearance" rows="4"
-        [(ngModel)]="appearance"
-        placeholder="À quoi tu ressembles physiquement : taille, cheveux, tenue, signes particuliers…"></textarea>
-    }
+    <label class="persona-form-label" for="appearance">Apparence (facultatif)</label>
+    <textarea class="persona-form-textarea" id="appearance" name="appearance" rows="4"
+      [(ngModel)]="appearance"
+      placeholder="À quoi tu ressembles physiquement : taille, cheveux, tenue, signes particuliers…"></textarea>
 
     <button class="persona-form-save" type="submit">Enregistrer</button>
 

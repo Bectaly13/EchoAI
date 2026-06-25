@@ -3,21 +3,11 @@ ion-content.characters-content {
   --padding-bottom: calc(72px + var(--safe-bottom));
 }
 
-.characters-toolbar {
+// Zone de défilement en colonne flex : permet de pousser le bouton d'action tout en bas
+// (margin-top: auto) même quand la liste est courte, sans saut à fond de scroll.
+ion-content.characters-content::part(scroll) {
   display: flex;
-  justify-content: flex-end;
-  padding: 12px 12px 0;
-}
-
-.characters-add {
-  border: none;
-  border-radius: 10px;
-  padding: 9px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  background: var(--app-accent);
-  color: var(--app-on-accent);
-  cursor: pointer;
+  flex-direction: column;
 }
 
 .characters-empty {
@@ -39,8 +29,28 @@ ion-content.characters-content {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
   padding: 12px 12px 0;
+  // Écart entre le dernier item et le bouton d'action quand la liste déborde (invisible
+  // quand la liste est courte : absorbé par le margin-top: auto du bouton).
+  margin-bottom: 12px;
+}
+
+.characters-add {
+  // Toujours plaqué en bas : margin-top: auto le pousse au bas de la colonne flex (même
+  // liste courte), sticky le maintient visible pendant le défilement. Le --padding-bottom
+  // de l'ion-content (navbar + zone sûre) le cale juste au-dessus de la navbar.
+  margin: auto 12px 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  cursor: pointer;
 }
 
 .characters-modal-text {
@@ -60,6 +70,19 @@ ion-content.characters-content {
   font-family: inherit;
   background: var(--app-background);
   color: var(--app-text);
+}
+
+.characters-modal-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--app-background);
+  color: var(--app-text);
+  resize: vertical;
 }
 
 .characters-genders {

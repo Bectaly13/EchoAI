@@ -4,10 +4,6 @@
 
 <ion-content [fullscreen]="true" class="conversations-content">
 
-  <div class="conversations-toolbar">
-    <button class="conversations-add" (click)="openNewConversation()">+ Nouvelle conversation</button>
-  </div>
-
   @if (conversations.length === 0) {
     <div class="conversations-empty">
       <p class="conversations-empty-text">Aucune conversation pour l'instant. Touche « + Nouvelle conversation » pour commencer à discuter.</p>
@@ -32,6 +28,8 @@
       }
     </div>
   }
+
+  <button class="conversations-add" (click)="openNewConversation()">+ Nouvelle conversation</button>
 
 </ion-content>
 
