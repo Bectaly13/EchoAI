@@ -13,6 +13,13 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.3",
+    changes: [
+      "Mémoire fidèle à l'historique : supprimer une partie de la conversation retire désormais les jalons qui y étaient nés, et régénérer une réponse efface le jalon qu'elle avait posé.",
+      "Les jalons que tu ajoutes toi-même (écran mémoire) ne sont jamais retirés automatiquement : ils restent sous ton contrôle."
+    ]
+  },
+  {
     version: "1.2.5",
     changes: [
       "Jalons de l'histoire fiabilisés : ils s'ajoutent un par un au fil des événements marquants, sans jamais fusionner ni se réécrire.",

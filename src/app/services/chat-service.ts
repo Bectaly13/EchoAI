@@ -30,6 +30,11 @@ export interface MemoryEntry {
   category: MemoryCategory;
   value: string;
   at: number;
+  // Id du message du modèle qui a produit ce jalon (catégorie "milestone" uniquement),
+  // pour le rembobinage : le jalon est retiré quand son message source est supprimé.
+  // Absent pour les jalons ajoutés à la main et pour les catégories réémises
+  // (location, situation, relationship, instruction), qui se rembobinent par remplacement.
+  sourceMessageId?: string;
 }
 
 // Résumé d'une conversation, pour la liste des conversations (page dédiée).
@@ -199,9 +204,11 @@ export class ChatService {
     }
 
     // Retire la dernière réponse, puis régénère : l'état courant (lieu/situation/
-    // relation/consignes) sera remplacé par la nouvelle réponse. Les jalons étant en
-    // delta (ajoutés, non rembobinés), un jalon issu de la réponse écartée peut subsister.
+    // relation/consignes) sera remplacé par la nouvelle réponse. Le(s) jalon(s)
+    // produit(s) par la réponse écartée sont rembobinés (la nouvelle réponse pourra en
+    // reproposer) : sinon ils resteraient rattachés à un message qui n'existe plus.
     messages.pop();
+    this.forgetMilestonesFrom(conversation, new Set([last.id]));
     const systemPrompt = await this.buildPrompt(character, conversation);
     // Les messages-images sont filtrés de l'historique transmis ; on regarde donc le
     // dernier tour réellement envoyé au modèle. S'il ne vient pas de l'utilisateur
@@ -231,18 +238,36 @@ export class ChatService {
     if (index <= 0) {
       return conversation.messages;
     }
+    // Ids de tous les messages retirés (la tranche supprimée + les messages `user`
+    // restés en fin de liste) → pour rembobiner les jalons qui en sont issus.
+    const removedIds = new Set(conversation.messages.slice(index).map(message => message.id));
     conversation.messages.splice(index);
     // Une conversation ne se termine jamais par un message de l'utilisateur : on
     // retire le(s) message(s) `user` resté(s) en fin de liste (supprimer une réponse
     // de l'IA enlève donc aussi le message utilisateur qui l'avait déclenchée).
     while (conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].role === "user") {
+      removedIds.add(conversation.messages[conversation.messages.length - 1].id);
       conversation.messages.pop();
     }
-    // La mémoire n'est pas rembobinée à la suppression (elle évolue par réémission du
-    // modèle) : si besoin, l'utilisateur l'ajuste via l'écran mémoire.
+    // Les catégories réémises (lieu/situation/relation/consignes) ne sont pas rembobinées
+    // (le modèle les reconsolide au tour suivant) ; les jalons, eux, sont en delta et ne
+    // se reconsolident jamais → on retire ceux nés dans les messages supprimés.
+    this.forgetMilestonesFrom(conversation, removedIds);
     await this.saveConversation(conversation);
 
     return conversation.messages;
+  }
+
+  // Retire les jalons dont le message source fait partie des messages supprimés. Les
+  // autres catégories, et les jalons sans source (ajoutés à la main, ou antérieurs au
+  // suivi de provenance), sont conservés tels quels.
+  private forgetMilestonesFrom(conversation: Conversation, removedIds: Set<string>): void {
+    if (!conversation.memory) {
+      return;
+    }
+    conversation.memory = conversation.memory.filter(entry =>
+      entry.category !== "milestone" || !entry.sourceMessageId || !removedIds.has(entry.sourceMessageId)
+    );
   }
 
   // L'utilisateur passe son tour : on génère un message supplémentaire du modèle
@@ -349,7 +374,9 @@ export class ChatService {
   //   sans jamais demander au modèle de recopier le journal (qu'il finissait par fusionner).
   private appendModelReply(conversation: Conversation, raw: string): string {
     const parsed = parseMemory(raw);
-    conversation.messages.push({ id: crypto.randomUUID(), role: "model", text: parsed.text, at: Date.now() });
+    // Id du message créé : sert à rattacher les nouveaux jalons à leur message source.
+    const messageId = crypto.randomUUID();
+    conversation.messages.push({ id: messageId, role: "model", text: parsed.text, at: Date.now() });
     if (parsed.hasMemoryBlock) {
       const existingMilestones = (conversation.memory ?? []).filter(entry => entry.category === "milestone");
       const replaced = parsed.entries
@@ -358,15 +385,16 @@ export class ChatService {
       const knownValues = new Set(existingMilestones.map(entry => entry.value));
       const newMilestones = parsed.entries
         .filter(line => line.category === "milestone" && !knownValues.has(line.value))
-        .map(line => this.toMemoryEntry(line.category, line.value));
+        .map(line => this.toMemoryEntry(line.category, line.value, messageId));
       conversation.memory = [...replaced, ...existingMilestones, ...newMilestones];
     }
     return parsed.text;
   }
 
-  // Fabrique une entrée de mémoire datée à partir d'une catégorie et d'une valeur.
-  private toMemoryEntry(category: MemoryCategory, value: string): MemoryEntry {
-    return { id: crypto.randomUUID(), category: category, value: value, at: Date.now() };
+  // Fabrique une entrée de mémoire datée. sourceMessageId n'est renseigné que pour les
+  // jalons issus d'une réponse du modèle (rembobinage) ; absent partout ailleurs.
+  private toMemoryEntry(category: MemoryCategory, value: string, sourceMessageId?: string): MemoryEntry {
+    return { id: crypto.randomUUID(), category: category, value: value, at: Date.now(), sourceMessageId: sourceMessageId };
   }
 
   // Renvoie la mémoire permanente de la conversation (vide si aucune).
