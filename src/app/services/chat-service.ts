@@ -10,6 +10,7 @@ import { UsageService } from './usage-service';
 import { buildGeminiContents } from '../utils/build-gemini-contents';
 import { buildSceneImagePrompt } from '../utils/build-scene-image-prompt';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
+import { interpolateTags } from '../utils/interpolate-tags';
 import { MemoryCategory, parseMemory } from '../utils/parse-memory';
 
 // Un message dans une conversation. role suit les valeurs attendues par l'API Gemini.
@@ -330,8 +331,10 @@ export class ChatService {
   async resetConversation(characterId: string): Promise<ChatMessage[]> {
     const conversation = await this.getOrCreateConversation(characterId);
     const greeting = await this.greetingFor(characterId);
-    conversation.messages = greeting
-      ? [{ id: crypto.randomUUID(), role: "model", text: greeting, at: Date.now() }]
+    const persona = await this.personaFor(conversation);
+    const text = await this.interpolateGreeting(characterId, greeting, persona);
+    conversation.messages = text
+      ? [{ id: crypto.randomUUID(), role: "model", text: text, at: Date.now() }]
       : [];
     conversation.memory = [];
     await this.saveConversation(conversation);
@@ -517,6 +520,18 @@ export class ChatService {
     return character?.greeting?.trim() ?? "";
   }
 
+  // Interpole les balises {char}/{user} de la salutation avec le nom du personnage et
+  // celui du persona donné, pour produire le texte du premier message affiché. La
+  // salutation est ainsi figée avec le persona du moment (cf. limite assumée).
+  private async interpolateGreeting(characterId: string, greeting: string, persona: Persona | undefined): Promise<string> {
+    if (!greeting) {
+      return greeting;
+    }
+    const character = await this.characterService.get(characterId);
+    const userName = persona?.name?.trim() || "l'utilisateur";
+    return interpolateTags(greeting, character?.name ?? "", userName);
+  }
+
   // Renvoie le persona incarné dans la conversation. À défaut de choix explicite
   // (ou si le persona choisi a été supprimé), on retombe sur le persona par défaut
   // « Moi » → l'utilisateur a toujours un persona transmis à l'IA.
@@ -533,11 +548,12 @@ export class ChatService {
   // Crée et persiste une conversation, initialisée avec la salutation si elle est
   // fournie, et avec le persona par défaut comme persona actif.
   private async persistNewConversation(characterId: string, greeting: string): Promise<Conversation> {
+    const defaultPersona = await this.personaService.getDefault();
     const messages: ChatMessage[] = [];
     if (greeting) {
-      messages.push({ id: crypto.randomUUID(), role: "model", text: greeting, at: Date.now() });
+      const text = await this.interpolateGreeting(characterId, greeting, defaultPersona);
+      messages.push({ id: crypto.randomUUID(), role: "model", text: text, at: Date.now() });
     }
-    const defaultPersona = await this.personaService.getDefault();
     const conversation: Conversation = {
       id: crypto.randomUUID(),
       characterId: characterId,

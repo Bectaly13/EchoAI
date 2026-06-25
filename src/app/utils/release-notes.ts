@@ -13,6 +13,15 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4",
+    changes: [
+      "Fiches personnage enrichies : nouveaux champs Scénario, Univers / cadre, Façon de parler et Histoire / passé (tous optionnels).",
+      "Balises {char} et {user} : écris-les dans n'importe quel champ, elles sont remplacées par le nom du personnage et le tien (persona actif) — pratique pour renommer un personnage en un seul endroit.",
+      "Création par IA améliorée : apparence centrée sur le physique, et personnages secondaires vraiment nommés (nom, fonction, relation) plutôt que des rôles génériques.",
+      "La génération de fiche propose désormais aussi un scénario de départ."
+    ]
+  },
+  {
     version: "1.3",
     changes: [
       "Mémoire fidèle à l'historique : supprimer une partie de la conversation retire désormais les jalons qui y étaient nés, et régénérer une réponse efface le jalon qu'elle avait posé.",

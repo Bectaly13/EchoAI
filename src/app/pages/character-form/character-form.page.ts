@@ -29,6 +29,10 @@ export class CharacterFormPage implements ViewWillEnter {
   // Message d'accueil du personnage (premier message de la conversation).
   greeting = "";
   // Champs structurés optionnels.
+  scenario = "";
+  setting = "";
+  speechStyle = "";
+  background = "";
   appearance = "";
   initialRelationship = "";
   likes = "";
@@ -67,6 +71,10 @@ export class CharacterFormPage implements ViewWillEnter {
     this.name = character.name;
     this.systemPrompt = character.systemPrompt;
     this.greeting = character.greeting ?? "";
+    this.scenario = character.scenario ?? "";
+    this.setting = character.setting ?? "";
+    this.speechStyle = character.speechStyle ?? "";
+    this.background = character.background ?? "";
     this.appearance = character.appearance ?? "";
     this.initialRelationship = character.initialRelationship ?? "";
     this.likes = character.likes ?? "";
@@ -91,6 +99,10 @@ export class CharacterFormPage implements ViewWillEnter {
       this.name = draft.name;
       this.systemPrompt = draft.systemPrompt;
       this.greeting = draft.greeting ?? "";
+      this.scenario = draft.scenario ?? "";
+      this.setting = draft.setting ?? "";
+      this.speechStyle = draft.speechStyle ?? "";
+      this.background = draft.background ?? "";
       this.appearance = draft.appearance ?? "";
       this.initialRelationship = draft.initialRelationship ?? "";
       this.likes = draft.likes ?? "";
@@ -152,6 +164,10 @@ export class CharacterFormPage implements ViewWillEnter {
       name: name,
       systemPrompt: this.systemPrompt.trim(),
       greeting: greeting,
+      scenario: this.scenario.trim(),
+      setting: this.setting.trim(),
+      speechStyle: this.speechStyle.trim(),
+      background: this.background.trim(),
       appearance: this.appearance.trim(),
       initialRelationship: this.initialRelationship.trim(),
       likes: this.likes.trim(),

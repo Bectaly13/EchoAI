@@ -6,6 +6,8 @@
 import { Character } from "../services/character-service";
 import { Persona } from "../services/persona-service";
 
+import { interpolateTags } from "./interpolate-tags";
+
 // Une entrée de mémoire telle qu'attendue par le prompt (catégorie + valeur).
 // Volontairement minimal pour ne pas coupler ce module au modèle de ChatService.
 interface MemoryItem {
@@ -37,7 +39,12 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
   blocks.push(buildMemoryInstructionBlock());
 
   // Les blocs sont séparés par une ligne vide pour rester lisibles côté modèle.
-  return blocks.join("\n\n");
+  const prompt = blocks.join("\n\n");
+  // Interpolation finale des balises {char}/{user} sur l'ensemble du prompt : les
+  // valeurs viennent des champs utilisateur (les blocs générés ici n'en contiennent
+  // pas). {user} suit le persona actif puisque le prompt est réassemblé à chaque tour.
+  const userName = options.persona?.name?.trim() || "l'utilisateur";
+  return interpolateTags(prompt, options.character.name, userName);
 }
 
 // Bloc décrivant le persona incarné par l'utilisateur (qui il est).
@@ -151,7 +158,11 @@ function buildCharacterBlock(character: Character): string {
   ];
   // Personnalité (description principale), puis les champs structurés renseignés.
   appendField(lines, "", character.systemPrompt);
+  appendField(lines, "Façon de parler", character.speechStyle);
   appendField(lines, "Apparence", character.appearance);
+  appendField(lines, "Histoire / passé", character.background);
+  appendField(lines, "Univers / cadre", character.setting);
+  appendField(lines, "Scénario / intrigue", character.scenario);
   appendField(lines, "Relation initiale avec l'utilisateur", character.initialRelationship);
   appendField(lines, "Goûts et préférences", character.likes);
   appendField(lines, "Ce qu'il n'aime pas", character.dislikes);

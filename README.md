@@ -11,8 +11,9 @@ Construit avec **Ionic 8** et **Angular 20** (composants standalone). Les donné
 > Pour l'instant l'application couvre l'essentiel ; d'autres fonctionnalités suivront.
 
 ### Personnages
-- **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** (obligatoire), et des **détails optionnels** (apparence, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
-- **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite.
+- **Créer un personnage** : un nom, une « personnalité » (instructions envoyées à l'IA comme *system prompt*), un **message d'accueil** (obligatoire), et des **détails optionnels** (scénario, univers / cadre, façon de parler, apparence, histoire / passé, relation initiale avec l'utilisateur, goûts, ce qu'il n'aime pas, personnages qu'il connaît). Une couleur d'avatar est attribuée au hasard.
+- **Balises `{char}` et `{user}`** : utilisables dans n'importe quel champ (et la salutation), elles sont remplacées à la volée par le nom du personnage et celui du persona actif. Renommer un personnage ne se fait alors qu'à un seul endroit (le champ « nom »), tout le reste suit.
+- **Création assistée par IA** : à partir d'un simple brouillon (« décris ton idée en quelques mots »), l'IA génère une fiche complète et cohérente qui pré-remplit tous les champs du formulaire — entièrement retouchables ensuite. Elle privilégie le physique pour l'apparence, nomme réellement les personnages secondaires (nom, fonction, relation) et propose un scénario de départ.
 - **Photo de profil générée** : l'IA peut générer une photo de profil du personnage via **Cloudflare Workers AI** (modèle FLUX, palier gratuit). Activée dès que les identifiants Cloudflare sont renseignés ; sinon une pastille colorée sert d'avatar.
 - **Lister les personnages** : la liste affiche tous les personnages, du plus récent au plus ancien.
 - **Modifier un personnage** : toucher une carte dans la liste ouvre sa fiche (tous les champs éditables à tout moment).

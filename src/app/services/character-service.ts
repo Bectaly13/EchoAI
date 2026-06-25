@@ -18,6 +18,10 @@ export interface Character {
   // sert à planter le décor. Optionnel (vide = pas de premier message imposé).
   greeting: string;
   // Champs structurés optionnels, ajoutés à la fiche envoyée à l'IA s'ils sont remplis.
+  scenario?: string;              // intrigue / situation de départ
+  setting?: string;               // univers / cadre (monde, époque, lieu)
+  speechStyle?: string;           // façon de parler / voix (registre, tics, ton)
+  background?: string;            // histoire / passé du personnage
   appearance?: string;            // apparence physique
   initialRelationship?: string;   // relation initiale avec l'utilisateur
   likes?: string;                 // goûts et préférences
@@ -34,7 +38,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters" | "avatarImage"
+  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -94,6 +98,10 @@ export class CharacterService {
       name: value("name"),
       systemPrompt: value("systemPrompt"),
       greeting: value("greeting"),
+      scenario: value("scenario"),
+      setting: value("setting"),
+      speechStyle: value("speechStyle"),
+      background: value("background"),
       appearance: value("appearance"),
       initialRelationship: value("initialRelationship"),
       likes: value("likes"),
@@ -108,6 +116,10 @@ export class CharacterService {
       name: "Personnage (démo)",
       systemPrompt: brief || "Personnalité à compléter.",
       greeting: "",
+      scenario: "",
+      setting: "",
+      speechStyle: "",
+      background: "",
       appearance: "",
       initialRelationship: "",
       likes: "",

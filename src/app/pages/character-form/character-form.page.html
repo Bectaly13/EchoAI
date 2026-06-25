@@ -59,10 +59,30 @@
 
     <p class="character-form-section">Détails (optionnels)</p>
 
+    <label class="character-form-label" for="scenario">Scénario</label>
+    <textarea class="character-form-textarea" id="scenario" name="scenario" rows="3"
+      [(ngModel)]="scenario"
+      placeholder="L'intrigue de départ : la situation qui plante l'histoire (au-delà du seul message d'accueil)."></textarea>
+
+    <label class="character-form-label" for="setting">Univers / cadre</label>
+    <textarea class="character-form-textarea" id="setting" name="setting" rows="3"
+      [(ngModel)]="setting"
+      placeholder="Le monde, l'époque, le lieu où se déroule l'histoire."></textarea>
+
+    <label class="character-form-label" for="speechStyle">Façon de parler</label>
+    <textarea class="character-form-textarea" id="speechStyle" name="speechStyle" rows="3"
+      [(ngModel)]="speechStyle"
+      placeholder="Registre de langue, tics de langage, accent, ton."></textarea>
+
     <label class="character-form-label" for="appearance">Apparence</label>
     <textarea class="character-form-textarea" id="appearance" name="appearance" rows="3"
       [(ngModel)]="appearance"
-      placeholder="À quoi ressemble ce personnage."></textarea>
+      placeholder="Physique : cheveux, yeux, taille, corpulence, traits… (vêtements en secondaire)."></textarea>
+
+    <label class="character-form-label" for="background">Histoire / passé</label>
+    <textarea class="character-form-textarea" id="background" name="background" rows="3"
+      [(ngModel)]="background"
+      placeholder="Origines, événements marquants de sa vie."></textarea>
 
     <label class="character-form-label" for="initialRelationship">Relation initiale avec toi</label>
     <textarea class="character-form-textarea" id="initialRelationship" name="initialRelationship" rows="3"
