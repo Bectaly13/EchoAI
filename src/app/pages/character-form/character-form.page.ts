@@ -35,8 +35,7 @@ export class CharacterFormPage implements ViewWillEnter {
   background = "";
   appearance = "";
   initialRelationship = "";
-  likes = "";
-  dislikes = "";
+  preferences = "";
   knownCharacters = "";
   // Photo de profil générée (data URL base64) et état d'attente associé.
   avatarImage = "";
@@ -45,6 +44,7 @@ export class CharacterFormPage implements ViewWillEnter {
   imageEnabled = false;
 
   async ionViewWillEnter() {
+    this.resetForm();
     await this.loadIfEditing();
   }
 
@@ -54,6 +54,28 @@ export class CharacterFormPage implements ViewWillEnter {
     private route: ActivatedRoute,
     private router: Router
   ) { }
+
+  // Réinitialise tous les champs (création) : la page n'étant pas détruite entre deux
+  // visites, sans cela elle conserverait les saisies précédentes. En édition,
+  // loadIfEditing re-remplit ensuite à partir du personnage.
+  resetForm() {
+    this.characterId = "";
+    this.brief = "";
+    this.generating = false;
+    this.name = "";
+    this.systemPrompt = "";
+    this.greeting = "";
+    this.scenario = "";
+    this.setting = "";
+    this.speechStyle = "";
+    this.background = "";
+    this.appearance = "";
+    this.initialRelationship = "";
+    this.preferences = "";
+    this.knownCharacters = "";
+    this.avatarImage = "";
+    this.generatingImage = false;
+  }
 
   // Mode édition : pré-remplit le formulaire si un id est présent dans l'URL.
   async loadIfEditing() {
@@ -77,8 +99,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.background = character.background ?? "";
     this.appearance = character.appearance ?? "";
     this.initialRelationship = character.initialRelationship ?? "";
-    this.likes = character.likes ?? "";
-    this.dislikes = character.dislikes ?? "";
+    this.preferences = character.preferences ?? "";
     this.knownCharacters = character.knownCharacters ?? "";
     this.avatarImage = character.avatarImage ?? "";
   }
@@ -105,8 +126,7 @@ export class CharacterFormPage implements ViewWillEnter {
       this.background = draft.background ?? "";
       this.appearance = draft.appearance ?? "";
       this.initialRelationship = draft.initialRelationship ?? "";
-      this.likes = draft.likes ?? "";
-      this.dislikes = draft.dislikes ?? "";
+      this.preferences = draft.preferences ?? "";
       this.knownCharacters = draft.knownCharacters ?? "";
     } catch (error) {
       await this.message.error("Échec de la génération de la fiche.");
@@ -170,8 +190,7 @@ export class CharacterFormPage implements ViewWillEnter {
       background: this.background.trim(),
       appearance: this.appearance.trim(),
       initialRelationship: this.initialRelationship.trim(),
-      likes: this.likes.trim(),
-      dislikes: this.dislikes.trim(),
+      preferences: this.preferences.trim(),
       knownCharacters: this.knownCharacters.trim(),
       avatarImage: this.avatarImage
     };

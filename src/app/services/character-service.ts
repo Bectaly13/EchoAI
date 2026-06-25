@@ -24,8 +24,7 @@ export interface Character {
   background?: string;            // histoire / passé du personnage
   appearance?: string;            // apparence physique
   initialRelationship?: string;   // relation initiale avec l'utilisateur
-  likes?: string;                 // goûts et préférences
-  dislikes?: string;              // ce qu'il n'aime pas
+  preferences?: string;           // goûts et préférences (ce qu'il aime ou non)
   knownCharacters?: string;       // autres personnages qu'il connaît
   // Photo de profil générée par l'IA, stockée en data URL base64. Optionnelle :
   // à défaut, la pastille de couleur (avatarColor) sert d'avatar.
@@ -38,7 +37,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "initialRelationship" | "likes" | "dislikes" | "knownCharacters" | "avatarImage"
+  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -104,8 +103,7 @@ export class CharacterService {
       background: value("background"),
       appearance: value("appearance"),
       initialRelationship: value("initialRelationship"),
-      likes: value("likes"),
-      dislikes: value("dislikes"),
+      preferences: value("preferences"),
       knownCharacters: value("knownCharacters")
     };
   }
@@ -122,8 +120,7 @@ export class CharacterService {
       background: "",
       appearance: "",
       initialRelationship: "",
-      likes: "",
-      dislikes: "",
+      preferences: "",
       knownCharacters: ""
     };
   }

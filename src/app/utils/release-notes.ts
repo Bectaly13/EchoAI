@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.1",
+    changes: [
+      "Champs « Ce qu'il aime » et « Ce qu'il n'aime pas » fusionnés en un seul « Goûts et préférences » (mise à jour automatique des personnages existants).",
+      "Formulaire de personnage : bouton « Enregistrer » toujours accessible (collé en bas), apparence placée en premier dans les détails.",
+      "Ouvrir « Nouveau personnage » repart d'un formulaire vierge (plus de saisies résiduelles)."
+    ]
+  },
+  {
     version: "1.4",
     changes: [
       "Fiches personnage enrichies : nouveaux champs Scénario, Univers / cadre, Façon de parler et Histoire / passé (tous optionnels).",

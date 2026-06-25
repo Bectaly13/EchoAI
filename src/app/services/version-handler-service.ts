@@ -16,11 +16,11 @@ export class VersionHandlerService {
   // de format, en ajoutant la migration updateToVx() correspondante. Sert à garantir
   // qu'un utilisateur d'une version antérieure récupère des données au bon format.
   // Indépendante de la version affichée ci-dessous.
-  private readonly appVersion = 3;
+  private readonly appVersion = 4;
   // Version **commerciale**, destinée à l'utilisateur (illustre l'ampleur des mises
   // à jour). Sans rapport avec appVersion. Reste « 1.0 » jusqu'à la finalisation de
   // l'app et les premiers tests utilisateur.
-  readonly appVersionDisplay = "1.4";
+  readonly appVersionDisplay = "1.4.1";
 
   constructor(
     private storage: StorageService,
@@ -54,6 +54,9 @@ export class VersionHandlerService {
     if (userVersion < 3) {
       await this.updateToV3();
     }
+    if (userVersion < 4) {
+      await this.updateToV4();
+    }
     await this.storage.set("version", this.appVersion);
   }
 
@@ -68,6 +71,35 @@ export class VersionHandlerService {
   private async updateToV3(): Promise<void> {
     const db = await this.database.get();
     db.usage = db.usage || [];
+    await this.database.update(db);
+  }
+
+  // Migration v3 → v4 : fusionne les champs "likes" et "dislikes" de chaque personnage
+  // en un unique champ "preferences". Les valeurs ne sont pas introduites par « aime »/
+  // « n'aime pas » (elles listent directement les objets) → on préfixe nous-mêmes, puis
+  // on retire les anciens champs.
+  private async updateToV4(): Promise<void> {
+    const db = await this.database.get();
+    const characters = db.characters || [];
+    for (const character of characters) {
+      const likes = (character.likes || "").trim();
+      const dislikes = (character.dislikes || "").trim();
+      const parts: string[] = [];
+      if (likes) {
+        parts.push(`Aime ${likes}`);
+      }
+      if (dislikes) {
+        parts.push(`N'aime pas ${dislikes}`);
+      }
+      // Simple retour à la ligne entre les deux parties (pas de « ; » : les valeurs se
+      // terminent souvent déjà par un point, la double ponctuation est disgracieuse).
+      const preferences = parts.join("\n");
+      if (preferences) {
+        character.preferences = preferences;
+      }
+      delete character.likes;
+      delete character.dislikes;
+    }
     await this.database.update(db);
   }
 }

@@ -18,6 +18,7 @@ export function buildDraftPrompt(brief: string): string {
     "- \"background\" : l'histoire et le passé du personnage (origines, événements marquants de sa vie).",
     "- \"setting\" : l'univers / le cadre où se déroule l'histoire (monde, époque, lieu).",
     "- \"scenario\" : l'intrigue / la situation de départ qui plante l'histoire, au-delà du seul message d'accueil. Propose TOUJOURS une situation cohérente avec le brouillon.",
+    "- \"preferences\" : ce que le personnage aime ET ce qu'il n'aime pas, réunis dans un seul champ.",
     "- \"knownCharacters\" : une LISTE de personnages secondaires NOMMÉS, un par ligne, chacun avec son nom + sa fonction + sa relation au personnage. Exemple : \"- Lana, meilleure amie\\n- Mme Dubois, professeure de chimie\\n- M. Durand, proviseur\". INTERDIT de te contenter d'ensembles génériques non nommés (ex. « les autres élèves, les professeurs ») : il faut de vrais noms pour fonder un socle stable (sinon un personnage risque de changer de nom au fil de l'histoire).",
     "- \"greeting\" : le message d'ouverture qui plante le décor. Il DOIT suivre le format des messages : les répliques sont préfixées par le nom de celui qui parle puis mises entre guillemets droits — pour le personnage principal, utilise la balise (ex. : {char} : \"Bonjour\") ; la narration (actions, lieux, ambiance) est écrite à la 3ᵉ personne, comme un narrateur, entre astérisques et en dehors des guillemets (ex. : *La nuit tombe sur le port.*). Dans la narration, désigne l'utilisateur par « tu » ; un personnage peut aussi le nommer via {user}. Passe RÉELLEMENT à la ligne (insère un vrai saut de ligne \\n) entre la narration et une réplique, et entre deux répliques — n'enchaîne jamais narration et dialogue sur la même ligne. Exemple exact du format attendu (chaque élément sur sa propre ligne) :\n*La nuit tombe sur le port ; une silhouette s'avance.*\n{char} : \"Te voilà enfin.\"\nLana : \"On t'attendait.\"\nLa salutation peut faire intervenir des personnages secondaires (qui parlent et agissent), pas seulement le personnage principal, pour planter un décor vivant. Reste concis : chaque paragraphe de narration fait 1 à 2 phrases courtes au maximum, et au plus 2 paragraphes de narration (ces limites ne concernent que la narration, pas les dialogues).",
     "",
@@ -39,8 +40,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     setting: { type: "string" },
     scenario: { type: "string" },
     initialRelationship: { type: "string" },
-    likes: { type: "string" },
-    dislikes: { type: "string" },
+    preferences: { type: "string" },
     knownCharacters: { type: "string" },
     greeting: { type: "string" }
   },
@@ -55,8 +55,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     "setting",
     "scenario",
     "initialRelationship",
-    "likes",
-    "dislikes",
+    "preferences",
     "knownCharacters",
     "greeting"
   ],

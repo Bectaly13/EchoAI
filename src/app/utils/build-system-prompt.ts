@@ -164,8 +164,7 @@ function buildCharacterBlock(character: Character): string {
   appendField(lines, "Univers / cadre", character.setting);
   appendField(lines, "Scénario / intrigue", character.scenario);
   appendField(lines, "Relation initiale avec l'utilisateur", character.initialRelationship);
-  appendField(lines, "Goûts et préférences", character.likes);
-  appendField(lines, "Ce qu'il n'aime pas", character.dislikes);
+  appendField(lines, "Goûts et préférences", character.preferences);
   appendField(lines, "Personnages qu'il connaît", character.knownCharacters);
   return lines.join("\n");
 }
