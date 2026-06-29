@@ -13,6 +13,12 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.6",
+    changes: [
+      "Illustration de scène nettement améliorée : l'image décrit désormais l'instant présent (qui, quoi, où) au lieu de recopier la conversation, et les scènes matures sont automatiquement épurées pour passer les filtres."
+    ]
+  },
+  {
     version: "1.4.5",
     changes: [
       "Création de personnage par IA : nouveau champ « Ton rôle dans l'histoire » pour décrire qui tu es, afin que l'IA ne te confonde plus avec le personnage à créer.",

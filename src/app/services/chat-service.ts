@@ -8,7 +8,7 @@ import { Persona, PersonaService } from './persona-service';
 import { UsageService } from './usage-service';
 
 import { buildGeminiContents } from '../utils/build-gemini-contents';
-import { buildSceneImagePrompt } from '../utils/build-scene-image-prompt';
+import { buildSceneImageInstruction, SCENE_IMAGE_SCHEMA } from '../utils/build-scene-image-instruction';
 import { buildSystemPrompt } from '../utils/build-system-prompt';
 import { interpolateTags } from '../utils/interpolate-tags';
 import { MemoryCategory, parseMemory } from '../utils/parse-memory';
@@ -312,7 +312,7 @@ export class ChatService {
     }
     const conversation = await this.getOrCreateConversation(characterId);
 
-    const prompt = buildSceneImagePrompt(character, conversation.memory ?? [], conversation.messages);
+    const prompt = await this.buildScenePrompt(character, conversation);
     let result;
     try {
       result = await this.image.generate(prompt);
@@ -371,6 +371,22 @@ export class ChatService {
   private async buildPrompt(character: Character, conversation: Conversation): Promise<string> {
     const persona = await this.personaFor(conversation);
     return buildSystemPrompt({ character: character, persona: persona, memory: conversation.memory });
+  }
+
+  // Pipeline IA-IA : demande à Gemini de transformer le contexte courant (personnage, persona,
+  // mémoire, derniers messages) en un prompt text-to-image pertinent, en anglais et épuré (SFW).
+  // Comptabilise la requête. Lève si Gemini ne renvoie pas de prompt exploitable (illustration
+  // impossible) — pas de repli déterministe (cf. décision : on passe uniquement par Gemini).
+  private async buildScenePrompt(character: Character, conversation: Conversation): Promise<string> {
+    const persona = await this.personaFor(conversation);
+    const instruction = buildSceneImageInstruction(character, persona, conversation.memory ?? [], conversation.messages);
+    const result = await this.gemini.generateStructured(instruction, SCENE_IMAGE_SCHEMA);
+    await this.usage.recordText(result);
+    const prompt = (result.data?.imagePrompt ?? "").trim();
+    if (!prompt) {
+      throw new Error("empty-image-prompt");
+    }
+    return prompt;
   }
 
   // Intègre une réponse brute du modèle : ajoute le message (texte nettoyé) et, si la
