@@ -29,9 +29,9 @@ export function buildSceneImageInstruction(
     "- Illustre l'INSTANT PRÉSENT, c'est-à-dire l'état décrit par le DERNIER message. Le contexte antérieur sert UNIQUEMENT à comprendre la situation présente.",
     "- Si un paramètre a changé au fil des messages (lieu, personnages présents, action, moment de la journée…), illustre le DERNIER état, jamais un état antérieur (ex. : si on passe d'un lieu A à un lieu B, illustre B). Cela vaut pour le lieu ET pour tous les autres paramètres.",
     "",
-    "Épuration (CRITIQUE) :",
-    "- Le service de génération d'image est très restrictif. Le prompt doit être ENTIÈREMENT SFW, sobre et non choquant.",
-    "- AUCUN terme explicite, sexuel, graphique ou violent ne doit apparaître dans le prompt. Recadre toute situation mature en une scène suggérée et pudique (ex. « two adults embracing » plutôt qu'une description explicite).",
+    "Convenance (CRITIQUE) :",
+    "- Le modèle d'image n'accepte que des images tout public. Le prompt doit décrire une scène entièrement convenable, sobre et de bon goût.",
+    "- Reste suggéré et pudique : si la scène est intime, évoque-la avec retenue et élégance (ex. « two adults embracing, warm intimate atmosphere »), sans aucun détail cru. Décris des tenues correctes et des poses décentes, même si ça contredit la scène ; la pureté de ta description est prioritaire devant la fidélité de la description.",
     "",
     "Contexte de la scène :"
   ];

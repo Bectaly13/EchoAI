@@ -13,6 +13,12 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.7",
+    changes: [
+      "Illustration de scène : les contextes adultes aboutissent désormais beaucoup plus souvent (formulation interne ajustée pour éviter des refus injustifiés)."
+    ]
+  },
+  {
     version: "1.4.6",
     changes: [
       "Illustration de scène nettement améliorée : l'image décrit désormais l'instant présent (qui, quoi, où) au lieu de recopier la conversation, et les scènes matures sont automatiquement épurées pour passer les filtres."
