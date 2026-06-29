@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.5",
+    changes: [
+      "Création de personnage par IA : nouveau champ « Ton rôle dans l'histoire » pour décrire qui tu es, afin que l'IA ne te confonde plus avec le personnage à créer.",
+      "Champ « Scénario » retiré de la fiche personnage.",
+      "Détails de la fiche personnage réorganisés dans un ordre plus logique."
+    ]
+  },
+  {
     version: "1.4.4",
     changes: [
       "Réponses vides nettement réduites : l'application relance toute seule quand une réponse revient vide, et affiche un message clair si elle reste bloquée (plus de bulle vide qui traîne).",

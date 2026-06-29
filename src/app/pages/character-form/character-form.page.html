@@ -14,6 +14,10 @@
         <textarea class="character-form-textarea" id="brief" name="brief" rows="3"
           [(ngModel)]="brief"
           placeholder="Décris ton idée en quelques mots ; l'IA en fera une fiche complète, que tu pourras retoucher."></textarea>
+        <label class="character-form-label" for="userRole">Ton rôle dans l'histoire (optionnel)</label>
+        <textarea class="character-form-textarea" id="userRole" name="userRole" rows="3"
+          [(ngModel)]="userRole"
+          placeholder="Décris-toi pour situer ta relation au personnage."></textarea>
         <button class="character-form-generate" type="button"
           (click)="generateDraft()" [disabled]="generating || !brief.trim()">
           {{ generating ? "Génération…" : "Générer la fiche" }}
@@ -68,10 +72,20 @@
       [(ngModel)]="appearance"
       placeholder="Physique : cheveux, yeux, taille, corpulence, traits… (vêtements en secondaire)."></textarea>
 
-    <label class="character-form-label" for="scenario">Scénario</label>
-    <textarea class="character-form-textarea" id="scenario" name="scenario" rows="3"
-      [(ngModel)]="scenario"
-      placeholder="L'intrigue de départ : la situation qui plante l'histoire (au-delà du seul message d'accueil)."></textarea>
+    <label class="character-form-label" for="initialRelationship">Relation initiale avec toi</label>
+    <textarea class="character-form-textarea" id="initialRelationship" name="initialRelationship" rows="3"
+      [(ngModel)]="initialRelationship"
+      placeholder="Comment vous vous connaissez au début de l'histoire."></textarea>
+
+    <label class="character-form-label" for="preferences">Goûts et préférences</label>
+    <textarea class="character-form-textarea" id="preferences" name="preferences" rows="3"
+      [(ngModel)]="preferences"
+      placeholder="Ce qu'il aime ou non"></textarea>
+
+    <label class="character-form-label" for="background">Histoire / passé</label>
+    <textarea class="character-form-textarea" id="background" name="background" rows="3"
+      [(ngModel)]="background"
+      placeholder="Origines, événements marquants de sa vie."></textarea>
 
     <label class="character-form-label" for="setting">Univers / cadre</label>
     <textarea class="character-form-textarea" id="setting" name="setting" rows="3"
@@ -82,21 +96,6 @@
     <textarea class="character-form-textarea" id="speechStyle" name="speechStyle" rows="3"
       [(ngModel)]="speechStyle"
       placeholder="Registre de langue, tics de langage, accent, ton."></textarea>
-
-    <label class="character-form-label" for="background">Histoire / passé</label>
-    <textarea class="character-form-textarea" id="background" name="background" rows="3"
-      [(ngModel)]="background"
-      placeholder="Origines, événements marquants de sa vie."></textarea>
-
-    <label class="character-form-label" for="initialRelationship">Relation initiale avec toi</label>
-    <textarea class="character-form-textarea" id="initialRelationship" name="initialRelationship" rows="3"
-      [(ngModel)]="initialRelationship"
-      placeholder="Comment vous vous connaissez au début de l'histoire."></textarea>
-
-    <label class="character-form-label" for="preferences">Goûts et préférences</label>
-    <textarea class="character-form-textarea" id="preferences" name="preferences" rows="3"
-      [(ngModel)]="preferences"
-      placeholder="Ce qu'il aime ou non"></textarea>
 
     <label class="character-form-label" for="knownCharacters">Personnages qu'il connaît</label>
     <textarea class="character-form-textarea" id="knownCharacters" name="knownCharacters" rows="3"

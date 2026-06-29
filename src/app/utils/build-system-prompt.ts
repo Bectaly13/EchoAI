@@ -172,16 +172,16 @@ function buildCharacterBlock(character: Character): string {
     "PERSONNAGE",
     `Tu incarnes « ${character.name} ». Reste fidèle à ce personnage en toutes circonstances.`
   ];
-  // Personnalité (description principale), puis les champs structurés renseignés.
+  // Personnalité (description principale), puis les champs structurés renseignés
+  // (même ordre que le formulaire de la fiche personnage).
   appendField(lines, "", character.systemPrompt);
-  appendField(lines, "Façon de parler", character.speechStyle);
-  appendField(lines, "Apparence", character.appearance);
   appendField(lines, "Âge", character.age);
-  appendField(lines, "Histoire / passé", character.background);
-  appendField(lines, "Univers / cadre", character.setting);
-  appendField(lines, "Scénario / intrigue", character.scenario);
+  appendField(lines, "Apparence", character.appearance);
   appendField(lines, "Relation initiale avec l'utilisateur", character.initialRelationship);
   appendField(lines, "Goûts et préférences", character.preferences);
+  appendField(lines, "Histoire / passé", character.background);
+  appendField(lines, "Univers / cadre", character.setting);
+  appendField(lines, "Façon de parler", character.speechStyle);
   appendField(lines, "Personnages qu'il connaît", character.knownCharacters);
   return lines.join("\n");
 }

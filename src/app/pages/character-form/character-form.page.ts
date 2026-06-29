@@ -23,13 +23,15 @@ export class CharacterFormPage implements ViewWillEnter {
   characterId = "";
   // Brouillon libre pour la génération assistée par IA, et état d'attente associé.
   brief = "";
+  // Rôle de l'utilisateur dans l'histoire (transitoire, aide à la génération) : sert à
+  // désambiguïser {user} du personnage à créer. Non persisté sur le personnage.
+  userRole = "";
   generating = false;
   name = "";
   systemPrompt = "";
   // Message d'accueil du personnage (premier message de la conversation).
   greeting = "";
   // Champs structurés optionnels.
-  scenario = "";
   setting = "";
   speechStyle = "";
   background = "";
@@ -62,11 +64,11 @@ export class CharacterFormPage implements ViewWillEnter {
   resetForm() {
     this.characterId = "";
     this.brief = "";
+    this.userRole = "";
     this.generating = false;
     this.name = "";
     this.systemPrompt = "";
     this.greeting = "";
-    this.scenario = "";
     this.setting = "";
     this.speechStyle = "";
     this.background = "";
@@ -95,7 +97,6 @@ export class CharacterFormPage implements ViewWillEnter {
     this.name = character.name;
     this.systemPrompt = character.systemPrompt;
     this.greeting = character.greeting ?? "";
-    this.scenario = character.scenario ?? "";
     this.setting = character.setting ?? "";
     this.speechStyle = character.speechStyle ?? "";
     this.background = character.background ?? "";
@@ -119,11 +120,10 @@ export class CharacterFormPage implements ViewWillEnter {
     }
     this.generating = true;
     try {
-      const draft = await this.characterService.draftFromBrief(brief);
+      const draft = await this.characterService.draftFromBrief(brief, this.userRole);
       this.name = draft.name;
       this.systemPrompt = draft.systemPrompt;
       this.greeting = draft.greeting ?? "";
-      this.scenario = draft.scenario ?? "";
       this.setting = draft.setting ?? "";
       this.speechStyle = draft.speechStyle ?? "";
       this.background = draft.background ?? "";
@@ -188,7 +188,6 @@ export class CharacterFormPage implements ViewWillEnter {
       name: name,
       systemPrompt: this.systemPrompt.trim(),
       greeting: greeting,
-      scenario: this.scenario.trim(),
       setting: this.setting.trim(),
       speechStyle: this.speechStyle.trim(),
       background: this.background.trim(),

@@ -18,7 +18,6 @@ export interface Character {
   // sert à planter le décor. Optionnel (vide = pas de premier message imposé).
   greeting: string;
   // Champs structurés optionnels, ajoutés à la fiche envoyée à l'IA s'ils sont remplis.
-  scenario?: string;              // intrigue / situation de départ
   setting?: string;               // univers / cadre (monde, époque, lieu)
   speechStyle?: string;           // façon de parler / voix (registre, tics, ton)
   background?: string;            // histoire / passé du personnage
@@ -38,7 +37,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "age" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
+  "name" | "systemPrompt" | "greeting" | "setting" | "speechStyle" | "background" | "appearance" | "age" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -80,12 +79,12 @@ export class CharacterService {
   // Génère une fiche de personnage structurée à partir d'un brouillon libre.
   // Renvoie les champs éditables à pré-remplir dans le formulaire (résultat
   // toujours retouchable par l'utilisateur). Retombe sur un mock sans clé API.
-  async draftFromBrief(brief: string): Promise<CharacterDraft> {
+  async draftFromBrief(brief: string, userRole: string): Promise<CharacterDraft> {
     const text = brief.trim();
     if (!this.gemini.hasApiKey()) {
       return this.mockDraft(text);
     }
-    const result = await this.gemini.generateStructured(buildDraftPrompt(text), CHARACTER_DRAFT_SCHEMA);
+    const result = await this.gemini.generateStructured(buildDraftPrompt(text, userRole), CHARACTER_DRAFT_SCHEMA);
     // Comptabilise cet appel (auparavant non suivi) dans le suivi d'utilisation.
     await this.usage.recordText(result);
     return this.normalizeDraft(result.data);
@@ -98,7 +97,6 @@ export class CharacterService {
       name: value("name"),
       systemPrompt: value("systemPrompt"),
       greeting: value("greeting"),
-      scenario: value("scenario"),
       setting: value("setting"),
       speechStyle: value("speechStyle"),
       background: value("background"),
@@ -116,7 +114,6 @@ export class CharacterService {
       name: "Personnage (démo)",
       systemPrompt: brief || "Personnalité à compléter.",
       greeting: "",
-      scenario: "",
       setting: "",
       speechStyle: "",
       background: "",
