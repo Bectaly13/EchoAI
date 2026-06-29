@@ -15,6 +15,8 @@ export interface Persona {
   description: string;
   // Apparence physique (facultative) : pour la cohérence long terme et l'immersion.
   appearance?: string;
+  // Âge (facultatif, texte libre) : renforce le cadre « adulte » transmis à l'IA.
+  age?: string;
   // Genre (facultatif sur les anciens personas : traité comme non précisé).
   gender?: PersonaGender;
   // Couleur de la pastille affichée dans la liste.
@@ -89,12 +91,13 @@ export class PersonaService {
   }
 
   // Crée un persona et le renvoie.
-  async create(name: string, description: string, gender: PersonaGender, appearance: string): Promise<Persona> {
+  async create(name: string, description: string, gender: PersonaGender, appearance: string, age: string): Promise<Persona> {
     const persona: Persona = {
       id: this.generateId(),
       name: name,
       description: description,
       appearance: appearance,
+      age: age,
       gender: gender,
       avatarColor: this.pickColor(),
       createdAt: Date.now()

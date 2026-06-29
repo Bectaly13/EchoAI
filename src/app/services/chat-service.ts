@@ -75,6 +75,11 @@ interface Conversation {
 // dernier tour `user`. Ce texte amorce la suite sans polluer l'historique stocké.
 const CONTINUATION_PROMPT = "[L'utilisateur passe son tour. Poursuis la scène toi-même, sans attendre de réplique de sa part.]";
 
+// Nombre maximal de re-tirages quand l'IA renvoie un texte vide (typiquement un blocage
+// PROHIBITED_CONTENT non configurable côté Google) : re-tirer change l'échantillonnage et
+// finit généralement par produire une réponse. Au-delà, on remonte une erreur "empty-response".
+const MAX_EMPTY_RETRIES = 3;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -469,9 +474,7 @@ export class ChatService {
       return this.mockReply(messages);
     }
     const contents = buildGeminiContents(messages);
-    const result = await this.gemini.generate(systemPrompt, contents);
-    await this.usage.recordText(result);
-    return result.text;
+    return await this.generateText(systemPrompt, contents);
   }
 
   // Comme generateReply, mais sans nouveau message utilisateur : on ajoute un tour
@@ -482,9 +485,23 @@ export class ChatService {
     }
     const contents = buildGeminiContents(messages);
     contents.push({ role: "user", parts: [{ text: CONTINUATION_PROMPT }] });
-    const result = await this.gemini.generate(systemPrompt, contents);
-    await this.usage.recordText(result);
-    return result.text;
+    return await this.generateText(systemPrompt, contents);
+  }
+
+  // Appelle Gemini en comptabilisant CHAQUE requête réelle, et re-tire jusqu'à
+  // MAX_EMPTY_RETRIES fois tant que le texte revient vide (blocage PROHIBITED_CONTENT
+  // non configurable côté Google : re-tirer change l'échantillonnage). Lève
+  // "empty-response" si tous les essais sont vides → l'appelant ne persiste alors aucun
+  // message vide et la page affiche une erreur explicite.
+  private async generateText(systemPrompt: string, contents: any[]): Promise<string> {
+    for (let attempt = 0; attempt <= MAX_EMPTY_RETRIES; attempt++) {
+      const result = await this.gemini.generate(systemPrompt, contents);
+      await this.usage.recordText(result);
+      if (result.text.trim()) {
+        return result.text;
+      }
+    }
+    throw new Error("empty-response");
   }
 
   // Réponse bidon utilisée tant qu'aucune clé API n'est configurée.

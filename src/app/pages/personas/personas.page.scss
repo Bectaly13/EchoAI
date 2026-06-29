@@ -3,26 +3,32 @@ ion-content.personas-content {
   --padding-bottom: calc(72px + var(--safe-bottom));
 }
 
-.personas-toolbar {
+// Zone de défilement en colonne flex : permet de plaquer le bouton d'action tout en bas
+// (margin-top: auto) même quand la liste est courte, sans saut à fond de scroll.
+ion-content.personas-content::part(scroll) {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px;
+  flex-direction: column;
 }
 
 .personas-hint {
   margin: 0;
+  padding: 12px;
   font-size: 13px;
   color: var(--app-text-muted);
 }
 
 .personas-add {
-  flex: 0 0 auto;
+  // Toujours plaqué en bas : margin-top: auto le pousse au bas de la colonne flex (même
+  // liste courte), sticky le maintient visible pendant le défilement. Le --padding-bottom
+  // de l'ion-content (navbar + zone sûre) le cale juste au-dessus de la navbar.
+  margin: auto 12px 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
   border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-size: 14px;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
   font-weight: 600;
   background: var(--app-accent);
   color: var(--app-on-accent);
@@ -46,6 +52,9 @@ ion-content.personas-content {
   gap: 10px;
   // Pas de padding bas : l'espace vient du --padding-bottom de l'ion-content.
   padding: 0 12px;
+  // Écart entre le dernier item et le bouton d'action quand la liste déborde (invisible
+  // quand la liste est courte : absorbé par le margin-top: auto du bouton).
+  margin-bottom: 12px;
 }
 
 .persona-item {
@@ -55,6 +64,8 @@ ion-content.personas-content {
   padding: 12px;
   border-radius: 14px;
   background: var(--app-surface);
+  // Toute la carte ouvre l'édition du persona.
+  cursor: pointer;
 }
 
 .persona-item-avatar {

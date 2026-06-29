@@ -69,8 +69,14 @@ export class GeminiService {
         safetySettings: SAFETY_SETTINGS
       };
       const response = await this.post(`${model}:generateContent`, body);
+      const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      // Trace les métadonnées quand le texte est vide (blocage finishReason/safety, part
+      // secondaire…) : aide au diagnostic des re-tirages déclenchés en amont par ChatService.
+      if (!text.trim()) {
+        this.logEmptyResponse(model, response);
+      }
       return {
-        text: response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "",
+        text: text,
         model: model,
         usage: this.parseUsage(response?.usageMetadata),
         exhausted: [...exhausted]
@@ -111,6 +117,26 @@ export class GeminiService {
   }
 
   // ----- Internes -----
+
+  // Journalise les métadonnées d'une réponse texte vide (aucun contenu de message,
+  // seulement de quoi identifier la cause : finishReason, blocage, parts…). Observable
+  // via chrome://inspect (DevTools WebView) ou logcat sur l'appareil.
+  private logEmptyResponse(model: string, response: any): void {
+    const candidate = response?.candidates?.[0];
+    const parts: any[] = candidate?.content?.parts ?? [];
+    console.warn("[Gemini] réponse vide", {
+      model: model,
+      finishReason: candidate?.finishReason,
+      blockReason: response?.promptFeedback?.blockReason,
+      candidateCount: response?.candidates?.length ?? 0,
+      partCount: parts.length,
+      // Vrai si une part (autre que la première, lue par generate) contient du texte → cause A.
+      partsHaveText: parts.some(part => typeof part?.text === "string" && part.text.trim().length > 0),
+      candidateSafetyRatings: candidate?.safetyRatings,
+      promptSafetyRatings: response?.promptFeedback?.safetyRatings,
+      usage: this.parseUsage(response?.usageMetadata)
+    });
+  }
 
   // Boucle de repli : essaie chaque modèle dans l'ordre via `call`. Sur 429, ajoute
   // le modèle à `exhausted` et tente le suivant ; toute autre erreur est remontée.

@@ -34,6 +34,7 @@ export class CharacterFormPage implements ViewWillEnter {
   speechStyle = "";
   background = "";
   appearance = "";
+  age = "";
   initialRelationship = "";
   preferences = "";
   knownCharacters = "";
@@ -70,6 +71,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.speechStyle = "";
     this.background = "";
     this.appearance = "";
+    this.age = "";
     this.initialRelationship = "";
     this.preferences = "";
     this.knownCharacters = "";
@@ -98,6 +100,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.speechStyle = character.speechStyle ?? "";
     this.background = character.background ?? "";
     this.appearance = character.appearance ?? "";
+    this.age = character.age ?? "";
     this.initialRelationship = character.initialRelationship ?? "";
     this.preferences = character.preferences ?? "";
     this.knownCharacters = character.knownCharacters ?? "";
@@ -125,6 +128,7 @@ export class CharacterFormPage implements ViewWillEnter {
       this.speechStyle = draft.speechStyle ?? "";
       this.background = draft.background ?? "";
       this.appearance = draft.appearance ?? "";
+      this.age = draft.age ?? "";
       this.initialRelationship = draft.initialRelationship ?? "";
       this.preferences = draft.preferences ?? "";
       this.knownCharacters = draft.knownCharacters ?? "";
@@ -189,6 +193,7 @@ export class CharacterFormPage implements ViewWillEnter {
       speechStyle: this.speechStyle.trim(),
       background: this.background.trim(),
       appearance: this.appearance.trim(),
+      age: this.age.trim(),
       initialRelationship: this.initialRelationship.trim(),
       preferences: this.preferences.trim(),
       knownCharacters: this.knownCharacters.trim(),

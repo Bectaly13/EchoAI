@@ -31,8 +31,8 @@ export class CharactersPage implements ViewWillEnter {
   // dans les aperçus : persona de la conversation existante, sinon persona par défaut.
   userNames: Record<string, string> = {};
   // Modale de saisie du persona par défaut au premier lancement (nom + genre +
-  // description + apparence ; ces deux derniers facultatifs).
-  namePrompt = { open: false, personaId: "", value: "", gender: "male" as PersonaGender, description: "", appearance: "" };
+  // âge + description + apparence ; tous facultatifs sauf le nom).
+  namePrompt = { open: false, personaId: "", value: "", gender: "male" as PersonaGender, age: "", description: "", appearance: "" };
   // Options du sélecteur de genre.
   readonly genderOptions: { value: PersonaGender; label: string }[] = [
     { value: "male", label: "Homme" },
@@ -93,6 +93,7 @@ export class CharactersPage implements ViewWillEnter {
       personaId: persona.id,
       value: persona.name,
       gender: persona.gender ?? "male",
+      age: persona.age ?? "",
       description: persona.description ?? "",
       appearance: persona.appearance ?? ""
     };
@@ -104,6 +105,7 @@ export class CharactersPage implements ViewWillEnter {
       await this.personaService.update(this.namePrompt.personaId, {
         name: trimmed,
         gender: this.namePrompt.gender,
+        age: this.namePrompt.age.trim(),
         description: this.namePrompt.description.trim(),
         appearance: this.namePrompt.appearance.trim()
       });

@@ -15,6 +15,7 @@ export function buildDraftPrompt(brief: string): string {
     "- \"systemPrompt\" : la personnalité, le tempérament, les valeurs et ce que sait le personnage (rédigé à la 3ᵉ personne, comme des instructions de jeu de rôle).",
     "- \"speechStyle\" : la façon de parler — registre de langue, tics de langage, accent, ton.",
     "- \"appearance\" : décris D'ABORD le physique (couleur de cheveux et d'yeux, taille, corpulence, traits du visage, âge apparent…). Les vêtements et accessoires ne viennent qu'APRÈS et brièvement ; l'attitude/le caractère ne vont PAS ici (ils relèvent de la personnalité).",
+    "- \"age\" : l'âge du personnage (un nombre d'années, ou une tranche pour un être non humain). Le personnage est TOUJOURS un adulte majeur — n'indique jamais un âge de mineur.",
     "- \"background\" : l'histoire et le passé du personnage (origines, événements marquants de sa vie).",
     "- \"setting\" : l'univers / le cadre où se déroule l'histoire (monde, époque, lieu).",
     "- \"scenario\" : l'intrigue / la situation de départ qui plante l'histoire, au-delà du seul message d'accueil. Propose TOUJOURS une situation cohérente avec le brouillon.",
@@ -36,6 +37,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     systemPrompt: { type: "string" },
     speechStyle: { type: "string" },
     appearance: { type: "string" },
+    age: { type: "string" },
     background: { type: "string" },
     setting: { type: "string" },
     scenario: { type: "string" },
@@ -51,6 +53,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     "systemPrompt",
     "speechStyle",
     "appearance",
+    "age",
     "background",
     "setting",
     "scenario",
@@ -59,5 +62,5 @@ export const CHARACTER_DRAFT_SCHEMA = {
     "knownCharacters",
     "greeting"
   ],
-  required: ["name", "systemPrompt", "greeting", "scenario"]
+  required: ["name", "systemPrompt", "greeting", "scenario", "age"]
 };

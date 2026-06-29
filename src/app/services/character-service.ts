@@ -23,6 +23,7 @@ export interface Character {
   speechStyle?: string;           // façon de parler / voix (registre, tics, ton)
   background?: string;            // histoire / passé du personnage
   appearance?: string;            // apparence physique
+  age?: string;                   // âge (texte libre ; un adulte par défaut)
   initialRelationship?: string;   // relation initiale avec l'utilisateur
   preferences?: string;           // goûts et préférences (ce qu'il aime ou non)
   knownCharacters?: string;       // autres personnages qu'il connaît
@@ -37,7 +38,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
+  "name" | "systemPrompt" | "greeting" | "scenario" | "setting" | "speechStyle" | "background" | "appearance" | "age" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -102,6 +103,7 @@ export class CharacterService {
       speechStyle: value("speechStyle"),
       background: value("background"),
       appearance: value("appearance"),
+      age: value("age"),
       initialRelationship: value("initialRelationship"),
       preferences: value("preferences"),
       knownCharacters: value("knownCharacters")
@@ -119,6 +121,7 @@ export class CharacterService {
       speechStyle: "",
       background: "",
       appearance: "",
+      age: "",
       initialRelationship: "",
       preferences: "",
       knownCharacters: ""

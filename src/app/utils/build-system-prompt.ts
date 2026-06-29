@@ -29,6 +29,7 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
   const blocks: string[] = [];
 
   blocks.push(buildCharacterBlock(options.character));
+  blocks.push(buildContentPolicyBlock());
   if (options.persona) {
     blocks.push(buildPersonaBlock(options.persona));
   }
@@ -47,6 +48,16 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
   return interpolateTags(prompt, options.character.name, userName);
 }
 
+// Principe général de contenu : tous les personnages sont des adultes. Formulation
+// POSITIVE (pas de négation) pour orienter la génération vers un output non ambigu et
+// limiter les faux positifs du filtre PROHIBITED_CONTENT (non désactivable côté app).
+function buildContentPolicyBlock(): string {
+  return [
+    "PRINCIPE GÉNÉRAL",
+    "Tous les personnages de cette fiction — toi, l'utilisateur et les éventuels personnages secondaires — sont des adultes majeurs. Décris-les, nomme-les et fais-les agir comme des adultes, sans aucune ambiguïté sur leur âge."
+  ].join("\n");
+}
+
 // Bloc décrivant le persona incarné par l'utilisateur (qui il est).
 function buildPersonaBlock(persona: Persona): string {
   const lines = [
@@ -56,6 +67,11 @@ function buildPersonaBlock(persona: Persona): string {
   const gender = personaGenderPhrase(persona.gender);
   if (gender) {
     lines.push(`L'utilisateur est ${gender}.`);
+  }
+  const age = persona.age?.trim();
+  if (age) {
+    // L'âge renforce le cadre « adulte » et la cohérence ; on rappelle le statut majeur.
+    lines.push(`L'utilisateur est un adulte majeur (âge : ${age}).`);
   }
   const description = persona.description.trim();
   if (description) {
@@ -160,6 +176,7 @@ function buildCharacterBlock(character: Character): string {
   appendField(lines, "", character.systemPrompt);
   appendField(lines, "Façon de parler", character.speechStyle);
   appendField(lines, "Apparence", character.appearance);
+  appendField(lines, "Âge", character.age);
   appendField(lines, "Histoire / passé", character.background);
   appendField(lines, "Univers / cadre", character.setting);
   appendField(lines, "Scénario / intrigue", character.scenario);

@@ -124,7 +124,11 @@ export class ChatPage implements ViewWillEnter {
       // Recharge l'historique persisté (inclut la réponse du modèle).
       this.messages = await this.chatService.getMessages(this.character.id);
     } catch (error) {
-      await this.message.error("Échec de la requête à l'IA.");
+      // Rien n'a été persisté (échec avant la sauvegarde) : on recharge pour retirer la
+      // bulle utilisateur optimiste, et on rend son texte au champ pour réessayer/reformuler.
+      this.messages = await this.chatService.getMessages(this.character.id);
+      this.draft = text;
+      await this.message.error(this.generationError(error, "Échec de la requête à l'IA."));
     } finally {
       this.sending = false;
       this.scrollToBottom();
@@ -190,7 +194,7 @@ export class ChatPage implements ViewWillEnter {
     try {
       this.messages = await this.chatService.skipTurn(this.character.id);
     } catch (error) {
-      await this.message.error("Échec de la génération.");
+      await this.message.error(this.generationError(error, "Échec de la génération."));
     } finally {
       this.sending = false;
       this.scrollToBottom();
@@ -219,7 +223,7 @@ export class ChatPage implements ViewWillEnter {
       await this.chatService.regenerate(this.character.id);
       this.messages = await this.chatService.getMessages(this.character.id);
     } catch (error) {
-      await this.message.error("Échec de la régénération.");
+      await this.message.error(this.generationError(error, "Échec de la régénération."));
     } finally {
       this.sending = false;
       this.regenerating = false;
@@ -273,6 +277,16 @@ export class ChatPage implements ViewWillEnter {
     if (this.character) {
       this.router.navigate(["memory", this.character.id]);
     }
+  }
+
+  // Message d'erreur d'une génération : distingue une réponse vide après re-tirages
+  // (blocage de contenu côté Google) d'un échec technique (réseau, quota…), pour guider
+  // l'utilisateur sur la marche à suivre.
+  private generationError(error: unknown, fallback: string): string {
+    if ((error as Error)?.message === "empty-response") {
+      return "La réponse a été bloquée (contenu jugé sensible). Réessaie ou reformule ton message.";
+    }
+    return fallback;
   }
 
   // ----- Modale de confirmation -----

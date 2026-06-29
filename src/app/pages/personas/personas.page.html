@@ -4,10 +4,7 @@
 
 <ion-content [fullscreen]="true" class="personas-content">
 
-  <div class="personas-toolbar">
-    <p class="personas-hint">Un persona indique au personnage IA qui tu es.</p>
-    <button class="personas-add" (click)="goToCreate()">+ Nouveau</button>
-  </div>
+  <p class="personas-hint">Un persona indique au personnage IA qui tu es.</p>
 
   @if (personas.length === 0) {
     <div class="personas-empty">
@@ -16,7 +13,7 @@
   } @else {
     <div class="personas-list">
       @for (persona of personas; track persona.id) {
-        <div class="persona-item">
+        <div class="persona-item" (click)="goToEdit(persona)">
           <div class="persona-item-avatar" [style.background]="persona.avatarColor">
             <span class="persona-item-initial">{{ initial(persona) }}</span>
           </div>
@@ -27,16 +24,17 @@
             </h2>
             <p class="persona-item-description">{{ persona.description }}</p>
           </div>
-          <div class="persona-item-actions">
-            <button class="persona-item-edit icon-btn" (click)="goToEdit(persona)">✎</button>
-            @if (!persona.isDefault) {
-              <button class="persona-item-delete icon-btn" (click)="confirmRemove(persona)">🗑</button>
-            }
-          </div>
+          @if (!persona.isDefault) {
+            <div class="persona-item-actions">
+              <button class="persona-item-delete icon-btn" (click)="$event.stopPropagation(); confirmRemove(persona)">🗑</button>
+            </div>
+          }
         </div>
       }
     </div>
   }
+
+  <button class="personas-add" (click)="goToCreate()">+ Nouveau persona</button>
 
 </ion-content>
 

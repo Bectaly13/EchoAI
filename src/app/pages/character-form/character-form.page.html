@@ -59,6 +59,10 @@
 
     <p class="character-form-section">Détails (optionnels)</p>
 
+    <label class="character-form-label" for="age">Âge</label>
+    <input class="character-form-input" id="age" name="age" type="text"
+      [(ngModel)]="age" placeholder="Ex. : 27 ans (le personnage est un adulte)." />
+
     <label class="character-form-label" for="appearance">Apparence</label>
     <textarea class="character-form-textarea" id="appearance" name="appearance" rows="3"
       [(ngModel)]="appearance"

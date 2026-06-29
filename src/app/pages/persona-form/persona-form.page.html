@@ -22,6 +22,10 @@
       }
     </div>
 
+    <label class="persona-form-label" for="age">Âge (facultatif)</label>
+    <input class="persona-form-input" id="age" name="age" type="text"
+      [(ngModel)]="age" placeholder="Ex. : 27 ans" />
+
     <label class="persona-form-label" for="description">Description (facultatif)</label>
     <textarea class="persona-form-textarea" id="description" name="description" rows="8"
       [(ngModel)]="description"

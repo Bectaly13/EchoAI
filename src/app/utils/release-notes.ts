@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.4.4",
+    changes: [
+      "Réponses vides nettement réduites : l'application relance toute seule quand une réponse revient vide, et affiche un message clair si elle reste bloquée (plus de bulle vide qui traîne).",
+      "Nouveau champ « Âge » dans les fiches de personnage et de persona, pour plus de cohérence.",
+      "Personas : le bouton « Nouveau persona » est désormais plaqué en bas, et toucher un persona ouvre directement sa fiche."
+    ]
+  },
+  {
     version: "1.4.3",
     changes: [
       "Ajustements mineurs du formulaire de persona (espacement de la liste des conversations, mention « facultatif » sur la description)."

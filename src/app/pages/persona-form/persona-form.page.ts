@@ -24,6 +24,8 @@ export class PersonaFormPage implements ViewWillEnter {
   description = "";
   // Apparence physique (facultative), pour la cohérence et l'immersion.
   appearance = "";
+  // Âge (facultatif), pour renforcer le cadre « adulte » transmis à l'IA.
+  age = "";
   // Genre du persona (« Homme » par défaut en création).
   gender: PersonaGender = "male";
   // Options du sélecteur de genre.
@@ -61,6 +63,7 @@ export class PersonaFormPage implements ViewWillEnter {
     this.name = persona.name;
     this.description = persona.description;
     this.appearance = persona.appearance ?? "";
+    this.age = persona.age ?? "";
     this.gender = persona.gender ?? "male";
     this.activeInConversations = await this.chatService.conversationsUsingPersona(persona.id);
   }
@@ -75,11 +78,11 @@ export class PersonaFormPage implements ViewWillEnter {
       await this.messageService.error("Donne un nom au persona.");
       return;
     }
-    const changes = { name: name, description: this.description.trim(), appearance: this.appearance.trim(), gender: this.gender };
+    const changes = { name: name, description: this.description.trim(), appearance: this.appearance.trim(), age: this.age.trim(), gender: this.gender };
     if (this.isEditing()) {
       await this.personaService.update(this.personaId, changes);
     } else {
-      await this.personaService.create(changes.name, changes.description, changes.gender, changes.appearance);
+      await this.personaService.create(changes.name, changes.description, changes.gender, changes.appearance, changes.age);
     }
     this.router.navigate(["personas"]);
   }
