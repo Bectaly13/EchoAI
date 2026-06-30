@@ -19,6 +19,10 @@ export interface ChatMessage {
   id: string;
   role: "user" | "model";
   text: string;
+  // Aparté hors-personnage (OOC) : instruction de l'utilisateur au modèle, affichée à part
+  // (ni bulle user ni bulle model) et transmise à Gemini comme tour `user` encapsulé. Ne
+  // déclenche aucune réponse. Absent = message normal.
+  kind?: "ooc";
   // Illustration de la scène (data URL base64) : présente sur les messages-images
   // générés par « Illustrer la scène ». Ces messages ne sont pas renvoyés au modèle texte.
   imageData?: string;
@@ -251,7 +255,12 @@ export class ChatService {
     // Une conversation ne se termine jamais par un message de l'utilisateur : on
     // retire le(s) message(s) `user` resté(s) en fin de liste (supprimer une réponse
     // de l'IA enlève donc aussi le message utilisateur qui l'avait déclenchée).
-    while (conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].role === "user") {
+    // Exception : un aparté OOC final est conservé (une conversation PEUT se terminer sur un OOC).
+    while (
+      conversation.messages.length > 0
+      && conversation.messages[conversation.messages.length - 1].role === "user"
+      && conversation.messages[conversation.messages.length - 1].kind !== "ooc"
+    ) {
       removedIds.add(conversation.messages[conversation.messages.length - 1].id);
       conversation.messages.pop();
     }
@@ -274,6 +283,37 @@ export class ChatService {
     conversation.memory = conversation.memory.filter(entry =>
       entry.category !== "milestone" || !entry.sourceMessageId || !removedIds.has(entry.sourceMessageId)
     );
+  }
+
+  // Édite le texte d'un message existant. Ne régénère PAS les messages suivants et ne
+  // recalcule PAS la mémoire : l'édition modifie le stockage, donc l'historique transmis
+  // à Gemini en tient compte pour les prochains messages (cf. décision 1.5).
+  async editMessage(characterId: string, messageId: string, newText: string): Promise<ChatMessage[]> {
+    const conversation = await this.getConversation(characterId);
+    if (!conversation) {
+      return [];
+    }
+    const text = newText.trim();
+    const message = conversation.messages.find(item => item.id === messageId);
+    if (!message || !text) {
+      return conversation.messages;
+    }
+    message.text = text;
+    await this.saveConversation(conversation);
+    return conversation.messages;
+  }
+
+  // Ajoute un aparté hors-personnage (OOC) : message à part, transmis à Gemini comme
+  // instruction encapsulée (cf. buildGeminiContents), qui NE déclenche AUCUNE réponse.
+  async addOocNote(characterId: string, text: string): Promise<ChatMessage[]> {
+    const conversation = await this.getOrCreateConversation(characterId);
+    const note = text.trim();
+    if (!note) {
+      return conversation.messages;
+    }
+    conversation.messages.push({ id: crypto.randomUUID(), role: "user", kind: "ooc", text: note, at: Date.now() });
+    await this.saveConversation(conversation);
+    return conversation.messages;
   }
 
   // L'utilisateur passe son tour : on génère un message supplémentaire du modèle

@@ -11,24 +11,38 @@
 <ion-content class="chat-content">
   <div class="chat-messages">
     @for (message of messages; track message.id) {
-      <app-message-bubble
-        class="chat-bubble"
-        [message]="message"
-        [canRegenerate]="canRegenerate(message)"
-        [canDelete]="canDelete(message)"
-        [disabled]="sending"
-        (regenerate)="regenerate()"
-        (remove)="confirmDelete(message)">
-      </app-message-bubble>
+      @if (message.kind === "ooc") {
+        <div class="chat-ooc">
+          <span class="chat-ooc-tag">Hors-personnage</span>
+          <p class="chat-ooc-text">{{ message.text }}</p>
+          <div class="chat-ooc-actions">
+            <button class="chat-ooc-edit" type="button" title="Éditer" [disabled]="sending" (click)="openEdit(message)">✎</button>
+            <button class="chat-ooc-delete" type="button" title="Supprimer" [disabled]="sending" (click)="confirmDelete(message)">🗑</button>
+          </div>
+        </div>
+      } @else {
+        <app-message-bubble
+          class="chat-bubble"
+          [message]="message"
+          [canRegenerate]="canRegenerate(message)"
+          [canEdit]="canEdit(message)"
+          [canDelete]="canDelete(message)"
+          [disabled]="sending"
+          (regenerate)="regenerate()"
+          (edit)="openEdit(message)"
+          (remove)="confirmDelete(message)">
+        </app-message-bubble>
+      }
     }
     @if (sending && !regenerating) {
-      <p class="chat-typing">…</p>
+      <ion-icon class="chat-typing ai-typing-star" name="sparkles" aria-label="L'IA écrit…"></ion-icon>
     }
   </div>
 </ion-content>
 
 <footer class="chat-footer">
   <div class="chat-quick">
+    <button class="chat-ooc-add" type="button" title="Aparté hors-personnage (consigne au modèle)" (click)="openOoc()" [disabled]="sending">📝</button>
     <button class="chat-skip" type="button" title="Passer mon tour" (click)="skip()" [disabled]="sending">⏭</button>
     @if (imageEnabled) {
       <button class="chat-illustrate" type="button" title="Illustrer la scène" (click)="illustrate()" [disabled]="sending">🖼</button>
@@ -49,6 +63,25 @@
   </div>
   <div class="chat-modal-actions" modalFooter>
     <button class="modal-btn" type="button" (click)="personaModal.open = false">Fermer</button>
+  </div>
+</app-modal>
+
+<app-modal [open]="oocModal.open" title="Aparté hors-personnage" (dismiss)="oocModal.open = false">
+  <p class="chat-ooc-hint">Donne une consigne au modèle (hors récit). Elle reste dans la conversation, est prise en compte, mais ne provoque pas de réponse.</p>
+  <textarea class="chat-edit-input" name="oocText" rows="4" [(ngModel)]="oocModal.value"
+    placeholder="Ex. : Recentre l'histoire sur l'enquête ; arrête la dispute."></textarea>
+  <div class="chat-modal-actions" modalFooter>
+    <button class="modal-btn" type="button" (click)="oocModal.open = false">Annuler</button>
+    <button class="modal-btn modal-btn-primary" type="button" (click)="saveOoc()">Ajouter</button>
+  </div>
+</app-modal>
+
+<app-modal [open]="editModal.open" title="Modifier le message" (dismiss)="editModal.open = false">
+  <textarea class="chat-edit-input" name="editText" rows="6" [(ngModel)]="editModal.value"
+    placeholder="Modifie le message…"></textarea>
+  <div class="chat-modal-actions" modalFooter>
+    <button class="modal-btn" type="button" (click)="editModal.open = false">Annuler</button>
+    <button class="modal-btn modal-btn-primary" type="button" (click)="saveEdit()">Valider</button>
   </div>
 </app-modal>
 

@@ -15,6 +15,8 @@ export class MessageBubbleComponent {
   message = input.required<ChatMessage>();
   // Affiche le bouton de régénération (réservé au dernier message de l'IA).
   canRegenerate = input<boolean>(false);
+  // Affiche le bouton d'édition (masqué sur le premier message / salutation et les images).
+  canEdit = input<boolean>(false);
   // Affiche le bouton de suppression (masqué sur le premier message / salutation).
   canDelete = input<boolean>(true);
   // Grise (désactive) les boutons d'action pendant qu'une action est en cours.
@@ -25,6 +27,8 @@ export class MessageBubbleComponent {
 
   // Régénérer ce message (réponse de l'IA).
   regenerate = output<void>();
+  // Éditer ce message (ouvre une modale côté page).
+  edit = output<void>();
   // Supprimer ce message et tous les suivants.
   remove = output<void>();
 

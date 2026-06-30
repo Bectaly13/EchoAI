@@ -9,6 +9,9 @@
     @if (canRegenerate()) {
       <button class="message-bubble-regenerate" type="button" title="Régénérer" [disabled]="disabled()" (click)="regenerate.emit()">↻</button>
     }
+    @if (canEdit()) {
+      <button class="message-bubble-edit" type="button" title="Éditer" [disabled]="disabled()" (click)="edit.emit()">✎</button>
+    }
     @if (canDelete()) {
       <button class="message-bubble-delete" type="button" title="Supprimer" [disabled]="disabled()" (click)="remove.emit()">🗑</button>
     }

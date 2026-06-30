@@ -60,6 +60,24 @@
   color: var(--app-danger);
 }
 
+/* Indicateur « l'IA écrit » : étoile monochrome (type IA) qui tourne. Classe partagée
+   par /chat (indicateur de frappe) et la page /test (étude du rendu) → rendu identique.
+   Couleur monochrome via variable de thème. */
+// Pulsation organique : un tour (360°) sur ~45 % du cycle, puis pause le reste du temps.
+// La courbe `cubic-bezier(0.34, 1.56, 0.64, 1)` dépasse 100 % en fin de course (le « 1.56 »)
+// → l'étoile dépasse un peu sa position d'arrivée puis se restabilise (effet overshoot).
+@keyframes ai-typing-star-pulse {
+  0%   { transform: rotate(0deg); }
+  45%  { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ai-typing-star {
+  font-size: 22px;
+  color: var(--app-accent);
+  animation: ai-typing-star-pulse 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
 /* Bouton icône (éditer, supprimer…) : contour, taille carrée fixe, glyphe centré.
    color = texte du thème pour que les glyphes monochromes (ex. ✎) soient visibles. */
 .icon-btn {

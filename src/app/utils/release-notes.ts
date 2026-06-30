@@ -13,6 +13,14 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.5",
+    changes: [
+      "Édition de message : touche ✎ sur un message (le tien ou celui du personnage) pour corriger son texte sans tout régénérer ; pris en compte pour la suite.",
+      "Aparté hors-personnage : le bouton 📝 glisse une consigne au personnage (ton, direction de l'histoire…) qui est respectée sans casser le récit et sans déclencher de réponse.",
+      "Indicateur d'attente revisité : une étoile animée pendant que le personnage rédige."
+    ]
+  },
+  {
     version: "1.4.7",
     changes: [
       "Illustration de scène : les contextes adultes aboutissent désormais beaucoup plus souvent (formulation interne ajustée pour éviter des refus injustifiés)."

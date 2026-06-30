@@ -1,7 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, ViewWillEnter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, ViewWillEnter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { sparkles } from 'ionicons/icons';
 
 import { Character, CharacterService } from 'src/app/services/character-service';
 import { ChatMessage, ChatService } from 'src/app/services/chat-service';
@@ -20,7 +22,7 @@ import { describeApiError } from 'src/app/utils/describe-api-error';
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, FormsModule, ConfirmModalComponent, HeaderComponent, MessageBubbleComponent, ModalComponent]
+  imports: [IonContent, IonHeader, IonIcon, FormsModule, ConfirmModalComponent, HeaderComponent, MessageBubbleComponent, ModalComponent]
 })
 export class ChatPage implements ViewWillEnter {
 
@@ -44,6 +46,10 @@ export class ChatPage implements ViewWillEnter {
   imageEnabled = false;
   // Modale de sélection du persona.
   personaModal = { open: false };
+  // Modale d'édition d'un message (texte modifiable).
+  editModal = { open: false, messageId: "", value: "" };
+  // Modale d'ajout d'un aparté hors-personnage (OOC).
+  oocModal = { open: false, value: "" };
   // Modale de confirmation (réutilisée pour reset / suppression de message).
   confirmModal = { open: false, title: "", message: "", confirmLabel: "Confirmer", action: (() => {}) as () => void };
 
@@ -58,7 +64,10 @@ export class ChatPage implements ViewWillEnter {
     private personaService: PersonaService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {
+    // Icône de l'indicateur « l'IA écrit » (étoile qui tourne).
+    addIcons({ sparkles });
+  }
 
   // Charge le personnage et l'historique à partir de l'id présent dans l'URL.
   async loadConversation() {
@@ -184,6 +193,24 @@ export class ChatPage implements ViewWillEnter {
     }
   }
 
+  // Ouvre la modale d'ajout d'un aparté hors-personnage (OOC).
+  openOoc() {
+    if (!this.sending && this.character) {
+      this.oocModal = { open: true, value: "" };
+    }
+  }
+
+  // Enregistre l'aparté OOC (sans déclencher de réponse) et recharge l'historique.
+  async saveOoc() {
+    if (!this.character) {
+      return;
+    }
+    await this.chatService.addOocNote(this.character.id, this.oocModal.value);
+    this.messages = await this.chatService.getMessages(this.character.id);
+    this.oocModal.open = false;
+    this.scrollToBottom();
+  }
+
   // L'utilisateur passe son tour : laisse le personnage IA enchaîner de lui-même.
   async skip() {
     if (this.sending || !this.character) {
@@ -236,6 +263,27 @@ export class ChatPage implements ViewWillEnter {
   // action en cours se fait via [disabled], pas ici.)
   canDelete(message: ChatMessage): boolean {
     return message !== this.messages[0];
+  }
+
+  // Vrai si le message est éditable : tout message porteur de texte sauf la salutation
+  // (premier message) ; les messages-image (sans texte) ne le sont pas.
+  canEdit(message: ChatMessage): boolean {
+    return message !== this.messages[0] && !message.imageData;
+  }
+
+  // Ouvre la modale d'édition, pré-remplie avec le texte du message.
+  openEdit(message: ChatMessage) {
+    this.editModal = { open: true, messageId: message.id, value: message.text };
+  }
+
+  // Enregistre l'édition (ne régénère pas la suite ni la mémoire) et recharge l'historique.
+  async saveEdit() {
+    if (!this.character) {
+      return;
+    }
+    await this.chatService.editMessage(this.character.id, this.editModal.messageId, this.editModal.value);
+    this.messages = await this.chatService.getMessages(this.character.id);
+    this.editModal.open = false;
   }
 
   // Demande confirmation avant de réinitialiser toute la conversation.

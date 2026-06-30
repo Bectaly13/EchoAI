@@ -51,12 +51,71 @@ ion-content.chat-content {
   padding: 16px;
 }
 
+// Positionnement de l'indicateur de frappe (taille/couleur/rotation : cf. .ai-typing-star).
 .chat-typing {
   align-self: flex-start;
   margin: 0;
   padding: 6px 14px;
-  font-size: 20px;
+}
+
+// Aparté hors-personnage (OOC) : encart centré, sobre, distinct des bulles user/IA.
+.chat-ooc {
+  align-self: center;
+  width: 88%;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 1px dashed var(--app-border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.chat-ooc-tag {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--app-text-muted);
+}
+
+.chat-ooc-text {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  color: var(--app-text-muted);
+}
+
+.chat-ooc-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.chat-ooc-edit,
+.chat-ooc-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--icon-btn-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--app-text);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-ooc-edit:disabled,
+.chat-ooc-delete:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .chat-footer {
@@ -111,6 +170,21 @@ ion-content.chat-content {
   opacity: 0.5;
 }
 
+.chat-ooc-add {
+  flex: 0 0 auto;
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  padding: 10px 14px;
+  font-size: 15px;
+  background: var(--app-background);
+  color: var(--app-accent);
+  cursor: pointer;
+}
+
+.chat-ooc-add[disabled] {
+  opacity: 0.5;
+}
+
 .chat-input {
   flex: 1 1 auto;
   min-width: 0;
@@ -152,7 +226,29 @@ ion-content.chat-content {
   color: var(--app-accent);
 }
 
+.chat-ooc-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--app-text-muted);
+}
+
+.chat-edit-input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.4;
+  background: var(--app-background);
+  color: var(--app-text);
+  resize: vertical;
+}
+
 .chat-modal-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
