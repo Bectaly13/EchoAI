@@ -18,9 +18,8 @@ Il est agrémenté au fur et à mesure.
 
 ## Documentation
 
-- **`TODO.md`** (racine) et **`README.md`** (racine) doivent rester **à jour à tout moment**.
-- **`TODO.md`** : à chaque fonctionnalité avancée ou terminée, mettre à jour son état (cocher / déplacer / retirer) au fur et à mesure de l'implémentation.
-- **`README.md`** : à chaque évolution du projet (nouvelle fonctionnalité, changement d'installation, de configuration ou d'architecture), répercuter le changement dans le README.
+- **`README.md`** (racine) doit rester **à jour à tout moment** : à chaque évolution du projet (nouvelle fonctionnalité, changement d'installation, de configuration ou d'architecture), répercuter le changement dans le README.
+- Les TODO de travail vivent dans `TODOs/` (cf. Workflow) : on coche/déplace leurs points au fil de l'implémentation. Il n'y a pas de TODO « vivant » à la racine.
 
 ---
 
@@ -83,7 +82,7 @@ Trois blocs séparés par une ligne vide :
 
 ## Workflow
 
-- **Toujours démarrer un correctif ou une fonctionnalité par un TODO structuré** : un fichier `TODO_*.md` à la racine, points **ordonnés par priorité**, avec pour chacun le **constat/symptôme**, la **méthode**, les **limites** et les **questions à trancher**. On formalise (et on tranche les questions) **avant** d'implémenter, puis on coche les points au fur et à mesure.
+- **Toujours démarrer un correctif ou une fonctionnalité par un TODO structuré** : un fichier `TODO_*.md` dans le dossier `TODOs/`, points **ordonnés par priorité**, avec pour chacun le **constat/symptôme**, la **méthode**, les **limites** et les **questions à trancher**. On formalise (et on tranche les questions) **avant** d'implémenter, puis on coche les points au fur et à mesure.
 - **Nommage des TODO** : pour une version, `TODO_vX_Y.md` (ex. `TODO_v1_1.md`) ; les autres chantiers gardent un nom descriptif (`TODO_STYLE.md`, `TODO_UI.md`…). Préfixer les versions par `v` pour éviter les conflits de noms.
 - **Implémentation** : un point à la fois, en vérifiant `npx tsc --noEmit -p tsconfig.app.json` + `npm run lint` (+ `npm run build` pour un changement SCSS ou de structure) après chaque point.
 
