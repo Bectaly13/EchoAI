@@ -13,6 +13,16 @@ export interface ReleaseNote {
 // Ordre d'affichage : la plus récente en premier.
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: "1.6",
+    changes: [
+      "Génération d'images réparée : les illustrations et photos de profil fonctionnent de nouveau (un paramètre n'était plus accepté par le service d'images).",
+      "Réponses des personnages beaucoup plus fiables : modèles Gemini mis à jour et repli automatique élargi (surcharge, modèle retiré…) — fini les « échec de génération » à répétition.",
+      "Nouveau champ « Ton rôle » sur la fiche personnage : ta place dans l'histoire y est désormais conservée (remplie automatiquement lors de la création par IA) et prise en compte à chaque message.",
+      "Apparence générée par l'IA recentrée sur le physique uniquement (plus de tenue imposée sur la fiche).",
+      "Chargement des grandes listes (personnages, conversations) nettement accéléré."
+    ]
+  },
+  {
     version: "1.5",
     changes: [
       "Édition de message : touche ✎ sur un message (le tien ou celui du personnage) pour corriger son texte sans tout régénérer ; pris en compte pour la suite.",

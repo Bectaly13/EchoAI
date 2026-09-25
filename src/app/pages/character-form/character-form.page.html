@@ -14,9 +14,9 @@
         <textarea class="character-form-textarea" id="brief" name="brief" rows="3"
           [(ngModel)]="brief"
           placeholder="Décris ton idée en quelques mots ; l'IA en fera une fiche complète, que tu pourras retoucher."></textarea>
-        <label class="character-form-label" for="userRole">Ton rôle dans l'histoire (optionnel)</label>
-        <textarea class="character-form-textarea" id="userRole" name="userRole" rows="3"
-          [(ngModel)]="userRole"
+        <label class="character-form-label" for="userRoleBrief">Ton rôle dans l'histoire (optionnel)</label>
+        <textarea class="character-form-textarea" id="userRoleBrief" name="userRoleBrief" rows="3"
+          [(ngModel)]="userRoleBrief"
           placeholder="Décris-toi pour situer ta relation au personnage."></textarea>
         <button class="character-form-generate" type="button"
           (click)="generateDraft()" [disabled]="generating || !brief.trim()">
@@ -70,12 +70,17 @@
     <label class="character-form-label" for="appearance">Apparence</label>
     <textarea class="character-form-textarea" id="appearance" name="appearance" rows="3"
       [(ngModel)]="appearance"
-      placeholder="Physique : cheveux, yeux, taille, corpulence, traits… (vêtements en secondaire)."></textarea>
+      placeholder="Physique uniquement : cheveux, yeux, taille, corpulence, traits du visage…"></textarea>
 
     <label class="character-form-label" for="initialRelationship">Relation initiale avec toi</label>
     <textarea class="character-form-textarea" id="initialRelationship" name="initialRelationship" rows="3"
       [(ngModel)]="initialRelationship"
       placeholder="Comment vous vous connaissez au début de l'histoire."></textarea>
+
+    <label class="character-form-label" for="userRole">Ton rôle</label>
+    <textarea class="character-form-textarea" id="userRole" name="userRole" rows="3"
+      [(ngModel)]="userRole"
+      placeholder="Ton rôle et ta place dans l'histoire, vis-à-vis du personnage."></textarea>
 
     <label class="character-form-label" for="preferences">Goûts et préférences</label>
     <textarea class="character-form-textarea" id="preferences" name="preferences" rows="3"

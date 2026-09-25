@@ -61,23 +61,26 @@ export class GeminiService {
   // Lève si tous les modèles échouent ou en cas d'erreur non liée au quota.
   async generate(systemPrompt: string, contents: any[]): Promise<GeminiTextResult> {
     const exhausted: string[] = [];
-    return await this.withFallback(environment.GEMINI_MODELS.map(model => model.id), exhausted, async model => {
+    return await this.withFallback(environment.GEMINI_MODELS, exhausted, async model => {
       const body = {
         // La personnalité du personnage est passée comme instruction système.
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: contents,
-        safetySettings: SAFETY_SETTINGS
+        safetySettings: SAFETY_SETTINGS,
+        // Budget de « réflexion » propre au modèle (0 = thinking désactivé). Un thinking
+        // implicite provoquait de fréquents 503 sur les modèles 3.x et alourdissait les réponses.
+        generationConfig: { thinkingConfig: { thinkingBudget: model.thinkingBudget } }
       };
-      const response = await this.post(`${model}:generateContent`, body);
+      const response = await this.post(`${model.id}:generateContent`, body);
       const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
       // Trace les métadonnées quand le texte est vide (blocage finishReason/safety, part
       // secondaire…) : aide au diagnostic des re-tirages déclenchés en amont par ChatService.
       if (!text.trim()) {
-        this.logEmptyResponse(model, response);
+        this.logEmptyResponse(model.id, response);
       }
       return {
         text: text,
-        model: model,
+        model: model.id,
         usage: this.parseUsage(response?.usageMetadata),
         exhausted: [...exhausted]
       };
@@ -89,17 +92,19 @@ export class GeminiService {
   // le modèle utilisé et l'usage, pour que l'appelant comptabilise la requête.
   async generateStructured(prompt: string, responseSchema: any): Promise<GeminiStructuredResult> {
     const exhausted: string[] = [];
-    return await this.withFallback(environment.GEMINI_MODELS.map(model => model.id), exhausted, async model => {
+    return await this.withFallback(environment.GEMINI_MODELS, exhausted, async model => {
       const body = {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         // Force le modèle à répondre par du JSON respectant le schéma fourni.
         generationConfig: {
           responseMimeType: "application/json",
-          responseSchema: responseSchema
+          responseSchema: responseSchema,
+          // Budget de réflexion propre au modèle (cf. generate).
+          thinkingConfig: { thinkingBudget: model.thinkingBudget }
         },
         safetySettings: SAFETY_SETTINGS
       };
-      const response = await this.post(`${model}:generateContent`, body);
+      const response = await this.post(`${model.id}:generateContent`, body);
       const text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
       let data: any = null;
       try {
@@ -109,7 +114,7 @@ export class GeminiService {
       }
       return {
         data: data,
-        model: model,
+        model: model.id,
         usage: this.parseUsage(response?.usageMetadata),
         exhausted: [...exhausted]
       };
@@ -138,10 +143,13 @@ export class GeminiService {
     });
   }
 
-  // Boucle de repli : essaie chaque modèle dans l'ordre via `call`. Sur 429, ajoute
-  // le modèle à `exhausted` et tente le suivant ; toute autre erreur est remontée.
-  // Lève la dernière erreur si tous les modèles sont épuisés.
-  private async withFallback<T>(models: string[], exhausted: string[], call: (model: string) => Promise<T>): Promise<T> {
+  // Boucle de repli : essaie chaque modèle dans l'ordre via `call`. On passe au modèle
+  // suivant quand l'échec est propre au modèle courant : quota épuisé (429), surcharge
+  // temporaire (503) ou modèle retiré (404). Seul le 429 marque le modèle « épuisé »
+  // (suivi UsageService) ; 503/404 sont transitoires/structurels, pas des dépassements
+  // de quota. Toute autre erreur (config : 400/401/403…) est remontée immédiatement, car
+  // tenter les autres modèles n'y changerait rien. Lève la dernière erreur si tous échouent.
+  private async withFallback<T>(models: { id: string; thinkingBudget: number }[], exhausted: string[], call: (model: { id: string; thinkingBudget: number }) => Promise<T>): Promise<T> {
     let lastError: unknown;
     for (const model of models) {
       try {
@@ -149,10 +157,13 @@ export class GeminiService {
       } catch (error) {
         lastError = error;
         if (error instanceof HttpErrorResponse && error.status === 429) {
-          exhausted.push(model);
+          exhausted.push(model.id);
           continue;
         }
-        // Erreur non liée au quota → inutile de tenter les autres modèles.
+        if (error instanceof HttpErrorResponse && (error.status === 503 || error.status === 404)) {
+          continue;
+        }
+        // Erreur non récupérable par un autre modèle → inutile de poursuivre.
         throw error;
       }
     }

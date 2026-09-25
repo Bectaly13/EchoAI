@@ -1,16 +1,16 @@
 // Construit l'instruction envoyée à l'IA pour transformer un brouillon libre
 // en fiche de personnage structurée (remplit les champs du formulaire de création).
 // Le résultat attendu est un JSON conforme à CHARACTER_DRAFT_SCHEMA.
-export function buildDraftPrompt(brief: string, userRole: string): string {
-  const role = userRole.trim();
-  // Section optionnelle décrivant {user} : sert UNIQUEMENT à désambiguïser l'utilisateur
-  // du personnage à créer (le modèle bâtissait parfois le personnage à partir de la
-  // description de l'utilisateur). Vide → prompt identique à avant.
+export function buildDraftPrompt(brief: string, userRoleBrief: string): string {
+  const role = userRoleBrief.trim();
+  // Section optionnelle décrivant {user} : sert à désambiguïser l'utilisateur du personnage
+  // à créer (le modèle bâtissait parfois le personnage à partir de la description de
+  // l'utilisateur), et à alimenter le champ "userRole". Vide → prompt identique à avant.
   const userSection = role
     ? [
         "",
         `L'utilisateur (désigné par {user}) se décrit ainsi : « ${role} ».`,
-        "ATTENTION : ce texte décrit l'UTILISATEUR, PAS le personnage à créer. Ne bâtis JAMAIS le personnage à partir de ces informations (le personnage est uniquement le sujet du brouillon ci-dessous). Sers-t'en seulement pour situer la relation (champ \"initialRelationship\" et mentions de {user})."
+        "ATTENTION : ce texte décrit l'UTILISATEUR, PAS le personnage à créer. Ne bâtis JAMAIS le personnage à partir de ces informations (le personnage est uniquement le sujet du brouillon ci-dessous). Sers-t'en pour situer la relation (champ \"initialRelationship\" et mentions de {user}) et pour rédiger le champ \"userRole\" (reformule proprement le rôle / la place de {user} dans l'histoire)."
       ]
     : [];
   return [
@@ -25,10 +25,11 @@ export function buildDraftPrompt(brief: string, userRole: string): string {
     "Champ par champ :",
     "- \"systemPrompt\" : la personnalité, le tempérament, les valeurs et ce que sait le personnage (rédigé à la 3ᵉ personne, comme des instructions de jeu de rôle).",
     "- \"speechStyle\" : la façon de parler — registre de langue, tics de langage, accent, ton.",
-    "- \"appearance\" : décris D'ABORD le physique (couleur de cheveux et d'yeux, taille, corpulence, traits du visage, âge apparent…). Les vêtements et accessoires ne viennent qu'APRÈS et brièvement ; l'attitude/le caractère ne vont PAS ici (ils relèvent de la personnalité).",
+    "- \"appearance\" : décris uniquement le physique du personnage — couleur de cheveux et d'yeux, coiffure, taille, corpulence, carnation, traits du visage, signes particuliers, âge apparent. Reste concis.",
     "- \"age\" : l'âge du personnage (un nombre d'années, ou une tranche pour un être non humain). Le personnage est TOUJOURS un adulte majeur — n'indique jamais un âge de mineur.",
     "- \"background\" : l'histoire et le passé du personnage (origines, événements marquants de sa vie).",
     "- \"setting\" : l'univers / le cadre où se déroule l'histoire (monde, époque, lieu).",
+    "- \"userRole\" : le rôle et la place de {user} dans l'histoire (qui il est vis-à-vis du personnage, sa fonction dans le récit), reformulé proprement à partir de la description de l'utilisateur si elle est fournie. Laisse vide si aucune information sur l'utilisateur n'est fournie.",
     "- \"preferences\" : ce que le personnage aime ET ce qu'il n'aime pas, réunis dans un seul champ.",
     "- \"knownCharacters\" : une LISTE de personnages secondaires NOMMÉS, un par ligne, chacun avec son nom + sa fonction + sa relation au personnage. Exemple : \"- Lana, meilleure amie\\n- Mme Dubois, professeure de chimie\\n- M. Durand, proviseur\". INTERDIT de te contenter d'ensembles génériques non nommés (ex. « les autres élèves, les professeurs ») : il faut de vrais noms pour fonder un socle stable (sinon un personnage risque de changer de nom au fil de l'histoire).",
     "- \"greeting\" : le message d'ouverture qui plante le décor. Il DOIT suivre le format des messages : les répliques sont préfixées par le nom de celui qui parle puis mises entre guillemets droits — pour le personnage principal, utilise la balise (ex. : {char} : \"Bonjour\") ; la narration (actions, lieux, ambiance) est écrite à la 3ᵉ personne, comme un narrateur, entre astérisques et en dehors des guillemets (ex. : *La nuit tombe sur le port.*). Dans la narration, désigne l'utilisateur par « tu » ; un personnage peut aussi le nommer via {user}. Passe RÉELLEMENT à la ligne (insère un vrai saut de ligne \\n) entre la narration et une réplique, et entre deux répliques — n'enchaîne jamais narration et dialogue sur la même ligne. Exemple exact du format attendu (chaque élément sur sa propre ligne) :\n*La nuit tombe sur le port ; une silhouette s'avance.*\n{char} : \"Te voilà enfin.\"\nLana : \"On t'attendait.\"\nLa salutation peut faire intervenir des personnages secondaires (qui parlent et agissent), pas seulement le personnage principal, pour planter un décor vivant. Reste concis : chaque paragraphe de narration fait 1 à 2 phrases courtes au maximum, et au plus 2 paragraphes de narration (ces limites ne concernent que la narration, pas les dialogues).",
@@ -52,6 +53,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     background: { type: "string" },
     setting: { type: "string" },
     initialRelationship: { type: "string" },
+    userRole: { type: "string" },
     preferences: { type: "string" },
     knownCharacters: { type: "string" },
     greeting: { type: "string" }
@@ -64,6 +66,7 @@ export const CHARACTER_DRAFT_SCHEMA = {
     "age",
     "appearance",
     "initialRelationship",
+    "userRole",
     "preferences",
     "background",
     "setting",

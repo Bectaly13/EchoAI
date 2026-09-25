@@ -16,11 +16,11 @@ export class VersionHandlerService {
   // de format, en ajoutant la migration updateToVx() correspondante. Sert à garantir
   // qu'un utilisateur d'une version antérieure récupère des données au bon format.
   // Indépendante de la version affichée ci-dessous.
-  private readonly appVersion = 4;
+  private readonly appVersion = 5;
   // Version **commerciale**, destinée à l'utilisateur (illustre l'ampleur des mises
   // à jour). Sans rapport avec appVersion. Reste « 1.0 » jusqu'à la finalisation de
   // l'app et les premiers tests utilisateur.
-  readonly appVersionDisplay = "1.5";
+  readonly appVersionDisplay = "1.6";
 
   constructor(
     private storage: StorageService,
@@ -56,6 +56,9 @@ export class VersionHandlerService {
     }
     if (userVersion < 4) {
       await this.updateToV4();
+    }
+    if (userVersion < 5) {
+      await this.updateToV5();
     }
     await this.storage.set("version", this.appVersion);
   }
@@ -99,6 +102,19 @@ export class VersionHandlerService {
       }
       delete character.likes;
       delete character.dislikes;
+    }
+    await this.database.update(db);
+  }
+
+  // Migration v4 → v5 : ajout du champ "userRole" (rôle de {user} dans l'histoire) sur
+  // chaque personnage. Initialisé à chaîne vide pour les personnages existants.
+  private async updateToV5(): Promise<void> {
+    const db = await this.database.get();
+    const characters = db.characters || [];
+    for (const character of characters) {
+      if (character.userRole === undefined) {
+        character.userRole = "";
+      }
     }
     await this.database.update(db);
   }

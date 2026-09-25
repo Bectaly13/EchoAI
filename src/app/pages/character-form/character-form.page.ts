@@ -23,9 +23,10 @@ export class CharacterFormPage implements ViewWillEnter {
   characterId = "";
   // Brouillon libre pour la génération assistée par IA, et état d'attente associé.
   brief = "";
-  // Rôle de l'utilisateur dans l'histoire (transitoire, aide à la génération) : sert à
-  // désambiguïser {user} du personnage à créer. Non persisté sur le personnage.
-  userRole = "";
+  // Brouillon décrivant l'utilisateur (transitoire, aide à la génération) : sert à
+  // désambiguïser {user} du personnage et à rédiger le champ persistant userRole.
+  // Non persisté tel quel (jeté après génération, comme `brief`).
+  userRoleBrief = "";
   generating = false;
   name = "";
   systemPrompt = "";
@@ -38,6 +39,8 @@ export class CharacterFormPage implements ViewWillEnter {
   appearance = "";
   age = "";
   initialRelationship = "";
+  // Rôle / place de {user} dans l'histoire (persistant, éditable, envoyé à l'IA).
+  userRole = "";
   preferences = "";
   knownCharacters = "";
   // Photo de profil générée (data URL base64) et état d'attente associé.
@@ -64,7 +67,7 @@ export class CharacterFormPage implements ViewWillEnter {
   resetForm() {
     this.characterId = "";
     this.brief = "";
-    this.userRole = "";
+    this.userRoleBrief = "";
     this.generating = false;
     this.name = "";
     this.systemPrompt = "";
@@ -75,6 +78,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.appearance = "";
     this.age = "";
     this.initialRelationship = "";
+    this.userRole = "";
     this.preferences = "";
     this.knownCharacters = "";
     this.avatarImage = "";
@@ -103,6 +107,7 @@ export class CharacterFormPage implements ViewWillEnter {
     this.appearance = character.appearance ?? "";
     this.age = character.age ?? "";
     this.initialRelationship = character.initialRelationship ?? "";
+    this.userRole = character.userRole ?? "";
     this.preferences = character.preferences ?? "";
     this.knownCharacters = character.knownCharacters ?? "";
     this.avatarImage = character.avatarImage ?? "";
@@ -120,7 +125,7 @@ export class CharacterFormPage implements ViewWillEnter {
     }
     this.generating = true;
     try {
-      const draft = await this.characterService.draftFromBrief(brief, this.userRole);
+      const draft = await this.characterService.draftFromBrief(brief, this.userRoleBrief);
       this.name = draft.name;
       this.systemPrompt = draft.systemPrompt;
       this.greeting = draft.greeting ?? "";
@@ -130,6 +135,7 @@ export class CharacterFormPage implements ViewWillEnter {
       this.appearance = draft.appearance ?? "";
       this.age = draft.age ?? "";
       this.initialRelationship = draft.initialRelationship ?? "";
+      this.userRole = draft.userRole ?? "";
       this.preferences = draft.preferences ?? "";
       this.knownCharacters = draft.knownCharacters ?? "";
     } catch (error) {
@@ -194,6 +200,7 @@ export class CharacterFormPage implements ViewWillEnter {
       appearance: this.appearance.trim(),
       age: this.age.trim(),
       initialRelationship: this.initialRelationship.trim(),
+      userRole: this.userRole.trim(),
       preferences: this.preferences.trim(),
       knownCharacters: this.knownCharacters.trim(),
       avatarImage: this.avatarImage

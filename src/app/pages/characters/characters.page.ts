@@ -67,10 +67,16 @@ export class CharactersPage implements ViewWillEnter {
   // le persona de sa conversation s'il en existe une, sinon le persona par défaut
   // (getActivePersonaId assure déjà ce repli).
   private async resolveUserNames(characters: Character[]): Promise<Record<string, string>> {
+    // Chargements groupés (indépendants du nombre de personnages) : personas actifs par
+    // conversation, tous les personas indexés par id, et le persona par défaut (repli).
+    const activePersonaIds = await this.chatService.getActivePersonaIdsByCharacter();
+    const personas = await this.personaService.list();
+    const defaultPersona = await this.personaService.getDefault();
+    const personaById = new Map(personas.map(persona => [persona.id, persona]));
     const names: Record<string, string> = {};
     for (const character of characters) {
-      const personaId = await this.chatService.getActivePersonaId(character.id);
-      const persona = personaId ? await this.personaService.get(personaId) : undefined;
+      const personaId = activePersonaIds[character.id];
+      const persona = (personaId ? personaById.get(personaId) : undefined) ?? defaultPersona;
       names[character.id] = persona?.name ?? "";
     }
     return names;

@@ -15,14 +15,16 @@ export interface ImageResult {
 // On garde une marge de sécurité sous la limite stricte.
 const MAX_PROMPT_LENGTH = 2000;
 
-// Génération en 512×512 (1 tuile) avec 4 steps. Coût estimé en neurons Cloudflare
-// pour flux-1-schnell : 9,60 neurons/step + 4,80 neurons/tuile 512×512.
-const IMAGE_SIZE = 512;
+// La résolution n'est plus paramétrable : l'API refuse désormais width/height (erreur
+// 5006 « Additional properties not allowed »). Le modèle impose du 1024×1024, soit
+// 4 tuiles de 512×512. Coût estimé en neurons Cloudflare pour flux-1-schnell :
+// 9,60 neurons/step + 4,80 neurons/tuile 512×512.
 const IMAGE_STEPS = 4;
+const IMAGE_TILES = 4;
 const NEURONS_PER_STEP = 9.6;
 const NEURONS_PER_TILE = 4.8;
-// 1 tuile car 512×512 → 4 × 9,60 + 1 × 4,80 = 43,2 neurons par image.
-const NEURONS_PER_IMAGE = IMAGE_STEPS * NEURONS_PER_STEP + NEURONS_PER_TILE;
+// 4 × 9,60 (steps) + 4 × 4,80 (tuiles) = 57,6 neurons par image (1024×1024).
+const NEURONS_PER_IMAGE = IMAGE_STEPS * NEURONS_PER_STEP + IMAGE_TILES * NEURONS_PER_TILE;
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +53,7 @@ export class ImageService {
         "Authorization": `Bearer ${environment.CLOUDFLARE_API_TOKEN}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ prompt: safePrompt, steps: IMAGE_STEPS, width: IMAGE_SIZE, height: IMAGE_SIZE })
+      body: JSON.stringify({ prompt: safePrompt, steps: IMAGE_STEPS })
     });
 
     if (!response.ok) {

@@ -123,9 +123,12 @@ export class ChatService {
   // conversations dont le personnage a été supprimé sont ignorées.
   async listConversations(): Promise<ConversationSummary[]> {
     const conversations: Conversation[] = (await this.database.getTable("conversations")) || [];
+    // Un seul chargement des personnages, indexés par id : évite une relecture complète
+    // de la db par conversation (coûteux quand la liste est longue).
+    const charactersById = await this.charactersById();
     const summaries: ConversationSummary[] = [];
     for (const conversation of conversations) {
-      const character = await this.characterService.get(conversation.characterId);
+      const character = charactersById.get(conversation.characterId);
       if (!character) {
         continue;
       }
@@ -147,12 +150,14 @@ export class ChatService {
   // (pour informer, à l'édition d'un persona, où il est actif).
   async conversationsUsingPersona(personaId: string): Promise<PersonaUsage[]> {
     const conversations: Conversation[] = (await this.database.getTable("conversations")) || [];
+    // Personnages indexés une seule fois (cf. listConversations).
+    const charactersById = await this.charactersById();
     const usages: PersonaUsage[] = [];
     for (const conversation of conversations) {
       if (conversation.personaId !== personaId) {
         continue;
       }
-      const character = await this.characterService.get(conversation.characterId);
+      const character = charactersById.get(conversation.characterId);
       if (character) {
         usages.push({
           characterName: character.name,
@@ -397,6 +402,21 @@ export class ChatService {
     return (await this.personaService.getDefault())?.id;
   }
 
+  // Version « en masse » de getActivePersonaId : renvoie, pour chaque conversation ayant
+  // un persona explicite, l'id de ce persona (indexé par characterId), en une seule lecture.
+  // Les personnages absents de la map n'ont pas de persona explicite → l'appelant retombe
+  // sur le persona par défaut. Évite N lectures quand une page résout tous les personnages.
+  async getActivePersonaIdsByCharacter(): Promise<Record<string, string>> {
+    const conversations: Conversation[] = (await this.database.getTable("conversations")) || [];
+    const result: Record<string, string> = {};
+    for (const conversation of conversations) {
+      if (conversation.personaId) {
+        result[conversation.characterId] = conversation.personaId;
+      }
+    }
+    return result;
+  }
+
   // Définit le persona incarné dans la conversation (undefined pour « aucun »).
   async setActivePersona(characterId: string, personaId: string | undefined): Promise<void> {
     await this.getOrCreateConversation(characterId);
@@ -575,6 +595,13 @@ export class ChatService {
 
   private async getConversation(characterId: string): Promise<Conversation | undefined> {
     return await this.database.getEntryWith("conversations", "characterId", characterId);
+  }
+
+  // Charge tous les personnages une seule fois, indexés par id. Utilisé par les listes
+  // pour résoudre le personnage de chaque conversation sans relire la db à chaque item.
+  private async charactersById(): Promise<Map<string, Character>> {
+    const characters: Character[] = (await this.database.getTable("characters")) || [];
+    return new Map(characters.map(character => [character.id, character]));
   }
 
   // Renvoie la conversation du personnage, en la créant (avec sa salutation) si besoin.

@@ -24,6 +24,7 @@ export interface Character {
   appearance?: string;            // apparence physique
   age?: string;                   // âge (texte libre ; un adulte par défaut)
   initialRelationship?: string;   // relation initiale avec l'utilisateur
+  userRole?: string;              // rôle / place de {user} dans l'histoire
   preferences?: string;           // goûts et préférences (ce qu'il aime ou non)
   knownCharacters?: string;       // autres personnages qu'il connaît
   // Photo de profil générée par l'IA, stockée en data URL base64. Optionnelle :
@@ -37,7 +38,7 @@ export interface Character {
 // Champs éditables d'un personnage (saisis dans le formulaire de création/édition).
 export type CharacterDraft = Pick<
   Character,
-  "name" | "systemPrompt" | "greeting" | "setting" | "speechStyle" | "background" | "appearance" | "age" | "initialRelationship" | "preferences" | "knownCharacters" | "avatarImage"
+  "name" | "systemPrompt" | "greeting" | "setting" | "speechStyle" | "background" | "appearance" | "age" | "initialRelationship" | "userRole" | "preferences" | "knownCharacters" | "avatarImage"
 >;
 
 @Injectable({
@@ -79,12 +80,12 @@ export class CharacterService {
   // Génère une fiche de personnage structurée à partir d'un brouillon libre.
   // Renvoie les champs éditables à pré-remplir dans le formulaire (résultat
   // toujours retouchable par l'utilisateur). Retombe sur un mock sans clé API.
-  async draftFromBrief(brief: string, userRole: string): Promise<CharacterDraft> {
+  async draftFromBrief(brief: string, userRoleBrief: string): Promise<CharacterDraft> {
     const text = brief.trim();
     if (!this.gemini.hasApiKey()) {
       return this.mockDraft(text);
     }
-    const result = await this.gemini.generateStructured(buildDraftPrompt(text, userRole), CHARACTER_DRAFT_SCHEMA);
+    const result = await this.gemini.generateStructured(buildDraftPrompt(text, userRoleBrief), CHARACTER_DRAFT_SCHEMA);
     // Comptabilise cet appel (auparavant non suivi) dans le suivi d'utilisation.
     await this.usage.recordText(result);
     return this.normalizeDraft(result.data);
@@ -103,6 +104,7 @@ export class CharacterService {
       appearance: value("appearance"),
       age: value("age"),
       initialRelationship: value("initialRelationship"),
+      userRole: value("userRole"),
       preferences: value("preferences"),
       knownCharacters: value("knownCharacters")
     };
@@ -120,6 +122,7 @@ export class CharacterService {
       appearance: "",
       age: "",
       initialRelationship: "",
+      userRole: "",
       preferences: "",
       knownCharacters: ""
     };

@@ -30,8 +30,9 @@ export function buildSystemPrompt(options: BuildSystemPromptOptions): string {
 
   blocks.push(buildCharacterBlock(options.character));
   blocks.push(buildContentPolicyBlock());
-  if (options.persona) {
-    blocks.push(buildPersonaBlock(options.persona));
+  // Bloc utilisateur : rendu dès qu'on a un persona OU un rôle défini sur le personnage.
+  if (options.persona || options.character.userRole?.trim()) {
+    blocks.push(buildUserBlock(options.persona, options.character.userRole));
   }
   if (options.memory && options.memory.length > 0) {
     blocks.push(buildMemoryBlock(options.memory));
@@ -58,31 +59,37 @@ function buildContentPolicyBlock(): string {
   ].join("\n");
 }
 
-// Bloc décrivant le persona incarné par l'utilisateur (qui il est).
-function buildPersonaBlock(persona: Persona): string {
-  const lines = [
-    "UTILISATEUR (PERSONA)",
-    `L'utilisateur incarne « ${persona.name} ». Tiens-en compte dans tes réponses et adresse-toi à lui en conséquence.`
-  ];
-  const gender = personaGenderPhrase(persona.gender);
-  if (gender) {
-    lines.push(`L'utilisateur est ${gender}.`);
+// Bloc décrivant l'utilisateur : le persona qu'il incarne (qui il est) et, le cas
+// échéant, le rôle que le personnage lui assigne dans l'histoire (userRole).
+function buildUserBlock(persona: Persona | undefined, userRole: string | undefined): string {
+  const lines = ["UTILISATEUR (PERSONA)"];
+  if (persona) {
+    lines.push(`L'utilisateur incarne « ${persona.name} ». Tiens-en compte dans tes réponses et adresse-toi à lui en conséquence.`);
+    const gender = personaGenderPhrase(persona.gender);
+    if (gender) {
+      lines.push(`L'utilisateur est ${gender}.`);
+    }
+    const age = persona.age?.trim();
+    if (age) {
+      // L'âge renforce le cadre « adulte » et la cohérence ; on rappelle le statut majeur.
+      lines.push(`L'utilisateur est un adulte majeur (âge : ${age}).`);
+    }
+    const description = persona.description.trim();
+    if (description) {
+      // Cadré : la description est rédigée par l'utilisateur (« je »/« il »/« elle »…). Ce
+      // préfixe évite que le modèle l'attribue au personnage qu'il incarne.
+      lines.push(`L'utilisateur se décrit ainsi : « ${description} »`);
+    }
+    const appearance = persona.appearance?.trim();
+    if (appearance) {
+      // Apparence physique de l'utilisateur, à garder cohérente sur la durée.
+      lines.push(`L'utilisateur a l'apparence physique suivante : « ${appearance} »`);
+    }
   }
-  const age = persona.age?.trim();
-  if (age) {
-    // L'âge renforce le cadre « adulte » et la cohérence ; on rappelle le statut majeur.
-    lines.push(`L'utilisateur est un adulte majeur (âge : ${age}).`);
-  }
-  const description = persona.description.trim();
-  if (description) {
-    // Cadré : la description est rédigée par l'utilisateur (« je »/« il »/« elle »…). Ce
-    // préfixe évite que le modèle l'attribue au personnage qu'il incarne.
-    lines.push(`L'utilisateur se décrit ainsi : « ${description} »`);
-  }
-  const appearance = persona.appearance?.trim();
-  if (appearance) {
-    // Apparence physique de l'utilisateur, à garder cohérente sur la durée.
-    lines.push(`L'utilisateur a l'apparence physique suivante : « ${appearance} »`);
+  const role = userRole?.trim();
+  if (role) {
+    // Rôle / place de l'utilisateur dans l'histoire, défini sur la fiche du personnage.
+    lines.push(`Rôle de l'utilisateur dans l'histoire : ${role}`);
   }
   return lines.join("\n");
 }
